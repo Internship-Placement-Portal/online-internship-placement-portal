@@ -1,5 +1,21 @@
-require('dotenv').config();
+const config = require('./config/env');
+const logger = require('./utils/logger');
+const { connectDb } = require('./config/db');
 const app = require('./app');
 
-const port = process.env.PORT || 5000;
-app.listen(port, () => console.log(`IPP API listening on port ${port}`));
+async function start() {
+  await connectDb();
+  const server = app.listen(config.port, () => logger.info(`IPP API listening on port ${config.port}`));
+
+  const shutdown = (signal) => {
+    logger.info(`${signal} received, shutting down`);
+    server.close(() => process.exit(0));
+  };
+  process.on('SIGINT', () => shutdown('SIGINT'));
+  process.on('SIGTERM', () => shutdown('SIGTERM'));
+}
+
+start().catch((err) => {
+  logger.error('Failed to start server', { error: err.message });
+  process.exit(1);
+});
