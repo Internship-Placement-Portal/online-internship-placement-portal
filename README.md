@@ -345,3 +345,9 @@ npm run dev               # http://localhost:5173
 ```
 
 > Aptitude-test scoring currently runs inside the Node API (`ScoringService`). The Python/Flask microservice from the SAD can be swapped in later behind the same service interface.
+
+### Milestone 1 notes (auth + RBAC)
+
+- Create the admin account once: `cd server && npm run seed:admin` (uses `ADMIN_EMAIL` / `ADMIN_PASSWORD` from `server/.env`).
+- Registration needs an email OTP. In development the OTP is printed in the server terminal (`MAIL_TRANSPORT=console`); this transport is refused in production.
+- Run server tests: `cd server && npm test` (uses an in-memory MongoDB, first run downloads a mongod binary).

@@ -7,7 +7,7 @@ const password = Joi.string()
   .pattern(/[A-Za-z]/, 'letter')
   .pattern(/\d/, 'digit')
   .messages({ 'string.pattern.name': 'password must contain at least one letter and one digit' });
-const email = Joi.string().trim().lowercase().email().max(254);
+const email = Joi.string().trim().lowercase().email({ tlds: { allow: false } }).max(254);
 
 const register = Joi.object({
   name: Joi.string().trim().min(2).max(100).required(),
