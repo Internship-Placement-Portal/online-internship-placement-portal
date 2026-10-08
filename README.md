@@ -314,3 +314,34 @@ The project documentation consists of:
 - **Software Requirements Specification (SRS) v1.0**
 - **Software Test Plan (STP) v1.0**
 - **Software Architecture and Design Specification (SAD) v1.0**
+
+---
+
+# 8. How to Run
+
+See [PLAN.md](PLAN.md) for the implementation plan, folder structure, schemas and API routes.
+
+### Prerequisites
+
+- Node.js 18+ and npm
+- MongoDB (local instance, Docker, or a MongoDB Atlas connection string)
+
+### Server (`server/`)
+
+```bash
+cd server
+cp .env.example .env      # then edit MONGODB_URI and JWT_ACCESS_SECRET
+npm install
+npm run dev               # http://localhost:5000  (GET /health -> ok)
+```
+
+### Client (`client/`)
+
+```bash
+cd client
+cp .env.example .env      # VITE_API_URL defaults to http://localhost:5000/api
+npm install
+npm run dev               # http://localhost:5173
+```
+
+> Aptitude-test scoring currently runs inside the Node API (`ScoringService`). The Python/Flask microservice from the SAD can be swapped in later behind the same service interface.
