@@ -1,16 +1,53 @@
+const nodemailer = require('nodemailer');
 const config = require('../config/env');
 const logger = require('../utils/logger');
 
-// Pluggable transport (SRS 3.3). Swap in SMTP/SendGrid later without touching callers.
-// "console" is a development-only convenience (blocked in production by config/env.js) so the
-// OTP can be read from the terminal. "memory" is used by tests.
+// Pluggable transport (SRS 3.3), selected by MAIL_TRANSPORT:
+//   smtp    real delivery through any SMTP provider (SMTP_HOST/PORT/USER/PASS/SECURE, MAIL_FROM). Default when SMTP_HOST is set.
+//   console development fallback: prints the mail (incl. OTPs and reset links) to the server console. Blocked in production.
+//   memory  collects mails in `outbox` (tests).
+// In development, if SMTP delivery fails the mail is ALSO printed to the console so sign-up flows never get stuck.
 const outbox = [];
+let transporter = null;
+
+const getTransporter = () => {
+  if (!transporter) {
+    transporter = nodemailer.createTransport({
+      host: config.smtp.host,
+      port: config.smtp.port,
+      secure: config.smtp.secure, // true = implicit TLS (port 465); false = STARTTLS upgrade when offered
+      requireTLS: config.isProd, // never send credentials or mail over plaintext in production (SR-001)
+      auth: config.smtp.user ? { user: config.smtp.user, pass: config.smtp.pass } : undefined,
+      tls: { minVersion: 'TLSv1.2' },
+      connectionTimeout: 10000,
+      greetingTimeout: 10000,
+      socketTimeout: 15000,
+    });
+  }
+  return transporter;
+};
+// Test seam: inject a fake transporter (anything with sendMail()).
+const setTransporter = (t) => {
+  transporter = t;
+};
+
+const printToConsole = ({ to, subject, text }) => {
+  // eslint-disable-next-line no-console
+  console.log(`\n--- DEV MAIL ---\nTo: ${to}\nSubject: ${subject}\n${text}\n----------------\n`);
+};
 
 async function send({ to, subject, text }) {
   switch (config.mailTransport) {
+    case 'smtp':
+      try {
+        await getTransporter().sendMail({ from: config.smtp.from, to, subject, text });
+      } catch (err) {
+        if (!config.isProd) printToConsole({ to, subject, text }); // dev fallback: keep OTPs visible
+        throw err; // let the retry wrapper handle/log it
+      }
+      return;
     case 'console':
-      // eslint-disable-next-line no-console
-      console.log(`\n--- DEV MAIL ---\nTo: ${to}\nSubject: ${subject}\n${text}\n----------------\n`);
+      printToConsole({ to, subject, text });
       return;
     case 'memory':
       outbox.push({ to, subject, text });
@@ -35,4 +72,4 @@ async function sendWithRetry(message, { retries = 3, baseDelayMs = config.isTest
   return false;
 }
 
-module.exports = { send, sendWithRetry, outbox };
+module.exports = { send, sendWithRetry, setTransporter, outbox };

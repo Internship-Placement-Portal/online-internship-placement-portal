@@ -1,4 +1,6 @@
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import ThemeToggle from './ThemeToggle.jsx';
 import { BarChart3, FileCheck2, GraduationCap, Search, Timer } from 'lucide-react';
 
 const POINTS = [
@@ -10,6 +12,9 @@ const POINTS = [
 
 // Split layout used by every pre-login page: brand panel + form card.
 export default function AuthCard({ title, subtitle, children }) {
+  useEffect(() => {
+    document.title = `${title} · IPP`;
+  }, [title]);
   return (
     <div className="auth-shell">
       <aside className="auth-hero" aria-hidden="false">
@@ -40,6 +45,9 @@ export default function AuthCard({ title, subtitle, children }) {
           {subtitle && <p className="muted">{subtitle}</p>}
           {children}
         </section>
+        <div className="auth-theme">
+          <ThemeToggle />
+        </div>
       </main>
     </div>
   );

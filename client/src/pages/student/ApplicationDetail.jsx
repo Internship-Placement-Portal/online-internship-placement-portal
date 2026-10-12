@@ -85,38 +85,30 @@ export default function ApplicationDetail() {
               <dl className="facts" style={{ marginTop: 12 }}>
                 <div className="fact">
                   <CalendarClock size={18} aria-hidden="true" />
-                  <div>
-                    <dt>When</dt>
+                  <dt>When</dt>
                     <dd>{formatDateTime(iv.date)}</dd>
-                  </div>
                 </div>
                 <div className="fact">
                   {iv.mode === 'online' ? <Video size={18} aria-hidden="true" /> : <MapPin size={18} aria-hidden="true" />}
-                  <div>
-                    <dt>Mode</dt>
+                  <dt>Mode</dt>
                     <dd style={{ textTransform: 'capitalize' }}>{iv.mode}</dd>
-                  </div>
                 </div>
                 {iv.link && (
                   <div className="fact">
                     <ExternalLink size={18} aria-hidden="true" />
-                    <div>
-                      <dt>Meeting link</dt>
+                    <dt>Meeting link</dt>
                       <dd>
                         <a href={iv.link} target="_blank" rel="noopener noreferrer">
                           {iv.link}
                         </a>
                       </dd>
-                    </div>
                   </div>
                 )}
                 {iv.notes && (
                   <div className="fact">
                     <FileText size={18} aria-hidden="true" />
-                    <div>
-                      <dt>Notes</dt>
+                    <dt>Notes</dt>
                       <dd className="prose">{iv.notes}</dd>
-                    </div>
                   </div>
                 )}
               </dl>
