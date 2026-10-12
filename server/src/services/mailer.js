@@ -20,4 +20,19 @@ async function send({ to, subject, text }) {
   }
 }
 
-module.exports = { send, outbox };
+// SRS 3.4: retry with exponential backoff for transient provider failures. Never throws: a failed email must not
+// roll back the action that triggered it (the in-app notification is the source of truth).
+async function sendWithRetry(message, { retries = 3, baseDelayMs = config.isTest ? 1 : 300, sender = send } = {}) {
+  for (let attempt = 0; attempt <= retries; attempt += 1) {
+    try {
+      await sender(message);
+      return true;
+    } catch (err) {
+      logger.warn('mail send failed', { attempt: attempt + 1, error: err.message });
+      if (attempt < retries) await new Promise((r) => setTimeout(r, baseDelayMs * 2 ** attempt));
+    }
+  }
+  return false;
+}
+
+module.exports = { send, sendWithRetry, outbox };
