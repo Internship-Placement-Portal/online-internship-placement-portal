@@ -6,6 +6,9 @@ const config = require('../config/env');
 const { connectDb } = require('../config/db');
 const User = require('../models/User');
 const Listing = require('../models/Listing');
+const Question = require('../models/Question');
+const Test = require('../models/Test');
+const bank = require('./data/questionBank');
 
 const DEMO_PASSWORD = process.env.DEMO_PASSWORD || 'Demo@12345';
 
@@ -121,6 +124,18 @@ const longText = (title, company) =>
     });
     console.log(`created listing: ${title}`);
   }
+
+  // Question bank + tests (IPP-F-014), created by the admin if present.
+  let addedQuestions = 0;
+  for (const q of bank.questions) {
+    if (await Question.exists({ text: q.text })) continue;
+    await Question.create({ ...q, createdBy: admin?._id });
+    addedQuestions += 1;
+  }
+  for (const t of bank.tests) {
+    if (!(await Test.exists({ title: t.title }))) await Test.create({ ...t, createdBy: admin?._id });
+  }
+  console.log(`questions added: ${addedQuestions}, tests: ${await Test.countDocuments()}`);
 
   console.log(`\nDemo password for non-admin accounts: ${DEMO_PASSWORD}`);
   await mongoose.disconnect();

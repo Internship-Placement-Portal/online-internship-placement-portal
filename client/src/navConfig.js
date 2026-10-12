@@ -1,4 +1,4 @@
-import { Briefcase, ClipboardCheck, FileText, Home, Search, ShieldCheck, User } from 'lucide-react';
+import { Briefcase, ClipboardCheck, FileQuestion, FileText, Home, ListChecks, Search, ShieldCheck, Timer, User } from 'lucide-react';
 
 export const ROLE_LABELS = { student: 'Student', recruiter: 'Recruiter', admin: 'Placement Officer' };
 
@@ -8,6 +8,7 @@ export const NAV = {
     { to: '/student', label: 'Home', icon: Home, end: true },
     { to: '/student/internships', label: 'Internships', icon: Search },
     { to: '/student/applications', label: 'Applications', icon: ClipboardCheck },
+    { to: '/student/tests', label: 'Tests', icon: Timer },
   ],
   recruiter: [
     { to: '/recruiter', label: 'Home', icon: Home, end: true },
@@ -16,6 +17,8 @@ export const NAV = {
   admin: [
     { to: '/admin', label: 'Home', icon: Home, end: true },
     { to: '/admin/approvals', label: 'Approvals', icon: ShieldCheck },
+    { to: '/admin/questions', label: 'Questions', icon: FileQuestion },
+    { to: '/admin/tests', label: 'Tests', icon: ListChecks },
   ],
 };
 

@@ -135,7 +135,7 @@ export function LogoTile({ name = '?', large }) {
   );
 }
 
-export function Modal({ title, onClose, children }) {
+export function Modal({ title, onClose, children, wide }) {
   const ref = useRef(null);
   useEffect(() => {
     const prev = document.activeElement;
@@ -149,7 +149,7 @@ export function Modal({ title, onClose, children }) {
   }, [onClose]);
   return (
     <div className="modal-backdrop" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="modal" role="dialog" aria-modal="true" aria-label={title} tabIndex={-1} ref={ref}>
+      <div className={`modal${wide ? " modal-wide" : ""}`} role="dialog" aria-modal="true" aria-label={title} tabIndex={-1} ref={ref}>
         <h2>{title}</h2>
         {children}
       </div>
