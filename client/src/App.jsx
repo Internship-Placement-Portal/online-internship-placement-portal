@@ -14,6 +14,11 @@ import StudentDashboard from './pages/student/StudentDashboard.jsx';
 import MyApplications from './pages/student/MyApplications.jsx';
 import ApplicationDetail from './pages/student/ApplicationDetail.jsx';
 import Applicants from './pages/recruiter/Applicants.jsx';
+import Tests from './pages/student/Tests.jsx';
+import TestRunner from './pages/student/TestRunner.jsx';
+import TestResult from './pages/student/TestResult.jsx';
+import QuestionBank from './pages/admin/QuestionBank.jsx';
+import { TestAttempts, TestsAdmin } from './pages/admin/TestsAdmin.jsx';
 import Internships from './pages/student/Internships.jsx';
 import RecruiterDashboard from './pages/recruiter/RecruiterDashboard.jsx';
 import MyListings from './pages/recruiter/MyListings.jsx';
@@ -43,6 +48,9 @@ export default function App() {
                 <Route index element={<StudentDashboard />} />
                 <Route path="internships" element={<Internships />} />
                 <Route path="internships/:id" element={<ListingDetail backTo="/student/internships" backLabel="All internships" />} />
+                <Route path="tests" element={<Tests />} />
+                <Route path="tests/attempt/:id" element={<TestRunner />} />
+                <Route path="tests/result/:id" element={<TestResult />} />
                 <Route path="applications" element={<MyApplications />} />
                 <Route path="applications/:id" element={<ApplicationDetail />} />
                 <Route path="profile" element={<Profile />} />
@@ -65,6 +73,9 @@ export default function App() {
               <Route path="/admin" element={<AppLayout />}>
                 <Route index element={<AdminDashboard />} />
                 <Route path="approvals" element={<Approvals />} />
+                <Route path="questions" element={<QuestionBank />} />
+                <Route path="tests" element={<TestsAdmin />} />
+                <Route path="tests/:id/attempts" element={<TestAttempts />} />
                 <Route path="listings/:id" element={<ListingDetail backTo="/admin/approvals" backLabel="Approvals" />} />
                 <Route path="profile" element={<Profile />} />
               </Route>
