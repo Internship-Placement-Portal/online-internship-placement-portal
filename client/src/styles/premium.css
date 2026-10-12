@@ -1162,3 +1162,11 @@ tbody tr:hover {
     overflow: visible;
   }
 }
+
+/* Login button only: the soft glow also sits above the button, matching the one below */
+.auth-card .btn-block {
+  box-shadow: 0 12px 26px -14px var(--glow), 0 -12px 26px -14px var(--glow);
+}
+.auth-card .btn-block:hover:not(:disabled) {
+  box-shadow: 0 16px 30px -14px var(--glow), 0 -16px 30px -14px var(--glow);
+}
