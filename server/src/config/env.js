@@ -36,6 +36,7 @@ const config = {
   bcryptRounds: int(process.env.BCRYPT_ROUNDS, isTest ? 4 : 12),
   lockout: { maxAttempts: 5, lockMinutes: 15 }, // IPP-F-004
   otp: { ttlMinutes: 10, maxAttempts: 5 },
+  passwordReset: { ttlMinutes: 30 }, // IPP-F-005
   rateLimit: {
     windowMs: 15 * 60 * 1000,
     authMax: int(process.env.RATE_LIMIT_AUTH_MAX, 30),
@@ -43,6 +44,7 @@ const config = {
   },
   // "console" prints mails (incl. OTPs) for local development only; never allowed in production.
   mailTransport: process.env.MAIL_TRANSPORT || (isProd ? 'none' : isTest ? 'memory' : 'console'),
+  dnsServers: (process.env.DNS_SERVERS || '').split(',').map((x) => x.trim()).filter(Boolean),
   trustProxy: process.env.TRUST_PROXY === 'true',
 };
 
