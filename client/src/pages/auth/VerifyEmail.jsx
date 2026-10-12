@@ -3,6 +3,7 @@ import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { resendOtpApi, verifyEmailApi } from '../../api/auth.js';
 import { errorInfo } from '../../api/http.js';
 import AuthCard, { FormError } from '../../components/AuthCard.jsx';
+import OtpInput from '../../components/OtpInput.jsx';
 
 export default function VerifyEmail() {
   const { state } = useLocation();
@@ -43,17 +44,7 @@ export default function VerifyEmail() {
   return (
     <AuthCard title="Verify your email" subtitle={`Enter the 6-digit code we sent to ${state.email || 'your email'}.`}>
       <form onSubmit={onSubmit} noValidate>
-        <label htmlFor="otp">Verification code</label>
-        <input
-          id="otp"
-          inputMode="numeric"
-          autoComplete="one-time-code"
-          maxLength={6}
-          pattern="\d{6}"
-          value={otp}
-          onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
-          required
-        />
+        <OtpInput value={otp} onChange={setOtp} />
         <FormError error={error} />
         {notice && (
           <p className="notice" role="status">

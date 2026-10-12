@@ -1,5 +1,6 @@
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { ROLE_HOME, useAuth } from '../context/AuthContext.jsx';
+import Landing from '../pages/Landing.jsx';
 
 function Splash() {
   return (
@@ -38,5 +39,5 @@ export function PublicOnlyRoute() {
 export function HomeRedirect() {
   const { user, loading } = useAuth();
   if (loading) return <Splash />;
-  return <Navigate to={user ? ROLE_HOME[user.role] : '/login'} replace />;
+  return user ? <Navigate to={ROLE_HOME[user.role]} replace /> : <Landing />;
 }
