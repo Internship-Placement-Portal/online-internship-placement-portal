@@ -3,6 +3,7 @@ const Application = require('../models/Application');
 const create = (data) => Application.create(data);
 const findById = (id) => Application.findById(id);
 const findByIdWithResume = (id) => Application.findById(id).select('+resumeKey');
+const findByStudentAndListing = (student, listing) => Application.findOne({ student, listing }).select('status');
 const exists = (student, listing) => Application.exists({ student, listing });
 
 async function listForStudent(student, { skip, limit }) {
@@ -29,4 +30,4 @@ async function listForListing(listing, { status }, { skip, limit }) {
 
 const save = (doc) => doc.save();
 
-module.exports = { create, findById, findByIdWithResume, exists, listForStudent, listForListing, save };
+module.exports = { create, findByStudentAndListing, findById, findByIdWithResume, exists, listForStudent, listForListing, save };
