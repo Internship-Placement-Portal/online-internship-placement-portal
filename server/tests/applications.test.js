@@ -54,6 +54,15 @@ describe('apply with resume (IPP-F-010)', () => {
     expect(doc.resumeKey).toMatch(/^[a-f0-9]{32}\.pdf$/);
   });
 
+  it('tells the student on the listing page whether they already applied', async () => {
+    const { student, listing } = await setup();
+    const before = await request(app).get(`/api/listings/${listing._id}`).set(student.auth);
+    expect(before.body.listing.application).toBe(null);
+    const { body } = await apply(student, listing._id);
+    const after = await request(app).get(`/api/listings/${listing._id}`).set(student.auth);
+    expect(after.body.listing.application).toEqual({ id: body.application.id, status: 'Applied' });
+  });
+
   it('blocks duplicate applications without storing a second file', async () => {
     const { student, listing } = await setup();
     await apply(student, listing._id);
