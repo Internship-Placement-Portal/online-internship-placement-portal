@@ -1197,3 +1197,54 @@ tbody tr:hover {
   box-shadow: none;
   cursor: not-allowed;
 }
+
+/* ───── Buttons v3: solid edge, soft all-around shadow, lift with glow on hover ───── */
+.btn {
+  border: 2px solid var(--a2);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 14%, transparent), 0 6px 16px -6px var(--glow), inset 0 1px 0 color-mix(in srgb, #ffffff 40%, transparent);
+  transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.2s, background 0.2s, border-color 0.2s;
+}
+:root[data-theme='dark'] .btn,
+:root:not([data-theme='light']) .btn {
+  border-color: var(--a4);
+}
+.btn:hover:not(:disabled) {
+  transform: translateY(-3px);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 5px color-mix(in srgb, var(--accent) 22%, transparent), 0 -6px 18px -8px var(--glow), 0 14px 26px -10px var(--glow), inset 0 1px 0 color-mix(in srgb, #ffffff 45%, transparent);
+}
+.btn:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent), 0 2px 8px -4px var(--glow);
+}
+.btn-secondary {
+  border: 2px solid var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 10%, transparent), 0 6px 16px -8px var(--glow);
+}
+.btn-secondary:hover:not(:disabled) {
+  box-shadow: 0 0 0 5px color-mix(in srgb, var(--accent) 18%, transparent), 0 -6px 18px -8px var(--glow), 0 14px 26px -10px var(--glow);
+}
+.btn-ghost,
+.btn-ghost:hover:not(:disabled) {
+  border: 2px solid transparent;
+  box-shadow: none;
+}
+.btn-ghost:hover:not(:disabled) {
+  border-color: var(--border-strong);
+  transform: translateY(-2px);
+  background: var(--primary-soft);
+}
+/* Disabled keeps the button shape: solid edge and soft shadow, just muted */
+.btn:disabled {
+  opacity: 1;
+  color: var(--muted);
+  background: var(--surface-2);
+  border: 2px solid var(--border-strong);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--border-strong) 25%, transparent), 0 4px 10px -6px var(--border-strong);
+  cursor: not-allowed;
+  transform: none;
+}
+.btn-danger,
+.btn-success {
+  border-color: color-mix(in srgb, currentColor 35%, transparent);
+}
