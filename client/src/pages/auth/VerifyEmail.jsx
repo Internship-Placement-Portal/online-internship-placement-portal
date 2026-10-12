@@ -60,11 +60,11 @@ export default function VerifyEmail() {
             {notice}
           </p>
         )}
-        <button type="submit" className="btn" disabled={busy || otp.length !== 6}>
+        <button type="submit" className="btn btn-block" disabled={busy || otp.length !== 6}>
           {busy ? 'Verifying…' : 'Verify'}
         </button>
       </form>
-      <p className="muted">
+      <p className="footer-links">
         Didn't get a code?{' '}
         <button type="button" className="link-button" onClick={resend}>
           Resend

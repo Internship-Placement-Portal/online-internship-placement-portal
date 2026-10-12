@@ -49,6 +49,14 @@ const logout = asyncHandler(async (req, res) => {
   res.status(204).end();
 });
 
+const forgotPassword = asyncHandler(async (req, res) => {
+  res.json(await authService.forgotPassword(req.body, ctxOf(req)));
+});
+
+const resetPassword = asyncHandler(async (req, res) => {
+  res.json(await authService.resetPassword(req.body, ctxOf(req)));
+});
+
 const me = (req, res) => res.json({ user: req.user.toSafeJSON() });
 
-module.exports = { register, verifyEmail, resendOtp, login, refresh, logout, me };
+module.exports = { register, verifyEmail, resendOtp, login, refresh, logout, me, forgotPassword, resetPassword };

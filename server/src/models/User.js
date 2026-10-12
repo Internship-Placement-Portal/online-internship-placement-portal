@@ -23,6 +23,21 @@ const userSchema = new mongoose.Schema(
     // IPP-F-004: account lockout
     failedLoginAttempts: { type: Number, default: 0 },
     lockUntil: { type: Date },
+
+    // IPP-F-005: single-use, 30-minute password reset token (only the hash is stored)
+    passwordResetTokenHash: { type: String, select: false },
+    passwordResetExpiresAt: { type: Date, select: false },
+
+    profile: {
+      phone: { type: String, trim: true, maxlength: 20 },
+      college: { type: String, trim: true, maxlength: 120 },
+      branch: { type: String, trim: true, maxlength: 80 },
+      graduationYear: { type: Number, min: 2000, max: 2100 },
+      skills: { type: [String], default: undefined },
+      companyName: { type: String, trim: true, maxlength: 120 },
+      companyDescription: { type: String, trim: true, maxlength: 1000 },
+      website: { type: String, trim: true, maxlength: 200 },
+    },
   },
   { timestamps: true }
 );
@@ -35,6 +50,7 @@ userSchema.methods.toSafeJSON = function toSafeJSON() {
     role: this.role,
     emailVerified: this.emailVerified,
     approvalStatus: this.approvalStatus,
+    profile: this.toObject().profile || {},
   };
 };
 

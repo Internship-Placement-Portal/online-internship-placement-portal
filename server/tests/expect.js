@@ -15,6 +15,12 @@ function expect(actual) {
     toBeUndefined: () => assert.equal(actual, undefined),
     toMatch: (re) => assert.match(String(actual), re),
     toContain: (s) => assert.ok(String(actual).includes(s), `expected value to contain ${s}`),
+    toBeTruthy: () => assert.ok(actual),
+    toBeFalsy: () => assert.ok(!actual),
+    toBeGreaterThan: (n) => assert.ok(actual > n, `expected ${actual} > ${n}`),
+    toBeLessThan: (n) => assert.ok(actual < n, `expected ${actual} < ${n}`),
+    toHaveLength: (n) => assert.equal(actual.length, n),
+    toContainItem: (item) => assert.ok(actual.includes(item), `expected array to include ${item}`),
   };
   api.not = {
     toBe: (e) => assert.notEqual(actual, e),

@@ -49,4 +49,35 @@ async function createAdmin(email = 'admin@example.com', password = 'AdminPass1')
   return { email, password };
 }
 
-module.exports = { startDb, stopDb, clearDb, lastOtp, registerVerified, createAdmin, creds };
+// Direct (already verified) user creation + token minting: fast path for tests that are not about auth itself.
+const { signAccessToken } = require('../src/utils/tokens');
+let seq = 0;
+async function createUser({ role = 'student', approvalStatus, ...rest } = {}) {
+  seq += 1;
+  const user = await User.create({
+    name: `${role} ${seq}`,
+    email: `${role}${seq}@example.com`,
+    passwordHash: await bcrypt.hash('Passw0rd!x', 4),
+    role,
+    emailVerified: true,
+    approvalStatus: approvalStatus || 'approved',
+    ...rest,
+  });
+  return { user, token: signAccessToken(user), auth: { Authorization: `Bearer ${signAccessToken(user)}` } };
+}
+
+const futureDate = (days = 30) => new Date(Date.now() + days * 86400000).toISOString().slice(0, 10);
+const listingBody = (over = {}) => ({
+  title: 'Backend Developer Intern',
+  description: 'Build REST APIs with Node.js and MongoDB alongside the platform team.',
+  domain: 'Software Development',
+  location: 'Bengaluru',
+  stipend: 20000,
+  duration: 3,
+  skills: ['Node.js', 'MongoDB'],
+  eligibility: 'Pre-final year B.E./B.Tech',
+  deadline: futureDate(),
+  ...over,
+});
+
+module.exports = { createUser, futureDate, listingBody, startDb, stopDb, clearDb, lastOtp, registerVerified, createAdmin, creds };
