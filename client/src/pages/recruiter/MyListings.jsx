@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Briefcase, Pencil, Plus, XCircle } from 'lucide-react';
+import { Briefcase, Pencil, Plus, Users, XCircle } from 'lucide-react';
 import { closeListingApi, myListingsApi, updateListingApi } from '../../api/listings.js';
 import { errorInfo } from '../../api/http.js';
 import { useAuth } from '../../context/AuthContext.jsx';
@@ -85,6 +85,11 @@ export default function MyListings() {
                 <ListingCard listing={l} to={`/recruiter/listings/${l.id}`} showStatus />
                 {l.status === 'rejected' && l.rejectionReason && <Alert tone="danger">Reason: {l.rejectionReason}</Alert>}
                 <div className="btn-row">
+                  {['approved', 'closed'].includes(l.status) && (
+                    <Link to={`/recruiter/listings/${l.id}/applicants`} className="btn btn-sm">
+                      <Users size={14} aria-hidden="true" /> Applicants
+                    </Link>
+                  )}
                   {l.status !== 'closed' && (
                     <Link to={`/recruiter/listings/${l.id}/edit`} className="btn btn-secondary btn-sm">
                       <Pencil size={14} aria-hidden="true" /> Edit

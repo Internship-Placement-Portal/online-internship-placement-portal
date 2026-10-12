@@ -3,6 +3,7 @@ import { Link, NavLink, Outlet } from 'react-router-dom';
 import { GraduationCap, LogOut, Menu, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.jsx';
 import { NAV, ROLE_LABELS } from '../navConfig.js';
+import NotificationBell from './NotificationBell.jsx';
 
 export function Brand({ to = '/' }) {
   return (
@@ -43,6 +44,7 @@ export default function AppLayout() {
           ))}
         </nav>
         <div className="topbar-right">
+          {user.role === 'student' && <NotificationBell />}
           <NavLink to={`/${user.role}/profile`} className="user-chip" aria-label="Your profile">
             <span className="avatar" aria-hidden="true">
               {initials}
