@@ -43,6 +43,7 @@ const config = {
   },
   // "console" prints mails (incl. OTPs) for local development only; never allowed in production.
   mailTransport: process.env.MAIL_TRANSPORT || (isProd ? 'none' : isTest ? 'memory' : 'console'),
+  dnsServers: (process.env.DNS_SERVERS || '').split(',').map((x) => x.trim()).filter(Boolean),
   trustProxy: process.env.TRUST_PROXY === 'true',
 };
 
