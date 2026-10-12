@@ -1,8 +1,11 @@
 const xss = require('xss');
 
 // IPP-SR-003: block NoSQL operator injection and strip HTML from user-supplied strings.
-const stripTags = (s) => xss(s, { whiteList: {}, stripIgnoreTag: true, stripIgnoreTagBody: ['script', 'style'] });
-const SKIP_KEYS = new Set(['password', 'currentPassword', 'newPassword', 'otp']);
+// A lone ">" cannot start markup, so the escaped form is turned back (keeps text like "CGPA >= 7" readable).
+const stripTags = (s) => xss(s, { whiteList: {}, stripIgnoreTag: true, stripIgnoreTagBody: ['script', 'style'] }).replace(/&gt;/g, '>');
+// Secrets are never altered. Code answers and question bank content legitimately contain "<" and ">" (e.g. `a < b`,
+// `List<int>`); they are only ever rendered as plain text (React escapes it), never as HTML.
+const SKIP_KEYS = new Set(['password', 'currentPassword', 'newPassword', 'otp', 'codeAnswer', 'text', 'options']);
 
 function clean(value, key) {
   if (typeof value === 'string') return SKIP_KEYS.has(key) ? value : stripTags(value);
