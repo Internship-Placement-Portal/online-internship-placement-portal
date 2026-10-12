@@ -1266,3 +1266,130 @@ tbody tr:hover {
 .theme-switch:active .ts-thumb {
   box-shadow: 2px 2px 5px var(--nm-dark), -2px -2px 5px var(--nm-light), 0 0 0 1px var(--border);
 }
+
+/* ───── Custom dropdown ───── */
+.select-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  width: 100%;
+  min-height: 2.65rem;
+  padding: 0.6rem 0.9rem 0.6rem 1rem;
+  font: inherit;
+  text-align: left;
+  color: var(--text);
+  background: var(--glass-strong);
+  border: 1px solid color-mix(in srgb, var(--accent) 24%, var(--border-strong));
+  border-radius: 999px;
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+}
+.select-trigger:hover:not(:disabled) {
+  border-color: var(--accent);
+  background: var(--primary-soft);
+}
+.select-trigger.open,
+.select-trigger:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 22%, transparent);
+}
+.select-trigger[aria-invalid='true'] {
+  border-color: var(--danger);
+}
+.select-value {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.select-chevron {
+  flex: none;
+  color: var(--accent-text);
+  transition: transform 0.3s cubic-bezier(0.3, 1.4, 0.5, 1);
+}
+.select-trigger.open .select-chevron {
+  transform: rotate(180deg);
+}
+.select-panel {
+  position: fixed;
+  z-index: 200;
+  max-height: 17.5rem;
+  overflow: auto;
+  margin: 0;
+  padding: 0.4rem;
+  list-style: none;
+  background: var(--glass-strong);
+  backdrop-filter: blur(22px) saturate(1.3);
+  -webkit-backdrop-filter: blur(22px) saturate(1.3);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  box-shadow: var(--shadow-lg), 0 0 0 1px color-mix(in srgb, var(--accent) 10%, transparent);
+  transform-origin: top center;
+  animation: selectIn 0.22s cubic-bezier(0.2, 0.9, 0.3, 1.15) both;
+}
+.select-panel.up {
+  transform-origin: bottom center;
+  animation-name: selectInUp;
+}
+@keyframes selectIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.95);
+  }
+}
+@keyframes selectInUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.95);
+  }
+}
+.select-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  padding: 0.6rem 0.85rem;
+  font-size: 0.93rem;
+  font-weight: 550;
+  color: var(--text);
+  border-radius: 14px;
+  cursor: pointer;
+  animation: optIn 0.28s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation-delay: calc(var(--i) * 24ms);
+}
+@keyframes optIn {
+  from {
+    opacity: 0;
+    transform: translateX(-6px);
+  }
+}
+.select-option.active {
+  background: var(--primary-soft);
+}
+.select-option.selected {
+  color: var(--primary-soft-text);
+  font-weight: 700;
+}
+.select-option.selected svg {
+  color: var(--accent-text);
+}
+.select-option[aria-disabled='true'] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+@media (prefers-reduced-motion: reduce) {
+  .select-panel,
+  .select-option {
+    animation: none;
+  }
+}
+
+.listing-card .foot {
+  flex-wrap: wrap;
+}
+.countdown {
+  white-space: nowrap;
+}
