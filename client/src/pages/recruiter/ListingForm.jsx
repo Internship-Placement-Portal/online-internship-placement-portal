@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import Select from '../../components/Select.jsx';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { ChevronLeft, Send } from 'lucide-react';
 import { createListingApi, domainsApi, getListingApi, updateListingApi } from '../../api/listings.js';
@@ -123,12 +124,12 @@ export default function ListingForm() {
           </Field>
           <Field id="domain" label="Domain" error={errors.domain}>
             {(a) => (
-              <select {...a} value={form.domain} onChange={set('domain')} required>
+              <Select {...a} value={form.domain} onChange={set('domain')} required>
                 <option value="">Select a domain</option>
                 {(domains || []).map((d) => (
                   <option key={d}>{d}</option>
                 ))}
-              </select>
+              </Select>
             )}
           </Field>
           <Field id="location" label="Location" error={errors.location}>

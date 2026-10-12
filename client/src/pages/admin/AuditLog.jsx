@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import Select from '../../components/Select.jsx';
 import { ScrollText } from 'lucide-react';
 import { auditActionsApi, auditLogsApi } from '../../api/dashboard.js';
 import { Alert, EmptyState, PageHead, Pagination, Spinner, useAsync } from '../../components/ui.jsx';
@@ -24,14 +25,14 @@ export default function AuditLog() {
       <form className="card toolbar" aria-label="Audit log filters" onSubmit={(e) => e.preventDefault()}>
         <div className="field" style={{ minWidth: '14rem' }}>
           <label htmlFor="action">Action</label>
-          <select id="action" value={filters.action} onChange={set('action')}>
+          <Select id="action" value={filters.action} onChange={set('action')}>
             <option value="">All actions</option>
             {(actions || []).map((a) => (
               <option key={a} value={a}>
                 {pretty(a)}
               </option>
             ))}
-          </select>
+          </Select>
         </div>
         <div className="field">
           <label htmlFor="from">From</label>
