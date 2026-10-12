@@ -11,7 +11,10 @@ function errorHandler(err, req, res, next) {
   if (!err.isOperational) {
     if (err.type === 'entity.parse.failed') [statusCode, code, message] = [400, 'INVALID_JSON', 'Malformed JSON body'];
     else if (err.type === 'entity.too.large') [statusCode, code, message] = [413, 'PAYLOAD_TOO_LARGE', 'Request body too large'];
-    else if (err.name === 'ValidationError') [statusCode, code, message] = [400, 'VALIDATION_ERROR', 'Invalid input'];
+    else if (err.name === 'MulterError') {
+      if (err.code === 'LIMIT_FILE_SIZE') [statusCode, code, message] = [413, 'FILE_TOO_LARGE', 'Resume must be 5 MB or smaller'];
+      else [statusCode, code, message] = [400, 'INVALID_UPLOAD', 'Upload a single PDF in the "resume" field'];
+    } else if (err.name === 'ValidationError') [statusCode, code, message] = [400, 'VALIDATION_ERROR', 'Invalid input'];
     else if (err.name === 'CastError') [statusCode, code, message] = [400, 'INVALID_ID', 'Invalid identifier'];
     else if (err.code === 11000) [statusCode, code, message] = [409, 'DUPLICATE', 'Resource already exists'];
     else {

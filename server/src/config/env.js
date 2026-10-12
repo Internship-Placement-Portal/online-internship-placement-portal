@@ -1,4 +1,5 @@
 require('dotenv').config({ quiet: true });
+const path = require('path');
 
 const isProd = process.env.NODE_ENV === 'production';
 const isTest = process.env.NODE_ENV === 'test';
@@ -41,7 +42,14 @@ const config = {
     windowMs: 15 * 60 * 1000,
     authMax: int(process.env.RATE_LIMIT_AUTH_MAX, 30),
     apiMax: int(process.env.RATE_LIMIT_API_MAX, 300),
+    uploadMax: int(process.env.RATE_LIMIT_UPLOAD_MAX, 10), // IPP-SR-004: resume uploads per window
   },
+  // Resume storage (local disk in development; swap StorageService for cloud storage later).
+  upload: {
+    dir: path.resolve(process.env.UPLOAD_DIR || path.join(__dirname, '../../uploads')),
+    maxBytes: 5 * 1024 * 1024, // IPP-SR-005 / IPP-F-010: 5 MB
+  },
+  clamav: { host: process.env.CLAMAV_HOST || '', port: int(process.env.CLAMAV_PORT, 3310) },
   // "console" prints mails (incl. OTPs) for local development only; never allowed in production.
   mailTransport: process.env.MAIL_TRANSPORT || (isProd ? 'none' : isTest ? 'memory' : 'console'),
   dnsServers: (process.env.DNS_SERVERS || '').split(',').map((x) => x.trim()).filter(Boolean),

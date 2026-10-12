@@ -19,4 +19,9 @@ const authLimiter = createRateLimiter({
   message: 'Too many authentication attempts, please try again later.',
 });
 
-module.exports = { createRateLimiter, apiLimiter, authLimiter };
+const uploadLimiter = createRateLimiter({
+  max: config.rateLimit.uploadMax,
+  message: 'Too many uploads, please try again later.',
+});
+
+module.exports = { createRateLimiter, apiLimiter, authLimiter, uploadLimiter };
