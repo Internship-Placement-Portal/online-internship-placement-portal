@@ -16,6 +16,7 @@ function expect(actual) {
     toMatch: (re) => assert.match(String(actual), re),
     toContain: (s) => assert.ok(String(actual).includes(s), `expected value to contain ${s}`),
     toBeTruthy: () => assert.ok(actual),
+    toThrow: () => assert.throws(actual),
     toBeFalsy: () => assert.ok(!actual),
     toBeGreaterThan: (n) => assert.ok(actual > n, `expected ${actual} > ${n}`),
     toBeLessThan: (n) => assert.ok(actual < n, `expected ${actual} < ${n}`),
