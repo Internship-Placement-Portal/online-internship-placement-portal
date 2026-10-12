@@ -28,6 +28,7 @@ import ListingForm from './pages/recruiter/ListingForm.jsx';
 import AdminDashboard from './pages/admin/AdminDashboard.jsx';
 import Approvals from './pages/admin/Approvals.jsx';
 import './styles/app.css';
+import './styles/premium.css';
 
 export default function App() {
   return (
