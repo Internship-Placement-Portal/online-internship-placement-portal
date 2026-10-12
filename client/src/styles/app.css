@@ -1,175 +1,181 @@
-/* ───────────── Design tokens ───────────── */
+/* ───────────── Design tokens ─────────────
+   Two themes only. Light/Dark follow the OS until the user picks one (data-theme on <html>).
+   Every colour comes from the brand palette; components use only these variables. */
 :root {
-  --bg: #f5f6fb;
-  --surface: #ffffff;
-  --surface-2: #f8fafc;
-  --text: #0f172a;
-  --muted: #475569;
-  --border: #e2e8f0;
-  --border-strong: #cbd5e1;
-  --primary: #4338ca;
-  --primary-hover: #3730a3;
+  /* Light palette */
+  --bg: #f1f7fb;
+  --surface: #fbfeff;
+  --text: #111c24;
+  --accent: #0085b5;
+  --a1: #0c3243;
+  --a2: #174e67;
+  --a3: #226b8c;
+  --a4: #2d8bb4;
+  --a5: #44abda;
+  --a6: #74c6f0;
+  --a7: #9adfff;
+  --a8: #b5f2ff;
+  --a9: #c8feff;
+  --g1: #292f32;
+  --g2: #43494c;
+  --g3: #5e6468;
+  --g4: #7b8185;
+  --g5: #999fa4;
+  --g6: #b5bcc0;
+  --g7: #cfd5da;
+  --g8: #e2e9ee;
+  --g9: #eff6fb;
+
+  /* Semantic roles (what components use) */
+  --surface-2: var(--g9);
+  --muted: var(--g3);
+  --border: color-mix(in srgb, var(--accent) 16%, transparent);
+  --border-strong: var(--g6);
+  --primary: var(--a3); /* filled controls: white text passes AA on this shade */
+  --primary-hover: var(--a2);
   --primary-text: #ffffff;
-  --primary-soft: #eef2ff;
-  --primary-soft-text: #3730a3;
-  --success: #15803d;
-  --success-soft: #dcfce7;
-  --warning: #92400e;
-  --warning-soft: #fef3c7;
-  --danger: #b91c1c;
-  --danger-soft: #fee2e2;
-  --info: #0c4a6e;
-  --info-soft: #e0f2fe;
-  --focus: #f59e0b;
+  --primary-soft: color-mix(in srgb, var(--accent) 12%, var(--surface));
+  --primary-soft-text: var(--a2);
+  --accent-text: var(--a3); /* small accent text and links */
+  --focus: var(--accent);
+  --glass: color-mix(in srgb, var(--surface) 72%, transparent);
+  --glass-strong: color-mix(in srgb, var(--surface) 88%, transparent);
+  --glass-border: color-mix(in srgb, #ffffff 70%, var(--accent) 14%);
+  --grad-hero: linear-gradient(135deg, var(--a9) 0%, var(--a7) 48%, var(--bg) 100%);
+  --orb: radial-gradient(circle at 35% 30%, var(--a7), var(--accent) 62%, var(--a3));
+  --glow: color-mix(in srgb, var(--accent) 32%, transparent);
+
+  /* Muted status colours, harmonised with the palette */
+  --success: #1e6f4f;
+  --success-soft: color-mix(in srgb, #2f9e72 16%, var(--surface));
+  --warning: #7d5410;
+  --warning-soft: color-mix(in srgb, #c28a2e 18%, var(--surface));
+  --danger: #9c3636;
+  --danger-soft: color-mix(in srgb, #c25555 14%, var(--surface));
+  --info: var(--a2);
+  --info-soft: var(--primary-soft);
   --on-danger: #ffffff;
   --on-success: #ffffff;
-  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06);
-  --shadow: 0 1px 3px rgba(15, 23, 42, 0.08), 0 8px 24px -12px rgba(15, 23, 42, 0.12);
-  --shadow-lg: 0 20px 40px -20px rgba(15, 23, 42, 0.3);
-  --radius: 14px;
-  --radius-sm: 9px;
-  --chart-1: #4f46e5;
-  --chart-2: #0891b2;
-  --chart-3: #d97706;
-  --chart-4: #be185d;
-  --chart-5: #16a34a;
+
+  --shadow-sm: 0 1px 2px color-mix(in srgb, var(--a1) 10%, transparent);
+  --shadow: 0 18px 50px -26px color-mix(in srgb, var(--accent) 45%, transparent), 0 2px 8px -4px color-mix(in srgb, var(--a1) 14%, transparent);
+  --shadow-lg: 0 30px 70px -30px color-mix(in srgb, var(--a1) 50%, transparent);
+  --radius: 26px;
+  --radius-sm: 14px;
+  --chart-1: var(--accent);
+  --chart-2: var(--a2);
+  --chart-3: var(--a6);
+  --chart-4: #b9873a;
+  --chart-5: #3a9a74;
   font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   color: var(--text);
   background: var(--bg);
   color-scheme: light;
 }
 
-/* Dark theme: follows the OS unless the user picked a theme explicitly (data-theme on <html>). */
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme='light']):not([data-theme='contrast']) {
-    --bg: #0b1020;
-    --surface: #131a2e;
-    --surface-2: #19223a;
-    --text: #e8ecf8;
-    --muted: #a8b3cc;
-    --border: #25304b;
-    --border-strong: #3a4766;
-    --primary: #8b93ff;
-    --primary-hover: #a5abff;
-    --primary-text: #0b1020;
-    --primary-soft: #1f2650;
-    --primary-soft-text: #c4c8ff;
-    --success: #4ade80;
-    --success-soft: #12341f;
-    --warning: #fbbf24;
-    --warning-soft: #3a2a0b;
-    --danger: #fca5a5;
-    --danger-soft: #3b1414;
-    --info: #7dd3fc;
-    --info-soft: #0c2a3d;
-    --shadow: 0 1px 3px rgba(0, 0, 0, 0.4), 0 8px 24px -12px rgba(0, 0, 0, 0.6);
-    --chart-1: #8b93ff;
-    --chart-2: #22d3ee;
-    --chart-3: #fbbf24;
-    --chart-4: #f472b6;
-    --chart-5: #4ade80;
+  :root:not([data-theme='light']) {
+    --bg: #080f15;
+    --surface: #121b21;
+    --text: #eaeff3;
+    --accent: #55bef0;
+    --a1: #c8feff;
+    --a2: #b5f2ff;
+    --a3: #9adfff;
+    --a4: #74c6f0;
+    --a5: #44abda;
+    --a6: #2d8bb4;
+    --a7: #226b8c;
+    --a8: #174e67;
+    --a9: #0c3243;
+    --g1: #edf7fe;
+    --g2: #e0e9f0;
+    --g3: #ccd6dc;
+    --g4: #b3bcc3;
+    --g5: #97a0a6;
+    --g6: #798288;
+    --g7: #5c656a;
+    --g8: #41494e;
+    --g9: #272f34;
+    --surface-2: color-mix(in srgb, var(--g9) 70%, var(--surface));
+    --muted: var(--g4);
+    --border: color-mix(in srgb, var(--accent) 20%, transparent);
+    --border-strong: var(--g7);
+    --primary: var(--accent);
+    --primary-hover: var(--a4);
+    --primary-text: #080f15;
+    --primary-soft: color-mix(in srgb, var(--accent) 16%, var(--surface));
+    --primary-soft-text: var(--a3);
+    --accent-text: var(--accent);
+    --glass: color-mix(in srgb, var(--surface) 62%, transparent);
+    --glass-strong: color-mix(in srgb, var(--surface) 86%, transparent);
+    --glass-border: color-mix(in srgb, var(--accent) 22%, transparent);
+    --grad-hero: linear-gradient(135deg, var(--a9) 0%, var(--a8) 100%);
+    --orb: radial-gradient(circle at 35% 30%, var(--a3), var(--accent) 55%, var(--a6));
+    --glow: color-mix(in srgb, var(--accent) 38%, transparent);
+    --success: #7fd6ab;
+    --warning: #e6bd6e;
+    --danger: #f19b9b;
+    --on-danger: #080f15;
+    --on-success: #080f15;
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);
+    --shadow: 0 24px 60px -30px rgba(0, 0, 0, 0.9), 0 0 0 1px color-mix(in srgb, var(--accent) 6%, transparent);
+    --shadow-lg: 0 34px 80px -30px rgba(0, 0, 0, 1);
+    --chart-4: #e0b062;
+    --chart-5: #6fd0a3;
     color-scheme: dark;
-    --on-danger: #1a0808;
-    --on-success: #052e16;
   }
 }
 :root[data-theme='dark'] {
-  --bg: #0b1020;
-  --surface: #131a2e;
-  --surface-2: #19223a;
-  --text: #e8ecf8;
-  --muted: #a8b3cc;
-  --border: #25304b;
-  --border-strong: #3a4766;
-  --primary: #8b93ff;
-  --primary-hover: #a5abff;
-  --primary-text: #0b1020;
-  --primary-soft: #1f2650;
-  --primary-soft-text: #c4c8ff;
-  --success: #4ade80;
-  --success-soft: #12341f;
-  --warning: #fbbf24;
-  --warning-soft: #3a2a0b;
-  --danger: #fca5a5;
-  --danger-soft: #3b1414;
-  --info: #7dd3fc;
-  --info-soft: #0c2a3d;
-  --shadow: 0 1px 3px rgba(0, 0, 0, 0.4), 0 8px 24px -12px rgba(0, 0, 0, 0.6);
-  --chart-1: #8b93ff;
-  --chart-2: #22d3ee;
-  --chart-3: #fbbf24;
-  --chart-4: #f472b6;
-  --chart-5: #4ade80;
+  --bg: #080f15;
+  --surface: #121b21;
+  --text: #eaeff3;
+  --accent: #55bef0;
+  --a1: #c8feff;
+  --a2: #b5f2ff;
+  --a3: #9adfff;
+  --a4: #74c6f0;
+  --a5: #44abda;
+  --a6: #2d8bb4;
+  --a7: #226b8c;
+  --a8: #174e67;
+  --a9: #0c3243;
+  --g1: #edf7fe;
+  --g2: #e0e9f0;
+  --g3: #ccd6dc;
+  --g4: #b3bcc3;
+  --g5: #97a0a6;
+  --g6: #798288;
+  --g7: #5c656a;
+  --g8: #41494e;
+  --g9: #272f34;
+  --surface-2: color-mix(in srgb, var(--g9) 70%, var(--surface));
+  --muted: var(--g4);
+  --border: color-mix(in srgb, var(--accent) 20%, transparent);
+  --border-strong: var(--g7);
+  --primary: var(--accent);
+  --primary-hover: var(--a4);
+  --primary-text: #080f15;
+  --primary-soft: color-mix(in srgb, var(--accent) 16%, var(--surface));
+  --primary-soft-text: var(--a3);
+  --accent-text: var(--accent);
+  --glass: color-mix(in srgb, var(--surface) 62%, transparent);
+  --glass-strong: color-mix(in srgb, var(--surface) 86%, transparent);
+  --glass-border: color-mix(in srgb, var(--accent) 22%, transparent);
+  --grad-hero: linear-gradient(135deg, var(--a9) 0%, var(--a8) 100%);
+  --orb: radial-gradient(circle at 35% 30%, var(--a3), var(--accent) 55%, var(--a6));
+  --glow: color-mix(in srgb, var(--accent) 38%, transparent);
+  --success: #7fd6ab;
+  --warning: #e6bd6e;
+  --danger: #f19b9b;
+  --on-danger: #080f15;
+  --on-success: #080f15;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);
+  --shadow: 0 24px 60px -30px rgba(0, 0, 0, 0.9), 0 0 0 1px color-mix(in srgb, var(--accent) 6%, transparent);
+  --shadow-lg: 0 34px 80px -30px rgba(0, 0, 0, 1);
+  --chart-4: #e0b062;
+  --chart-5: #6fd0a3;
   color-scheme: dark;
-  --on-danger: #1a0808;
-  --on-success: #052e16;
-}
-
-/* High-contrast theme (WCAG 2.1 AA/AAA): black surfaces, white text, yellow accents, strong borders (IPP-NF-004). */
-:root[data-theme='contrast'] {
-  --bg: #000000;
-  --surface: #000000;
-  --surface-2: #0d0d0d;
-  --text: #ffffff;
-  --muted: #ececec;
-  --border: #ffffff;
-  --border-strong: #ffffff;
-  --primary: #ffd400;
-  --primary-hover: #ffe766;
-  --primary-text: #000000;
-  --primary-soft: #1f1a00;
-  --primary-soft-text: #ffe766;
-  --success: #6dff9a;
-  --success-soft: #00290f;
-  --warning: #ffd400;
-  --warning-soft: #2b2400;
-  --danger: #ff8f8f;
-  --danger-soft: #330000;
-  --info: #8fe3ff;
-  --info-soft: #00232e;
-  --focus: #00e5ff;
-  --shadow-sm: none;
-  --shadow: none;
-  --shadow-lg: 0 0 0 2px #ffffff;
-  --chart-1: #ffd400;
-  --chart-2: #00e5ff;
-  --chart-3: #ff9d3d;
-  --chart-4: #ff7ad9;
-  --chart-5: #6dff9a;
-  --on-danger: #000000;
-  --on-success: #000000;
-  color-scheme: dark;
-}
-:root[data-theme='contrast'] a {
-  text-decoration: underline;
-}
-:root[data-theme='contrast'] .card,
-:root[data-theme='contrast'] input,
-:root[data-theme='contrast'] select,
-:root[data-theme='contrast'] textarea,
-:root[data-theme='contrast'] .btn-secondary,
-:root[data-theme='contrast'] .table-wrap,
-:root[data-theme='contrast'] .topbar {
-  border-width: 2px;
-}
-:root[data-theme='contrast'] .hero-card,
-:root[data-theme='contrast'] .auth-hero {
-  background: #000;
-  border: 2px solid #fff;
-}
-:root[data-theme='contrast'] .auth-hero::after {
-  display: none;
-}
-:root[data-theme='contrast'] .badge,
-:root[data-theme='contrast'] .chip {
-  border: 1px solid currentColor;
-}
-:root[data-theme='contrast'] .timeline li.done .dot,
-:root[data-theme='contrast'] .mark.ok,
-:root[data-theme='contrast'] .mark.bad,
-:root[data-theme='contrast'] .btn-danger,
-:root[data-theme='contrast'] .btn-success {
-  color: #000;
 }
 
 @media (prefers-reduced-motion: reduce) {

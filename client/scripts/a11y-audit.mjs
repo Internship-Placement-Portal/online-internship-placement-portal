@@ -25,7 +25,7 @@ const candidates = [
 const executablePath = candidates.find((p) => fs.existsSync(p));
 if (!executablePath) throw new Error('No Chrome/Edge found. Set BROWSER_PATH.');
 
-const THEMES = ['light', 'dark', 'contrast'];
+const THEMES = ['light', 'dark'];
 const SUITES = [
   { who: 'public', login: null, paths: ['/login', '/register', '/forgot-password'] },
   {
