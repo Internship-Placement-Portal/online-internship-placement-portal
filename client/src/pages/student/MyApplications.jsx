@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { CalendarClock, ClipboardList, Video } from 'lucide-react';
 import { myApplicationsApi } from '../../api/applications.js';
+import { Stepper } from '../../components/fx.jsx';
 import { Alert, EmptyState, LogoTile, PageHead, Pagination, Skeletons, StatusBadge, useAsync } from '../../components/ui.jsx';
 import { formatDate, formatDateTime } from '../../lib/format.js';
 
@@ -46,6 +47,9 @@ export default function MyApplications() {
                   )}
                 </div>
                 <StatusBadge status={a.status} />
+                <div className="stepper-wrap">
+                  <Stepper status={a.status} interview={a.interview} />
+                </div>
               </Link>
             ))}
           </div>

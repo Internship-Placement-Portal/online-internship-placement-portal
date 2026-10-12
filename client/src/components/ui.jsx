@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { errorInfo } from '../api/http.js';
+import { EmptyArt } from './fx.jsx';
 import { AlertTriangle, CheckCircle2, ChevronLeft, ChevronRight, Info, Loader2, XCircle } from 'lucide-react';
 
 const ALERT_ICONS = { info: Info, success: CheckCircle2, warning: AlertTriangle, danger: XCircle };
@@ -35,11 +36,7 @@ export function Skeletons({ count = 6 }) {
 export function EmptyState({ icon: Icon, title, children, action }) {
   return (
     <div className="empty">
-      {Icon && (
-        <span className="empty-icon">
-          <Icon size={24} aria-hidden="true" />
-        </span>
-      )}
+      <EmptyArt />
       <h3>{title}</h3>
       {children && <p>{children}</p>}
       {action}
