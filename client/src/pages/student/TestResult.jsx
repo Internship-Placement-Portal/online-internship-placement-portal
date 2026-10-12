@@ -105,29 +105,23 @@ export default function TestResult() {
           <dl className="facts" style={{ marginTop: 12 }}>
             <div className="fact">
               <Target size={18} aria-hidden="true" />
-              <div>
-                <dt>Answered</dt>
+              <dt>Answered</dt>
                 <dd>
                   {r.answeredCount} of {r.totalQuestions}
                 </dd>
-              </div>
             </div>
             <div className="fact">
               <Clock size={18} aria-hidden="true" />
-              <div>
-                <dt>Time taken</dt>
+              <dt>Time taken</dt>
                 <dd>
                   {mmss(r.timeTakenSec)} <span className="muted small">· avg {r.avgTimePerQuestionSec}s per question</span>
                 </dd>
-              </div>
             </div>
             {r.codingPending > 0 && (
               <div className="fact">
                 <Code2 size={18} aria-hidden="true" />
-                <div>
-                  <dt>Coding answers</dt>
+                <dt>Coding answers</dt>
                   <dd>{r.codingPending} awaiting review</dd>
-                </div>
               </div>
             )}
           </dl>

@@ -1,8 +1,9 @@
-import { useState } from 'react';
-import { Link, NavLink, Outlet } from 'react-router-dom';
+import { useEffect, useRef, useState } from 'react';
+import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
 import { GraduationCap, LogOut, Menu, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.jsx';
 import { NAV, ROLE_LABELS } from '../navConfig.js';
+import ThemeToggle from './ThemeToggle.jsx';
 import NotificationBell from './NotificationBell.jsx';
 
 export function Brand({ to = '/' }) {
@@ -20,6 +21,20 @@ export function Brand({ to = '/' }) {
 export default function AppLayout() {
   const { user, logout } = useAuth();
   const [open, setOpen] = useState(false);
+  const { pathname } = useLocation();
+  const main = useRef(null);
+  const first = useRef(true);
+
+  // WCAG 2.4.2 / 2.4.3: each page gets a descriptive <title>, and focus moves to the new content after navigation.
+  useEffect(() => {
+    const t = setTimeout(() => {
+      const h1 = main.current?.querySelector('h1');
+      document.title = h1 ? `${h1.textContent} · IPP` : 'IPP — Internship & Placement Portal';
+      if (!first.current) main.current?.focus({ preventScroll: true });
+      first.current = false;
+    }, 350);
+    return () => clearTimeout(t);
+  }, [pathname]);
   const links = NAV[user.role] || [];
   const initials = user.name
     .split(/\s+/)
@@ -44,12 +59,14 @@ export default function AppLayout() {
           ))}
         </nav>
         <div className="topbar-right">
+          <ThemeToggle compact />
           {user.role === 'student' && <NotificationBell />}
-          <NavLink to={`/${user.role}/profile`} className="user-chip" aria-label="Your profile">
+          <NavLink to={`/${user.role}/profile`} className="user-chip">
             <span className="avatar" aria-hidden="true">
               {initials}
             </span>
             <span className="who">
+              <span className="sr-only">Your profile: </span>
               <strong>{user.name}</strong>
               <span>{ROLE_LABELS[user.role]}</span>
             </span>
@@ -68,7 +85,7 @@ export default function AppLayout() {
           </button>
         </div>
       </header>
-      <main id="main" className="content">
+      <main id="main" className="content" tabIndex={-1} ref={main}>
         <Outlet />
       </main>
     </div>
