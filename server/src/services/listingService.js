@@ -1,6 +1,7 @@
 const AppError = require('../utils/AppError');
 const { parsePaging, pageResult } = require('../utils/pagination');
 const listingRepository = require('../repositories/listingRepository');
+const applicationRepository = require('../repositories/applicationRepository');
 const { DOMAINS } = require('../models/Listing');
 
 const EDITABLE = ['title', 'company', 'description', 'domain', 'location', 'stipend', 'duration', 'skills', 'eligibility', 'deadline'];
@@ -104,6 +105,9 @@ async function getById(user, id) {
     if (listing.status !== 'approved' || listing.deadline < new Date()) {
       throw new AppError(404, 'LISTING_NOT_FOUND', 'This internship is not available');
     }
+    // Lets the UI show "Applied" instead of the apply form.
+    const existing = await applicationRepository.findByStudentAndListing(user._id, listing._id);
+    return { ...toDto(listing), application: existing ? { id: String(existing._id), status: existing.status } : null };
   } else if (user.role === 'recruiter' && String(listing.recruiter._id) !== String(user._id)) {
     throw new AppError(403, 'FORBIDDEN', 'You can only view your own listings');
   }

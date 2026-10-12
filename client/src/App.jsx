@@ -11,6 +11,9 @@ import ResetPassword from './pages/auth/ResetPassword.jsx';
 import Profile from './pages/Profile.jsx';
 import ListingDetail from './pages/ListingDetail.jsx';
 import StudentDashboard from './pages/student/StudentDashboard.jsx';
+import MyApplications from './pages/student/MyApplications.jsx';
+import ApplicationDetail from './pages/student/ApplicationDetail.jsx';
+import Applicants from './pages/recruiter/Applicants.jsx';
 import Internships from './pages/student/Internships.jsx';
 import RecruiterDashboard from './pages/recruiter/RecruiterDashboard.jsx';
 import MyListings from './pages/recruiter/MyListings.jsx';
@@ -40,6 +43,8 @@ export default function App() {
                 <Route index element={<StudentDashboard />} />
                 <Route path="internships" element={<Internships />} />
                 <Route path="internships/:id" element={<ListingDetail backTo="/student/internships" backLabel="All internships" />} />
+                <Route path="applications" element={<MyApplications />} />
+                <Route path="applications/:id" element={<ApplicationDetail />} />
                 <Route path="profile" element={<Profile />} />
               </Route>
             </Route>
@@ -51,6 +56,7 @@ export default function App() {
                 <Route path="listings/new" element={<ListingForm />} />
                 <Route path="listings/:id" element={<ListingDetail backTo="/recruiter/listings" backLabel="My listings" />} />
                 <Route path="listings/:id/edit" element={<ListingForm />} />
+                <Route path="listings/:id/applicants" element={<Applicants />} />
                 <Route path="profile" element={<Profile />} />
               </Route>
             </Route>

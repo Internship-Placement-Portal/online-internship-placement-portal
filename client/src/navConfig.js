@@ -7,6 +7,7 @@ export const NAV = {
   student: [
     { to: '/student', label: 'Home', icon: Home, end: true },
     { to: '/student/internships', label: 'Internships', icon: Search },
+    { to: '/student/applications', label: 'Applications', icon: ClipboardCheck },
   ],
   recruiter: [
     { to: '/recruiter', label: 'Home', icon: Home, end: true },
