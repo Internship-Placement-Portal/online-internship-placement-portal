@@ -5,6 +5,7 @@ const app = require('./app');
 
 async function start() {
   await connectDb();
+  require('./jobs/expireListings').start();
   const server = app.listen(config.port, () => logger.info(`IPP API listening on port ${config.port}`));
 
   const shutdown = (signal) => {
