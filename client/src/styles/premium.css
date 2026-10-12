@@ -1216,3 +1216,53 @@ tbody tr:hover {
   outline: 3px solid var(--focus);
   outline-offset: 2px;
 }
+
+/* Theme switch v2: neumorphic. Inset track, raised thumb, paired light/dark shadows from the palette */
+:root {
+  --nm-light: var(--surface);
+  --nm-dark: color-mix(in srgb, var(--a3) 40%, var(--bg));
+}
+:root[data-theme='dark'] {
+  --nm-light: color-mix(in srgb, var(--g9) 85%, transparent);
+  --nm-dark: var(--bg);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --nm-light: color-mix(in srgb, var(--g9) 85%, transparent);
+    --nm-dark: var(--bg);
+  }
+}
+.theme-switch {
+  width: 5rem;
+  height: 2.6rem;
+  padding: 0 0.8rem;
+  color: var(--muted);
+  background: linear-gradient(145deg, color-mix(in srgb, var(--bg) 92%, var(--nm-dark)), var(--bg));
+  border: 1px solid var(--border);
+  box-shadow: inset 4px 4px 9px var(--nm-dark), inset -4px -4px 9px var(--nm-light);
+}
+.theme-switch.on {
+  background: linear-gradient(145deg, color-mix(in srgb, var(--bg) 92%, var(--nm-dark)), var(--bg));
+}
+.theme-switch .ts-sun,
+.theme-switch .ts-moon {
+  opacity: 0.7;
+}
+.ts-thumb {
+  left: 0.3rem;
+  width: 1.95rem;
+  height: 1.95rem;
+  color: var(--accent-text);
+  background: linear-gradient(145deg, var(--nm-light), color-mix(in srgb, var(--surface) 88%, var(--nm-dark)));
+  box-shadow: 4px 5px 10px var(--nm-dark), -3px -3px 8px var(--nm-light), 0 0 0 1px var(--border), 0 0 14px -2px var(--glow);
+  transition: left 0.35s cubic-bezier(0.3, 1.3, 0.5, 1), box-shadow 0.25s;
+}
+.theme-switch.on .ts-thumb {
+  left: calc(100% - 2.25rem);
+}
+.theme-switch:hover .ts-thumb {
+  box-shadow: 5px 6px 12px var(--nm-dark), -4px -4px 10px var(--nm-light), 0 0 0 1px var(--border), 0 0 20px -2px var(--glow);
+}
+.theme-switch:active .ts-thumb {
+  box-shadow: 2px 2px 5px var(--nm-dark), -2px -2px 5px var(--nm-light), 0 0 0 1px var(--border);
+}
