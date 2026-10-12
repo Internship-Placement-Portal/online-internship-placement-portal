@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import ThemeToggle from './ThemeToggle.jsx';
+import { Orb } from './fx.jsx';
 import { BarChart3, FileCheck2, GraduationCap, Search, Timer } from 'lucide-react';
 
 const POINTS = [
@@ -25,6 +26,7 @@ export default function AuthCard({ title, subtitle, children }) {
           IPP
         </Link>
         <div>
+          <Orb icon={GraduationCap} size={84} />
           <h2>Your next internship starts here.</h2>
           <p>The Internship &amp; Placement Preparation Portal connects students, recruiters and placement officers on one platform.</p>
         </div>
