@@ -14,4 +14,26 @@ const updateById = (id, update) => User.updateOne({ _id: id }, update);
 const incrementFailedLogins = (id) =>
   User.findByIdAndUpdate(id, { $inc: { failedLoginAttempts: 1 } }, { returnDocument: 'after' });
 
-module.exports = { findByEmail, findByEmailWithOtp, findById, findByIdWithOtp, create, updateById, incrementFailedLogins };
+const findByResetHash = (hash) =>
+  User.findOne({ passwordResetTokenHash: hash }).select('+passwordResetTokenHash +passwordResetExpiresAt');
+
+async function listByRole(role, { approvalStatus }, { skip, limit }) {
+  const filter = { role, emailVerified: true, ...(approvalStatus && { approvalStatus }) };
+  const [items, total] = await Promise.all([
+    User.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit),
+    User.countDocuments(filter),
+  ]);
+  return { items, total };
+}
+
+module.exports = {
+  findByEmail,
+  findByEmailWithOtp,
+  findById,
+  findByIdWithOtp,
+  findByResetHash,
+  listByRole,
+  create,
+  updateById,
+  incrementFailedLogins,
+};
