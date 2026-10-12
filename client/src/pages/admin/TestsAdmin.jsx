@@ -258,7 +258,7 @@ export function TestAttempts() {
                   <td className="small">{formatDateTime(a.submittedAt)}</td>
                   <td>
                     {['submitted', 'auto_submitted'].includes(a.status) && (
-                      <button type="button" className="btn btn-secondary btn-sm" onClick={() => reenable(a)} aria-label={`Re-enable test for ${a.student.name}`}>
+                      <button type="button" className="btn btn-secondary btn-sm" onClick={() => reenable(a)} aria-label={`Allow reattempt for ${a.student.name}`}>
                         <RotateCcw size={14} aria-hidden="true" /> Allow reattempt
                       </button>
                     )}

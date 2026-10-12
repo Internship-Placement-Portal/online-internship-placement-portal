@@ -14,7 +14,7 @@
     "coverage:core": "c8 check-coverage --lines 70 --functions 70 --branches 70 --include \"src/**/auth*.js\" --include \"src/**/application*.js\" --include \"src/**/notification*.js\" --include \"src/**/test*.js\" --include \"src/**/attempt*.js\" --include \"src/**/scoring*.js\" --include \"src/**/question*.js\" --include \"src/**/storage*.js\" --include \"src/**/scan*.js\" --include \"src/**/resumeValidation.js\""
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=22"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",

@@ -9,10 +9,8 @@ import ApplyPanel from '../features/ApplyPanel.jsx';
 const Fact = ({ icon: Icon, label, children }) => (
   <div className="fact">
     <Icon size={18} aria-hidden="true" />
-    <div>
-      <dt>{label}</dt>
+    <dt>{label}</dt>
       <dd>{children}</dd>
-    </div>
   </div>
 );
 
