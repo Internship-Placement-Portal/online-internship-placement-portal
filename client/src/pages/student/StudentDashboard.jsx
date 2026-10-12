@@ -1,13 +1,29 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, Search } from 'lucide-react';
-import { searchListingsApi } from '../../api/listings.js';
+import { ArrowRight, CalendarClock, ClipboardCheck, FileText, Search, Target, Timer, Trophy, Video } from 'lucide-react';
+import { studentDashboardApi } from '../../api/dashboard.js';
 import { useAuth } from '../../context/AuthContext.jsx';
-import ListingCard from '../../components/ListingCard.jsx';
-import { Alert, EmptyState, Skeletons, useAsync } from '../../components/ui.jsx';
+import { ChartCard, LineChart } from '../../components/charts.jsx';
+import { Alert, EmptyState, Spinner, StatusBadge, useAsync } from '../../components/ui.jsx';
+import { BarRow } from './TestResult.jsx';
+import { formatDate, formatDateTime } from '../../lib/format.js';
 
+const Kpi = ({ icon: Icon, num, label, sub }) => (
+  <div className="card stat">
+    <span className="stat-icon">
+      <Icon size={22} aria-hidden="true" />
+    </span>
+    <div>
+      <div className="stat-num">{num}</div>
+      <div className="stat-label">{label}</div>
+      {sub && <div className="kpi-sub">{sub}</div>}
+    </div>
+  </div>
+);
+
+// IPP-F-018: applications submitted, interviews scheduled and test scores, straight from the underlying records.
 export default function StudentDashboard() {
   const { user } = useAuth();
-  const { data, loading, error } = useAsync(() => searchListingsApi({ limit: 3 }), []);
+  const { data: d, loading, error } = useAsync(studentDashboardApi, []);
 
   return (
     <>
@@ -15,34 +31,137 @@ export default function StudentDashboard() {
         <div>
           <h1 id="welcome">Welcome back, {user.name.split(' ')[0]} 👋</h1>
           <p className="muted" style={{ marginTop: 6 }}>
-            Browse fresh internships, apply with your resume and practise for placements.
+            Here is your progress across applications, interviews and aptitude tests.
           </p>
         </div>
-        <Link to="/student/internships" className="btn">
-          <Search size={17} aria-hidden="true" /> Find internships
-        </Link>
+        <div className="btn-row">
+          <Link to="/student/internships" className="btn">
+            <Search size={17} aria-hidden="true" /> Find internships
+          </Link>
+          <Link to="/student/tests" className="btn btn-secondary">
+            <Timer size={17} aria-hidden="true" /> Practice tests
+          </Link>
+        </div>
       </section>
 
-      <div className="card-header" style={{ marginTop: 28 }}>
-        <h2>Latest internships</h2>
-        <Link to="/student/internships" className="btn btn-ghost btn-sm">
-          View all <ArrowRight size={15} aria-hidden="true" />
-        </Link>
-      </div>
-      {error && <Alert tone="danger">{error}</Alert>}
-      {loading && <Skeletons count={3} />}
-      {data &&
-        (data.items.length === 0 ? (
-          <EmptyState icon={Search} title="No openings right now">
-            New internships appear here as soon as recruiters publish them.
-          </EmptyState>
-        ) : (
-          <div className="cards">
-            {data.items.map((l) => (
-              <ListingCard key={l.id} listing={l} to={`/student/internships/${l.id}`} />
-            ))}
+      {error && (
+        <div style={{ marginTop: 16 }}>
+          <Alert tone="danger">{error}</Alert>
+        </div>
+      )}
+      {loading && (
+        <div style={{ marginTop: 24 }}>
+          <Spinner label="Loading your dashboard…" />
+        </div>
+      )}
+
+      {d && (
+        <>
+          <div className="grid grid-4" style={{ marginTop: 20 }}>
+            <Kpi icon={ClipboardCheck} num={d.applications.total} label="Applications submitted" sub={`${d.applications.byStatus.Selected} selected · ${d.applications.byStatus.Shortlisted} shortlisted`} />
+            <Kpi icon={CalendarClock} num={d.interviews.scheduled} label="Interviews scheduled" sub={`${d.interviews.upcoming.length} upcoming`} />
+            <Kpi icon={Timer} num={d.tests.attempts} label="Tests completed" sub={d.tests.attempts ? `Best accuracy ${d.tests.bestAccuracy}%` : 'None yet'} />
+            <Kpi icon={Target} num={`${d.tests.avgAccuracy}%`} label="Average test accuracy" />
           </div>
-        ))}
+
+          <div className="grid grid-2" style={{ marginTop: 16, alignItems: 'start' }}>
+            <section className="card" aria-labelledby="upcoming">
+              <div className="card-header">
+                <h2 id="upcoming">Upcoming interviews</h2>
+              </div>
+              {d.interviews.upcoming.length === 0 ? (
+                <p className="muted">No upcoming interviews. Shortlisted applications will show their schedule here.</p>
+              ) : (
+                <ul className="plain-list">
+                  {d.interviews.upcoming.map((i) => (
+                    <li key={i.applicationId}>
+                      <Link to={`/student/applications/${i.applicationId}`} className="row-link">
+                        <span className="stat-icon" style={{ width: '2.4rem', height: '2.4rem' }}>
+                          {i.mode === 'online' ? <Video size={18} aria-hidden="true" /> : <CalendarClock size={18} aria-hidden="true" />}
+                        </span>
+                        <span className="grow">
+                          <strong>{i.title}</strong>
+                          <span className="muted small" style={{ display: 'block' }}>
+                            {i.company} · {formatDateTime(i.date)}
+                          </span>
+                        </span>
+                        <ArrowRight size={16} aria-hidden="true" />
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </section>
+
+            <section className="card" aria-labelledby="recent">
+              <div className="card-header">
+                <h2 id="recent">Recent applications</h2>
+                <Link to="/student/applications" className="btn btn-ghost btn-sm">
+                  All
+                </Link>
+              </div>
+              {d.applications.recent.length === 0 ? (
+                <EmptyState icon={FileText} title="No applications yet">
+                  <Link to="/student/internships">Browse internships</Link> and apply with your resume.
+                </EmptyState>
+              ) : (
+                <ul className="plain-list">
+                  {d.applications.recent.map((a) => (
+                    <li key={a.id}>
+                      <Link to={`/student/applications/${a.id}`} className="row-link">
+                        <span className="grow">
+                          <strong>{a.title}</strong>
+                          <span className="muted small" style={{ display: 'block' }}>
+                            {a.company} · {formatDate(a.appliedAt)}
+                          </span>
+                        </span>
+                        <StatusBadge status={a.status} />
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </section>
+          </div>
+
+          <div className="grid grid-2" style={{ marginTop: 16, alignItems: 'start' }}>
+            <ChartCard
+              title="Test accuracy trend"
+              subtitle="Your last completed tests, oldest to newest"
+              table={{ head: ['Test', 'Date', 'Accuracy'], rows: d.tests.trend.map((t) => [t.label, formatDate(t.submittedAt), `${t.accuracy}%`]) }}
+            >
+              {d.tests.trend.length === 0 ? (
+                <EmptyState icon={Trophy} title="No tests taken yet">
+                  <Link to="/student/tests">Take a practice test</Link> to start tracking your progress.
+                </EmptyState>
+              ) : (
+                <LineChart
+                  data={d.tests.trend.map((t, i) => ({ label: `${t.label} (${formatDate(t.submittedAt)})`, short: String(i + 1), accuracy: t.accuracy }))}
+                  series={[{ key: 'accuracy', name: 'Accuracy %' }]}
+                  max={100}
+                  unit="%"
+                  summary={`Accuracy over your last ${d.tests.trend.length} tests, latest ${d.tests.trend[d.tests.trend.length - 1].accuracy} percent`}
+                />
+              )}
+            </ChartCard>
+
+            <section className="card" aria-labelledby="cats">
+              <h2 id="cats" style={{ marginBottom: 14 }}>
+                Strengths by category
+              </h2>
+              {d.tests.categoryAccuracy.length === 0 ? (
+                <p className="muted">Category performance appears after your first test.</p>
+              ) : (
+                <div className="stack" style={{ gap: 14 }}>
+                  {d.tests.categoryAccuracy.map((c) => (
+                    <BarRow key={c.category} label={c.category} value={c.accuracy} caption={`${c.accuracy}% · ${c.total} answers`} />
+                  ))}
+                </div>
+              )}
+            </section>
+          </div>
+        </>
+      )}
     </>
   );
 }
