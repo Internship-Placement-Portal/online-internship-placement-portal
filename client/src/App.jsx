@@ -19,6 +19,8 @@ import TestRunner from './pages/student/TestRunner.jsx';
 import TestResult from './pages/student/TestResult.jsx';
 import QuestionBank from './pages/admin/QuestionBank.jsx';
 import { TestAttempts, TestsAdmin } from './pages/admin/TestsAdmin.jsx';
+import Analytics from './pages/admin/Analytics.jsx';
+import AuditLog from './pages/admin/AuditLog.jsx';
 import Internships from './pages/student/Internships.jsx';
 import RecruiterDashboard from './pages/recruiter/RecruiterDashboard.jsx';
 import MyListings from './pages/recruiter/MyListings.jsx';
@@ -73,6 +75,8 @@ export default function App() {
               <Route path="/admin" element={<AppLayout />}>
                 <Route index element={<AdminDashboard />} />
                 <Route path="approvals" element={<Approvals />} />
+                <Route path="analytics" element={<Analytics />} />
+                <Route path="audit" element={<AuditLog />} />
                 <Route path="questions" element={<QuestionBank />} />
                 <Route path="tests" element={<TestsAdmin />} />
                 <Route path="tests/:id/attempts" element={<TestAttempts />} />

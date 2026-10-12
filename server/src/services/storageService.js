@@ -21,7 +21,8 @@ async function save(buffer) {
 }
 
 const open = (key) => fs.createReadStream(pathFor(key));
-const exists = (key) => fsp.access(pathFor(key)).then(() => true, () => false);
+// Unknown / malformed keys simply do not exist (never throw into the request).
+const exists = (key) => (KEY_RE.test(String(key)) ? fsp.access(pathFor(key)).then(() => true, () => false) : Promise.resolve(false));
 const remove = (key) => fsp.rm(pathFor(key), { force: true });
 
 module.exports = { save, open, exists, remove };

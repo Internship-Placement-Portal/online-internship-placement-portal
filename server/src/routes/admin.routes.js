@@ -15,6 +15,11 @@ router.patch('/recruiters/:id', validate(idParam, 'params'), validate(v.decision
 router.get('/listings', validate(v.listListings, 'query'), controller.listListings);
 router.patch('/listings/:id', validate(idParam, 'params'), validate(v.decision), controller.decideListing);
 
+// Audit log viewer (IPP-F-024)
+const dv = require('../validators/dashboardValidators');
+router.get('/audit-logs', validate(dv.auditLogs, 'query'), controller.auditLogs);
+router.get('/audit-logs/actions', controller.auditActions);
+
 // Question bank (IPP-F-014)
 router.get('/questions', validate(tv.listQuestions, 'query'), testController.qList);
 router.get('/questions/categories', testController.qCategories);
