@@ -154,6 +154,13 @@ describe('search, filter, pagination (IPP-F-007)', () => {
     expect((await request(app).get('/api/listings')).status).toBe(401);
   });
 
+  it('treats empty filter values as "no filter" instead of rejecting them', async () => {
+    const res = await get('/api/listings?q=&domain=&location=&minStipend=&sort=&page=&limit=', student);
+    expect(res.status).toBe(200);
+    expect(res.body.total).toBe(3);
+    expect((await get('/api/listings/mine?status=', recruiter)).status).toBe(200);
+  });
+
   it('exposes the domain list', async () => {
     const res = await get('/api/listings/domains', student);
     expect(res.body.domains.length).toBeGreaterThan(5);

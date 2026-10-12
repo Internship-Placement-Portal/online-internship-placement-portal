@@ -182,14 +182,14 @@ describe('RBAC (IPP-F-023, IPP-SR-006)', () => {
 
   it('allows the matching role and returns 403 + audit entry otherwise', async () => {
     const student = await tokenFor();
-    const ok = await request(app).get('/api/rbac/student').set('Authorization', `Bearer ${student}`);
+    const ok = await request(app).get('/api/applications/mine').set('Authorization', `Bearer ${student}`);
     expect(ok.status).toBe(200);
 
-    const denied = await request(app).get('/api/rbac/admin').set('Authorization', `Bearer ${student}`);
+    const denied = await request(app).get('/api/admin/recruiters').set('Authorization', `Bearer ${student}`);
     expect(denied.status).toBe(403);
     expect(denied.body.code).toBe('FORBIDDEN');
     expect(await AuditLog.countDocuments({ action: 'RBAC_DENIED' })).toBe(1);
-    expect((await request(app).get('/api/rbac/recruiter').set('Authorization', `Bearer ${student}`)).status).toBe(403);
+    expect((await request(app).get('/api/listings/mine').set('Authorization', `Bearer ${student}`)).status).toBe(403);
   });
 
   it('admin and recruiter only reach their own routes; anonymous gets 401', async () => {
@@ -197,11 +197,11 @@ describe('RBAC (IPP-F-023, IPP-SR-006)', () => {
     const adminToken = (await login(admin.email, admin.password)).body.token;
     const recruiterToken = await tokenFor({ email: 'r@example.com', role: 'recruiter' });
 
-    expect((await request(app).get('/api/rbac/admin').set('Authorization', `Bearer ${adminToken}`)).status).toBe(200);
-    expect((await request(app).get('/api/rbac/student').set('Authorization', `Bearer ${adminToken}`)).status).toBe(403);
-    expect((await request(app).get('/api/rbac/recruiter').set('Authorization', `Bearer ${recruiterToken}`)).status).toBe(200);
-    expect((await request(app).get('/api/rbac/admin').set('Authorization', `Bearer ${recruiterToken}`)).status).toBe(403);
-    expect((await request(app).get('/api/rbac/student')).status).toBe(401);
+    expect((await request(app).get('/api/admin/recruiters').set('Authorization', `Bearer ${adminToken}`)).status).toBe(200);
+    expect((await request(app).get('/api/applications/mine').set('Authorization', `Bearer ${adminToken}`)).status).toBe(403);
+    expect((await request(app).get('/api/listings/mine').set('Authorization', `Bearer ${recruiterToken}`)).status).toBe(200);
+    expect((await request(app).get('/api/admin/recruiters').set('Authorization', `Bearer ${recruiterToken}`)).status).toBe(403);
+    expect((await request(app).get('/api/applications/mine')).status).toBe(401);
   });
 
   it('a deactivated user is cut off immediately', async () => {

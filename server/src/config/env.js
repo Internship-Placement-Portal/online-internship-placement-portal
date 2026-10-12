@@ -51,11 +51,28 @@ const config = {
   },
   clamav: { host: process.env.CLAMAV_HOST || '', port: int(process.env.CLAMAV_PORT, 3310) },
   // "console" prints mails (incl. OTPs) for local development only; never allowed in production.
-  mailTransport: process.env.MAIL_TRANSPORT || (isProd ? 'none' : isTest ? 'memory' : 'console'),
+  mailTransport: process.env.MAIL_TRANSPORT || (process.env.SMTP_HOST ? 'smtp' : isProd ? 'none' : isTest ? 'memory' : 'console'),
+  smtp: {
+    host: process.env.SMTP_HOST || '',
+    port: int(process.env.SMTP_PORT, 587),
+    secure: process.env.SMTP_SECURE === 'true',
+    user: process.env.SMTP_USER || '',
+    pass: process.env.SMTP_PASS || '',
+    from: process.env.MAIL_FROM || 'IPP <no-reply@ipp.local>',
+  },
   dnsServers: (process.env.DNS_SERVERS || '').split(',').map((x) => x.trim()).filter(Boolean),
   trustProxy: process.env.TRUST_PROXY === 'true',
+  // IPP-SR-001 / IPP-NF-003: TLS 1.2+ everywhere. Either terminate TLS in Node (TLS_CERT_FILE + TLS_KEY_FILE) or behind a
+  // reverse proxy / load balancer (then set TRUST_PROXY=true and keep FORCE_HTTPS on so plain HTTP is never served).
+  forceHttps: process.env.FORCE_HTTPS ? process.env.FORCE_HTTPS === 'true' : isProd,
+  tls: { certFile: process.env.TLS_CERT_FILE || '', keyFile: process.env.TLS_KEY_FILE || '', minVersion: 'TLSv1.2' },
+  // Background jobs (listing expiry, test auto-submit) can be limited to one instance when scaling out (IPP-NF-005).
+  jobsEnabled: process.env.JOBS_ENABLED !== 'false',
 };
 
+if (config.mailTransport === 'smtp' && !config.smtp.host) {
+  throw new Error('MAIL_TRANSPORT=smtp requires SMTP_HOST');
+}
 if (isProd && config.mailTransport === 'console') {
   throw new Error('MAIL_TRANSPORT=console is not allowed in production');
 }
