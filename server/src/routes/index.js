@@ -11,6 +11,5 @@ router.use('/tests', testRoutes.tests);
 router.use('/attempts', testRoutes.attempts);
 router.use('/dashboard', require('./dashboard.routes'));
 router.use('/admin', require('./admin.routes'));
-router.use('/rbac', require('./rbac.routes'));
 
 module.exports = router;
