@@ -1,24 +1,12 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, CalendarClock, ClipboardCheck, FileText, Search, Target, Timer, Trophy, Video } from 'lucide-react';
+import { ArrowRight, CalendarClock, ClipboardCheck, FileText, Sparkles, Target, Timer, Trophy, Video } from 'lucide-react';
 import { studentDashboardApi } from '../../api/dashboard.js';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { ChartCard, LineChart } from '../../components/charts.jsx';
+import { DashHero, StatCard } from '../../components/fx.jsx';
 import { Alert, EmptyState, Spinner, StatusBadge, useAsync } from '../../components/ui.jsx';
 import { BarRow } from './TestResult.jsx';
 import { formatDate, formatDateTime } from '../../lib/format.js';
-
-const Kpi = ({ icon: Icon, num, label, sub }) => (
-  <div className="card stat">
-    <span className="stat-icon">
-      <Icon size={22} aria-hidden="true" />
-    </span>
-    <div>
-      <div className="stat-num">{num}</div>
-      <div className="stat-label">{label}</div>
-      {sub && <div className="kpi-sub">{sub}</div>}
-    </div>
-  </div>
-);
 
 // IPP-F-018: applications submitted, interviews scheduled and test scores, straight from the underlying records.
 export default function StudentDashboard() {
@@ -27,22 +15,11 @@ export default function StudentDashboard() {
 
   return (
     <>
-      <section className="card hero-card" aria-labelledby="welcome">
-        <div>
-          <h1 id="welcome">Welcome back, {user.name.split(' ')[0]} 👋</h1>
-          <p className="muted" style={{ marginTop: 6 }}>
-            Here is your progress across applications, interviews and aptitude tests.
-          </p>
-        </div>
-        <div className="btn-row">
-          <Link to="/student/internships" className="btn">
-            <Search size={17} aria-hidden="true" /> Find internships
-          </Link>
-          <Link to="/student/tests" className="btn btn-secondary">
-            <Timer size={17} aria-hidden="true" /> Practice tests
-          </Link>
-        </div>
-      </section>
+      <DashHero eyebrow="Student dashboard" greeting={`Hey ${user.name.split(' ')[0]},`} title="here's your progress" search orbIcon={Sparkles}>
+        <Link to="/student/tests" className="btn btn-secondary">
+          <Timer size={17} aria-hidden="true" /> Practice tests
+        </Link>
+      </DashHero>
 
       {error && (
         <div style={{ marginTop: 16 }}>
@@ -58,10 +35,10 @@ export default function StudentDashboard() {
       {d && (
         <>
           <div className="grid grid-4" style={{ marginTop: 20 }}>
-            <Kpi icon={ClipboardCheck} num={d.applications.total} label="Applications submitted" sub={`${d.applications.byStatus.Selected} selected · ${d.applications.byStatus.Shortlisted} shortlisted`} />
-            <Kpi icon={CalendarClock} num={d.interviews.scheduled} label="Interviews scheduled" sub={`${d.interviews.upcoming.length} upcoming`} />
-            <Kpi icon={Timer} num={d.tests.attempts} label="Tests completed" sub={d.tests.attempts ? `Best accuracy ${d.tests.bestAccuracy}%` : 'None yet'} />
-            <Kpi icon={Target} num={`${d.tests.avgAccuracy}%`} label="Average test accuracy" />
+            <StatCard icon={ClipboardCheck} value={d.applications.total} label="Applications submitted" sub={`${d.applications.byStatus.Selected} selected · ${d.applications.byStatus.Shortlisted} shortlisted`} to="/student/applications" />
+            <StatCard icon={CalendarClock} value={d.interviews.scheduled} label="Interviews scheduled" sub={`${d.interviews.upcoming.length} upcoming`} />
+            <StatCard icon={Timer} value={d.tests.attempts} label="Tests completed" sub={d.tests.attempts ? `Best accuracy ${d.tests.bestAccuracy}%` : 'None yet'} spark={d.tests.trend.map((t) => t.accuracy)} to="/student/tests" />
+            <StatCard icon={Target} value={d.tests.avgAccuracy} suffix="%" decimals={1} label="Average test accuracy" />
           </div>
 
           <div className="grid grid-2" style={{ marginTop: 16, alignItems: 'start' }}>
@@ -76,7 +53,7 @@ export default function StudentDashboard() {
                   {d.interviews.upcoming.map((i) => (
                     <li key={i.applicationId}>
                       <Link to={`/student/applications/${i.applicationId}`} className="row-link">
-                        <span className="stat-icon" style={{ width: '2.4rem', height: '2.4rem' }}>
+                        <span className="stat-icon" style={{ width: '2.5rem', height: '2.5rem', borderRadius: 14 }}>
                           {i.mode === 'online' ? <Video size={18} aria-hidden="true" /> : <CalendarClock size={18} aria-hidden="true" />}
                         </span>
                         <span className="grow">

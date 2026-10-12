@@ -1,30 +1,24 @@
 import { useState } from 'react';
-import { Contrast, Monitor, Moon, Sun } from 'lucide-react';
-import { THEMES, getTheme, setTheme } from '../theme.js';
+import { Moon, Sun } from 'lucide-react';
+import { getTheme, setTheme } from '../theme.js';
 
-const ICONS = { system: Monitor, light: Sun, dark: Moon, contrast: Contrast };
-
-// Keyboard-accessible native <select> with a leading icon; changes apply instantly and are remembered.
-export default function ThemeToggle({ compact = false }) {
+// One-click Light/Dark switch (icon button, announced through its aria-label).
+export default function ThemeToggle() {
   const [theme, setState] = useState(getTheme);
-  const Icon = ICONS[theme];
+  const dark = theme === 'dark';
   return (
-    <label className={`theme-toggle${compact ? ' compact' : ''}`} style={{ margin: 0 }}>
-      <span className="sr-only">Colour theme</span>
-      <Icon size={16} aria-hidden="true" />
-      <select
-        value={theme}
-        onChange={(e) => {
-          setState(e.target.value);
-          setTheme(e.target.value);
-        }}
-      >
-        {THEMES.map(([v, label]) => (
-          <option key={v} value={v}>
-            {label}
-          </option>
-        ))}
-      </select>
-    </label>
+    <button
+      type="button"
+      className="icon-btn"
+      aria-label={dark ? 'Switch to light theme' : 'Switch to dark theme'}
+      title={dark ? 'Light theme' : 'Dark theme'}
+      onClick={() => {
+        const next = dark ? 'light' : 'dark';
+        setState(next);
+        setTheme(next);
+      }}
+    >
+      {dark ? <Sun size={19} aria-hidden="true" /> : <Moon size={19} aria-hidden="true" />}
+    </button>
   );
 }
