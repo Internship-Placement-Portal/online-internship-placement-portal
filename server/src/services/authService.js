@@ -27,7 +27,7 @@ async function issueAndSendOtp(user) {
     otpExpiresAt: new Date(Date.now() + config.otp.ttlMinutes * MIN),
     otpAttempts: 0,
   });
-  await mailer.send({
+  await mailer.sendWithRetry({
     to: user.email,
     subject: 'Verify your IPP account',
     text: `Your verification code is ${otp}. It expires in ${config.otp.ttlMinutes} minutes.`,
@@ -192,7 +192,7 @@ async function forgotPassword({ email }, ctx = {}) {
       passwordResetExpiresAt: new Date(Date.now() + config.passwordReset.ttlMinutes * MIN),
     });
     const link = `${config.clientOrigin}/reset-password?token=${token}`;
-    await mailer.send({
+    await mailer.sendWithRetry({
       to: user.email,
       subject: 'Reset your IPP password',
       text: `Use this link to choose a new password (valid for ${config.passwordReset.ttlMinutes} minutes, single use):\n${link}`,

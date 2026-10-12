@@ -36,7 +36,7 @@ async function decideRecruiter(admin, id, { decision, reason }, ctx = {}) {
     metadata: { reason: reason || undefined },
     ip: ctx.ip,
   });
-  await mailer.send({
+  await mailer.sendWithRetry({
     to: user.email,
     subject: decision === 'approved' ? 'Your IPP recruiter account is approved' : 'Your IPP recruiter registration was not approved',
     text:
