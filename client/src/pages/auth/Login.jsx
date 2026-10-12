@@ -50,12 +50,15 @@ export default function Login() {
           required
         />
 
+        <p className="small" style={{ textAlign: 'right', marginTop: 8 }}>
+          <Link to="/forgot-password">Forgot password?</Link>
+        </p>
         <FormError error={error} />
-        <button type="submit" className="btn" disabled={busy || !email || !password}>
+        <button type="submit" className="btn btn-block" disabled={busy || !email || !password}>
           {busy ? 'Logging in…' : 'Log in'}
         </button>
       </form>
-      <p className="muted">
+      <p className="footer-links">
         New here? <Link to="/register">Create an account</Link>
       </p>
     </AuthCard>

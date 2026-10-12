@@ -5,4 +5,6 @@ export const verifyEmailApi = (body) => http.post('/auth/verify-email', body).th
 export const resendOtpApi = (body) => http.post('/auth/resend-otp', body).then((r) => r.data);
 export const loginApi = (body) => http.post('/auth/login', body).then((r) => r.data);
 export const logoutApi = () => http.post('/auth/logout');
+export const forgotPasswordApi = (body) => http.post('/auth/forgot-password', body).then((r) => r.data);
+export const resetPasswordApi = (body) => http.post('/auth/reset-password', body).then((r) => r.data);
 export { refreshSession };

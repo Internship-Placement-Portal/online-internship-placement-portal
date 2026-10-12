@@ -75,11 +75,11 @@ export default function Register() {
         )}
 
         <FormError error={error && !Object.keys(fieldErrors).length ? error : ''} />
-        <button type="submit" className="btn" disabled={busy}>
+        <button type="submit" className="btn btn-block" disabled={busy}>
           {busy ? 'Creating account…' : 'Register'}
         </button>
       </form>
-      <p className="muted">
+      <p className="footer-links">
         Already registered? <Link to="/login">Log in</Link>
       </p>
     </AuthCard>
