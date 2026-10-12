@@ -36,6 +36,7 @@ const config = {
   bcryptRounds: int(process.env.BCRYPT_ROUNDS, isTest ? 4 : 12),
   lockout: { maxAttempts: 5, lockMinutes: 15 }, // IPP-F-004
   otp: { ttlMinutes: 10, maxAttempts: 5 },
+  passwordReset: { ttlMinutes: 30 }, // IPP-F-005
   rateLimit: {
     windowMs: 15 * 60 * 1000,
     authMax: int(process.env.RATE_LIMIT_AUTH_MAX, 30),

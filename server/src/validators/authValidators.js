@@ -24,4 +24,7 @@ const verifyEmail = Joi.object({
 });
 const resendOtp = Joi.object({ email: email.required() });
 
-module.exports = { register, login, verifyEmail, resendOtp };
+const forgotPassword = Joi.object({ email: email.required() });
+const resetPassword = Joi.object({ token: Joi.string().min(20).max(200).required(), password: password.required() });
+
+module.exports = { register, login, verifyEmail, resendOtp, forgotPassword, resetPassword };
