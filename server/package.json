@@ -8,7 +8,8 @@
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
     "test": "node --require ./tests/setup.js --test --test-concurrency=1 \"tests/**/*.test.js\"",
-    "seed:admin": "node src/scripts/seedAdmin.js"
+    "seed:admin": "node src/scripts/seedAdmin.js",
+    "seed:demo": "node src/scripts/seedDemo.js"
   },
   "engines": {
     "node": ">=18"
