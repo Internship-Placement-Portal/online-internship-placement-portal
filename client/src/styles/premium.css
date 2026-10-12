@@ -1125,3 +1125,11 @@ tbody tr:hover {
 .bar-track span {
   background: linear-gradient(90deg, var(--accent), var(--a4));
 }
+
+.stat-card .stat-icon {
+  display: grid;
+  place-items: center;
+}
+.btn {
+  white-space: nowrap;
+}
