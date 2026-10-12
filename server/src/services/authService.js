@@ -182,4 +182,39 @@ async function logout(rawToken) {
   if (record && !record.revokedAt) await refreshTokenRepository.revoke(record._id);
 }
 
-module.exports = { register, verifyEmail, resendOtp, login, refresh, logout };
+// IPP-F-005: emailed single-use link valid for 30 minutes. Always answers the same way so emails can't be probed.
+async function forgotPassword({ email }, ctx = {}) {
+  const user = await userRepository.findByEmail(email);
+  if (user && user.isActive) {
+    const token = randomToken();
+    await userRepository.updateById(user._id, {
+      passwordResetTokenHash: sha256(token),
+      passwordResetExpiresAt: new Date(Date.now() + config.passwordReset.ttlMinutes * MIN),
+    });
+    const link = `${config.clientOrigin}/reset-password?token=${token}`;
+    await mailer.send({
+      to: user.email,
+      subject: 'Reset your IPP password',
+      text: `Use this link to choose a new password (valid for ${config.passwordReset.ttlMinutes} minutes, single use):\n${link}`,
+    });
+    await auditService.record({ actor: user._id, action: 'PASSWORD_RESET_REQUESTED', targetType: 'User', targetId: user._id, ip: ctx.ip });
+  }
+  return { status: 'sent' };
+}
+
+async function resetPassword({ token, password }, ctx = {}) {
+  const invalid = () => new AppError(400, 'INVALID_RESET_TOKEN', 'This reset link is invalid or has expired');
+  const user = await userRepository.findByResetHash(sha256(token));
+  if (!user || !user.passwordResetExpiresAt || user.passwordResetExpiresAt < new Date()) throw invalid();
+
+  await userRepository.updateById(user._id, {
+    passwordHash: await bcrypt.hash(password, config.bcryptRounds),
+    failedLoginAttempts: 0,
+    $unset: { passwordResetTokenHash: 1, passwordResetExpiresAt: 1, lockUntil: 1 },
+  });
+  await refreshTokenRepository.revokeAllForUser(user._id); // sign out every session
+  await auditService.record({ actor: user._id, action: 'PASSWORD_RESET_COMPLETED', targetType: 'User', targetId: user._id, ip: ctx.ip });
+  return { status: 'password_reset' };
+}
+
+module.exports = { register, verifyEmail, resendOtp, login, refresh, logout, forgotPassword, resetPassword };
