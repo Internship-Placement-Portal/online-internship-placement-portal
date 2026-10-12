@@ -1133,3 +1133,32 @@ tbody tr:hover {
 .btn {
   white-space: nowrap;
 }
+
+/* Auth pages: fit the viewport, no page scroll (the theme switch floats top-right instead of sitting below the card) */
+.auth-shell {
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+}
+.auth-main {
+  position: relative;
+  padding: 1rem 1.25rem;
+  overflow-y: auto;
+}
+.auth-theme {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  margin: 0;
+}
+.auth-hero {
+  overflow: hidden;
+}
+@media (max-width: 820px) {
+  .auth-shell {
+    height: auto;
+    min-height: 100dvh;
+    overflow: visible;
+  }
+}
