@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import Select from '../../components/Select.jsx';
 import { Link, useParams } from 'react-router-dom';
 import { CalendarPlus, Check, ChevronLeft, FileText, Users, X } from 'lucide-react';
 import { listingApplicantsApi, openResume, scheduleInterviewApi, updateStatusApi } from '../../api/applications.js';
@@ -55,10 +56,10 @@ function InterviewDialog({ applicant, onClose, onSaved }) {
         </Field>
         <Field id="mode" label="Mode" error={errors.mode}>
           {(a) => (
-            <select {...a} value={form.mode} onChange={set('mode')}>
+            <Select {...a} value={form.mode} onChange={set('mode')}>
               <option value="online">Online</option>
               <option value="in-person">In person</option>
-            </select>
+            </Select>
           )}
         </Field>
         {form.mode === 'online' && (

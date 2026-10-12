@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import Select from '../../components/Select.jsx';
 import { useSearchParams } from 'react-router-dom';
 import { Search, SearchX, SlidersHorizontal } from 'lucide-react';
 import { domainsApi, searchListingsApi } from '../../api/listings.js';
@@ -81,34 +82,34 @@ export default function Internships() {
           </div>
           <div className="field">
             <label htmlFor="minStipend">Min. stipend</label>
-            <select id="minStipend" value={draft.minStipend} onChange={set('minStipend')}>
+            <Select id="minStipend" value={draft.minStipend} onChange={set('minStipend')}>
               <option value="">Any</option>
               {[5000, 10000, 15000, 20000, 30000].map((n) => (
                 <option key={n} value={n}>
                   ₹{n.toLocaleString('en-IN')}+
                 </option>
               ))}
-            </select>
+            </Select>
           </div>
           <div className="field">
             <label htmlFor="duration">Duration</label>
-            <select id="duration" value={draft.duration} onChange={set('duration')}>
+            <Select id="duration" value={draft.duration} onChange={set('duration')}>
               <option value="">Any</option>
               {[2, 3, 4, 6].map((n) => (
                 <option key={n} value={n}>
                   Up to {n} months
                 </option>
               ))}
-            </select>
+            </Select>
           </div>
           <div className="field">
             <label htmlFor="sort">Sort by</label>
-            <select id="sort" value={draft.sort} onChange={set('sort')}>
+            <Select id="sort" value={draft.sort} onChange={set('sort')}>
               <option value="">{draft.q ? 'Relevance' : 'Newest'}</option>
               <option value="newest">Newest</option>
               <option value="stipend_desc">Highest stipend</option>
               <option value="deadline_asc">Closing soon</option>
-            </select>
+            </Select>
           </div>
           <div className="btn-row">
             <button type="submit" className="btn">

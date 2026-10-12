@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import Select from '../../components/Select.jsx';
 import { Download, FileSpreadsheet, FileText, Percent, Send, UserCheck, Users } from 'lucide-react';
 import { downloadExport, placementApi } from '../../api/dashboard.js';
 import { errorInfo } from '../../api/http.js';
@@ -87,12 +88,12 @@ export default function Analytics() {
         </div>
         <div className="field">
           <label htmlFor="company">Company</label>
-          <select id="company" value={draft.company} onChange={set('company')}>
+          <Select id="company" value={draft.company} onChange={set('company')}>
             <option value="">All companies</option>
             {(d?.filters.companies || []).map((c) => (
               <option key={c}>{c}</option>
             ))}
-          </select>
+          </Select>
         </div>
         <button type="submit" className="btn">
           Apply

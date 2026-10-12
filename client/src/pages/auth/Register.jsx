@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import Select from '../../components/Select.jsx';
 import { Link, useNavigate } from 'react-router-dom';
 import { registerApi } from '../../api/auth.js';
 import { errorInfo } from '../../api/http.js';
@@ -66,10 +67,10 @@ export default function Register() {
         {fieldErrors.password && <p className="field-error">{fieldErrors.password}</p>}
 
         <label htmlFor="role">I am a</label>
-        <select id="role" value={form.role} onChange={set('role')}>
+        <Select id="role" value={form.role} onChange={set('role')}>
           <option value="student">Student</option>
           <option value="recruiter">Recruiter / Company</option>
-        </select>
+        </Select>
         {form.role === 'recruiter' && (
           <p className="muted small">Recruiter accounts need approval from a placement officer before you can post listings.</p>
         )}

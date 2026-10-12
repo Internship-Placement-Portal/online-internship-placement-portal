@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import Select from '../../components/Select.jsx';
 import { Archive, ArchiveRestore, FileQuestion, Pencil, Plus, Search, Trash2, X } from 'lucide-react';
 import { createQuestionApi, deleteQuestionApi, listQuestionsApi, questionCategoriesApi, updateQuestionApi } from '../../api/tests.js';
 import { errorInfo } from '../../api/http.js';
@@ -62,10 +63,10 @@ function QuestionForm({ question, categories, onClose, onSaved }) {
         {!editing && (
           <Field id="type" label="Type">
             {(a) => (
-              <select {...a} value={form.type} onChange={set('type')}>
+              <Select {...a} value={form.type} onChange={set('type')}>
                 <option value="mcq">Multiple choice</option>
                 <option value="coding">Coding</option>
-              </select>
+              </Select>
             )}
           </Field>
         )}
@@ -88,11 +89,11 @@ function QuestionForm({ question, categories, onClose, onSaved }) {
           <div className="form-grid" style={{ gridTemplateColumns: '1fr 1fr' }}>
             <Field id="difficulty" label="Difficulty">
               {(a) => (
-                <select {...a} value={form.difficulty} onChange={set('difficulty')}>
+                <Select {...a} value={form.difficulty} onChange={set('difficulty')}>
                   <option value="easy">Easy</option>
                   <option value="medium">Medium</option>
                   <option value="hard">Hard</option>
-                </select>
+                </Select>
               )}
             </Field>
             <Field id="marks" label="Marks" error={errors.marks}>
@@ -207,37 +208,37 @@ export default function QuestionBank() {
         </div>
         <div className="field">
           <label htmlFor="fc">Category</label>
-          <select id="fc" value={filters.category} onChange={setFilter('category')}>
+          <Select id="fc" value={filters.category} onChange={setFilter('category')}>
             <option value="">All</option>
             {(categories || []).map((c) => (
               <option key={c}>{c}</option>
             ))}
-          </select>
+          </Select>
         </div>
         <div className="field">
           <label htmlFor="ft">Type</label>
-          <select id="ft" value={filters.type} onChange={setFilter('type')}>
+          <Select id="ft" value={filters.type} onChange={setFilter('type')}>
             <option value="">All</option>
             <option value="mcq">MCQ</option>
             <option value="coding">Coding</option>
-          </select>
+          </Select>
         </div>
         <div className="field">
           <label htmlFor="fd">Difficulty</label>
-          <select id="fd" value={filters.difficulty} onChange={setFilter('difficulty')}>
+          <Select id="fd" value={filters.difficulty} onChange={setFilter('difficulty')}>
             <option value="">All</option>
             <option value="easy">Easy</option>
             <option value="medium">Medium</option>
             <option value="hard">Hard</option>
-          </select>
+          </Select>
         </div>
         <div className="field">
           <label htmlFor="fa">Status</label>
-          <select id="fa" value={filters.active} onChange={setFilter('active')}>
+          <Select id="fa" value={filters.active} onChange={setFilter('active')}>
             <option value="">All</option>
             <option value="true">Active</option>
             <option value="false">Archived</option>
-          </select>
+          </Select>
         </div>
       </form>
 
