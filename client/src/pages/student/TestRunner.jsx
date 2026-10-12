@@ -269,9 +269,23 @@ export default function TestRunner() {
             </span>
           )}
         </div>
-        <div className={`timer${low ? ' low' : ''}`} role="timer" aria-label="Time remaining">
-          <Timer size={20} aria-hidden="true" />
-          <span>{fmt(remaining)}</span>
+        <div className={`timer-ring${low ? ' low' : ''}`} role="timer" aria-label="Time remaining">
+          <svg viewBox="0 0 100 100" aria-hidden="true">
+            <circle className="track" cx="50" cy="50" r="44" fill="none" strokeWidth="7" />
+            <circle
+              className="prog"
+              cx="50"
+              cy="50"
+              r="44"
+              fill="none"
+              strokeWidth="7"
+              strokeLinecap="round"
+              strokeDasharray={2 * Math.PI * 44}
+              strokeDashoffset={2 * Math.PI * 44 * (1 - Math.max(0, Math.min(1, remaining / (attempt.test.durationMinutes * 60))))}
+              transform="rotate(-90 50 50)"
+            />
+          </svg>
+          <span className="time">{fmt(remaining)}</span>
         </div>
       </div>
       <p className="sr-only" aria-live="assertive">
