@@ -319,35 +319,52 @@ The project documentation consists of:
 
 # 8. How to Run
 
-See [PLAN.md](PLAN.md) for the implementation plan, folder structure, schemas and API routes.
-
-### Prerequisites
-
-- Node.js 18+ and npm
-- MongoDB (local instance, Docker, or a MongoDB Atlas connection string)
-
-### Server (`server/`)
+Prerequisites: Node.js 22+, npm, and a MongoDB database (Atlas connection string or local).
 
 ```bash
-cd server
-cp .env.example .env      # then edit MONGODB_URI and JWT_ACCESS_SECRET
-npm install
-npm run dev               # http://localhost:5000  (GET /health -> ok)
+# API  -> http://localhost:5000
+cd server && cp .env.example .env     # set MONGODB_URI and JWT_ACCESS_SECRET (+ ADMIN_EMAIL / ADMIN_PASSWORD)
+npm install && npm run seed:admin && npm run seed:demo && npm start
+
+# Web app -> http://localhost:5173
+cd client && cp .env.example .env && npm install && npm run dev
 ```
 
-### Client (`client/`)
+### Environment variables (`server/.env`, see `.env.example`)
 
-```bash
-cd client
-cp .env.example .env      # VITE_API_URL defaults to http://localhost:5000/api
-npm install
-npm run dev               # http://localhost:5173
-```
+| Variable | Purpose |
+|---|---|
+| `MONGODB_URI`, `JWT_ACCESS_SECRET` | Required. Secret must be 32+ chars in production. |
+| `PORT`, `CLIENT_ORIGIN` | API port (default 5000) and the allowed browser origin. |
+| `JWT_ACCESS_EXPIRES_MIN`, `REFRESH_TOKEN_EXPIRES_DAYS`, `BCRYPT_ROUNDS` | Token lifetimes (access capped at 60 min) and hashing cost. |
+| `ADMIN_EMAIL`, `ADMIN_PASSWORD` | Admin created by `seed:admin`. |
+| `SMTP_HOST/PORT/USER/PASS/SECURE`, `MAIL_FROM` | Real email. Without `SMTP_HOST`, mails (OTP, reset links) print in the server console. |
+| `DNS_SERVERS` | Optional; fixes `mongodb+srv` lookups on networks with a broken resolver. |
+| `UPLOAD_DIR`, `CLAMAV_HOST` | Resume storage path; optional ClamAV scanner. |
+| `RATE_LIMIT_*`, `TRUST_PROXY`, `FORCE_HTTPS`, `TLS_CERT_FILE/TLS_KEY_FILE`, `JOBS_ENABLED` | Rate limits, TLS and scaling options (see `docs/SECURITY.md`). |
 
-> Aptitude-test scoring currently runs inside the Node API (`ScoringService`). The Python/Flask microservice from the SAD can be swapped in later behind the same service interface.
+Client: `VITE_API_URL` (default `http://localhost:5000/api`).
 
-### Milestone 1 notes (auth + RBAC)
+### Scripts
 
-- Create the admin account once: `cd server && npm run seed:admin` (uses `ADMIN_EMAIL` / `ADMIN_PASSWORD` from `server/.env`).
-- Registration needs an email OTP. In development the OTP is printed in the server terminal (`MAIL_TRANSPORT=console`); this transport is refused in production.
-- Run server tests: `cd server && npm test` (uses an in-memory MongoDB, first run downloads a mongod binary).
+| Where | Command | What |
+|---|---|---|
+| server | `npm start` / `npm run dev` | Run the API. |
+| server | `npm test` / `npm run test:coverage` | Tests (in-memory MongoDB) / tests with >=70% coverage gates. |
+| server | `npm run seed:admin`, `npm run seed:demo` | Admin account; demo users, listings, question bank, 12 months of history. |
+| client | `npm run dev` / `npm run build` | Dev server / production build. |
+| client | `npm run a11y` | axe-core accessibility audit in 3 themes. |
+| repo | `node perf/bench.js`, `perf/k6/load.js` | Load checks. |
+
+### Demo accounts
+
+Password for all demo users: `Demo@12345`. Admin: `ADMIN_EMAIL` / `ADMIN_PASSWORD` from `server/.env`.
+
+| Role | Email |
+|---|---|
+| Student | `student@ipp.demo`, `student2@ipp.demo` |
+| Recruiter (approved) | `recruiter@ipp.demo`, `recruiter2@ipp.demo` |
+| Recruiter (pending approval) | `pending.recruiter@ipp.demo` |
+
+More docs: [PLAN.md](PLAN.md), [docs/SECURITY.md](docs/SECURITY.md), [docs/PERFORMANCE.md](docs/PERFORMANCE.md), [docs/ACCESSIBILITY.md](docs/ACCESSIBILITY.md).
+Aptitude scoring runs in Node behind `scoringService`; a Flask service can replace it via `setScorer()`.
