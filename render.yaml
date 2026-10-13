@@ -1,0 +1,48 @@
+# Render Blueprint: New > Blueprint > pick this repo. Fill the `sync: false` values when prompted.
+services:
+  - type: web
+    name: ipp-api
+    runtime: node
+    rootDir: server
+    plan: free
+    buildCommand: npm ci
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - { key: NODE_ENV, value: production }
+      - { key: NODE_VERSION, value: 22 }
+      - { key: TRUST_PROXY, value: "true" }
+      - { key: COOKIE_SAMESITE, value: none }          # client and API are on different onrender.com subdomains
+      - { key: JWT_ACCESS_SECRET, generateValue: true }
+      - { key: MONGODB_URI, sync: false }              # Atlas connection string (allow 0.0.0.0/0 in Atlas Network Access)
+      - { key: CLIENT_ORIGIN, sync: false }            # https://<your ipp-client>.onrender.com (no trailing slash)
+      - { key: SMTP_HOST, sync: false }                # required: OTP / reset / status emails
+      - { key: SMTP_PORT, value: 587 }
+      - { key: SMTP_USER, sync: false }
+      - { key: SMTP_PASS, sync: false }
+      - { key: MAIL_FROM, sync: false }
+      - { key: SCORING_SERVICE_URL, sync: false }      # https://<your ipp-scoring>.onrender.com
+      - { key: SCORING_SERVICE_TOKEN, sync: false }    # same value as on ipp-scoring
+
+  - type: web
+    name: ipp-scoring
+    runtime: python
+    rootDir: scoring-service
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT
+    healthCheckPath: /health
+    envVars:
+      - { key: PYTHON_VERSION, value: 3.12.7 }
+      - { key: SCORING_SERVICE_TOKEN, sync: false }
+
+  - type: web
+    name: ipp-client
+    runtime: static
+    rootDir: client
+    buildCommand: npm ci && npm run build
+    staticPublishPath: dist
+    envVars:
+      - { key: VITE_API_URL, sync: false }             # https://<your ipp-api>.onrender.com/api
+    routes:
+      - { type: rewrite, source: /*, destination: /index.html }
