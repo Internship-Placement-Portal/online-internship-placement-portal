@@ -2,7 +2,6 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, BarChart3, Briefcase, Check, ClipboardCheck, GraduationCap, Search, ShieldCheck, Timer, UserCheck } from 'lucide-react';
 import { Brand } from '../components/AppLayout.jsx';
 import ThemeToggle from '../components/ThemeToggle.jsx';
-import { CountUp } from '../components/fx.jsx';
 
 const ROLES = [
   [GraduationCap, 'For students', ['Discover verified internships and apply with one resume upload', 'Practise with timed aptitude tests and instant scoring', 'Track every application, interview and score in one dashboard']],
@@ -53,27 +52,6 @@ export default function Landing() {
               <Link to="/login" className="btn btn-secondary btn-lg">
                 I already have an account
               </Link>
-            </div>
-          </section>
-
-          <section className="card l-stats" aria-label="Platform at a glance">
-            <div>
-              <strong>
-                <CountUp value={500} suffix="+" />
-              </strong>
-              <span>Internships</span>
-            </div>
-            <div>
-              <strong>
-                <CountUp value={120} suffix="+" />
-              </strong>
-              <span>Companies</span>
-            </div>
-            <div>
-              <strong>
-                <CountUp value={5000} suffix="+" />
-              </strong>
-              <span>Students</span>
             </div>
           </section>
 

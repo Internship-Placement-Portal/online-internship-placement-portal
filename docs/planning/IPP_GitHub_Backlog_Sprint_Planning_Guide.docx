@@ -1,0 +1,159 @@
+Team 6 | IPP Mini-Project | GitHub Backlog Planning
+
+**GITHUB BACKLOG ****&**** SPRINT PLANNING GUIDE**
+
+*Online Internship **&** Placement Preparation Portal (IPP) | Team 6*
+
+1. Purpose and deadline
+
+This document provides the step-by-step GitHub setup, requirement backlog, proposed story points, balanced task ownership for all four team members, and a two-sprint planning template. The backlog is based on the team's SRS v1.0. The dates provided in the course instruction are: backlog creation and story pointing by 12 October 2026; dry run during 12–16 October 2026; entries may still be revised on 19 October 2026.
+
+2. Team members
+
+| Team member | SRN |
+| --- | --- |
+| Harshith | PES2UG24CS186 |
+| Heemadhawala R | PES2UG24CS190 |
+| Joshwin Paul | PES2UG24CS208 |
+| Kanishq Surendran | PES2UG24CS214 |
+
+3. GitHub setup: step by step
+
+- **Open the mini-project repository: **Sign in at https://github.com, open the Team 6 IPP repository, and confirm it is the correct repository.
+
+- **Create a Project: **Use the repository Projects tab and choose New project, or create a project from your profile/organization under Projects. Name it “IPP – Internship & Placement Preparation Portal”. A Board or Table layout is suitable.
+
+- **Link the repository: **If the Project was created from your profile/organization, open Project settings and add/link the IPP repository. If created from the repository Projects tab, verify the repository is connected.
+
+- **Enable Issues: **Open repository Settings → General → Features and enable Issues if it is not visible and you have permission.
+
+- **Create backlog issues: **For every requirement in Section 4 of this document, create one GitHub Issue. Use the requirement ID in the title so the issue can be traced back to the SRS.
+
+- **Add issues to the Project: **In the Project, choose Add item and add each existing repository issue. Verify that all 36 issues appear.
+
+- **Create useful labels: **Suggested labels: functional-requirement, non-functional-requirement, security, priority-high, priority-medium, sprint-1, sprint-2. Reuse labels rather than creating duplicates.
+
+- **Add Story Points field: **In the Project table, use + / Add field → Number, name it “Story Points”, and enter the estimate listed for each issue below. If your instructor has specified a different scale, use that scale instead.
+
+- **Assign owners: **Open each issue and select the listed GitHub username under Assignees. Make sure each teammate has repository access; names in this document must be matched to their actual GitHub accounts.
+
+- **Set up sprint planning: **In Project settings, create Iterations named Sprint 1 and Sprint 2 with the official dates supplied by the instructor. If Iterations are unavailable, create a single-select Sprint field with Backlog, Sprint 1, and Sprint 2.
+
+- **Set status columns: **Use a Status field with Backlog, Todo, In Progress, and Done. During the dry run, practise moving issues through the workflow; only mark genuinely completed work as Done.
+
+4. Backlog: requirements, story points, owners and proposed sprint
+
+The SRS specifies 24 functional requirements (IPP-F-001 to IPP-F-024), six non-functional requirements (IPP-NF-001 to IPP-NF-006), and six security requirements (IPP-SR-001 to IPP-SR-006). This plan creates one issue per requirement: 36 issues total. Story points below are proposed relative estimates for team discussion, not values stated in the SRS. Sprint placement is provisional until official sprint dates and team capacity are confirmed.
+
+| Requirement ID | Backlog item / GitHub Issue title | Points | Assigned owner | Proposed sprint | Priority |
+| --- | --- | --- | --- | --- | --- |
+| IPP-F-001 | Role-based registration with email verification | 5 | Harshith | Sprint 1 | High |
+| IPP-F-002 | Email/password login and JWT session | 5 | Heemadhawala R | Sprint 1 | High |
+| IPP-F-003 | Hash and salt stored passwords | 3 | Joshwin Paul | Sprint 1 | High |
+| IPP-F-004 | Lock account after repeated failed logins | 3 | Kanishq Surendran | Sprint 1 | Medium |
+| IPP-F-005 | Time-limited password reset flow | 3 | Harshith | Sprint 1 | Medium |
+| IPP-F-006 | Recruiter create/edit/publish internship listings | 5 | Heemadhawala R | Sprint 1 | High |
+| IPP-F-007 | Search and filter internship listings | 5 | Joshwin Paul | Sprint 1 | High |
+| IPP-F-008 | Display internship details and eligibility | 2 | Kanishq Surendran | Sprint 1 | Medium |
+| IPP-F-009 | Hide expired internship listings automatically | 3 | Harshith | Sprint 1 | Medium |
+| IPP-F-010 | Upload PDF resume and submit application | 5 | Heemadhawala R | Sprint 2 | High |
+|  |  |  |  |  |  |
+| IPP-F-011 | Recruiter application status management | 5 | Joshwin Paul | Sprint 2 | High |
+| IPP-F-012 | Notify students of application status changes | 3 | Kanishq Surendran | Sprint 2 | High |
+| IPP-F-013 | Schedule and record interviews | 3 | Harshith | Sprint 2 | Medium |
+| IPP-F-014 | Timed aptitude/coding test engine | 8 | Heemadhawala R | Sprint 2 | High |
+| IPP-F-015 | Automatically evaluate MCQ answers | 5 | Joshwin Paul | Sprint 2 | High |
+| IPP-F-016 | Restrict test reattempts with admin override | 3 | Kanishq Surendran | Sprint 2 | Medium |
+| IPP-F-017 | Record per-attempt test analytics | 5 | Harshith | Sprint 2 | Medium |
+| IPP-F-018 | Student progress dashboard | 5 | Heemadhawala R | Sprint 2 | High |
+| IPP-F-019 | Placement analytics for placement officers | 8 | Joshwin Paul | Sprint 2 | High |
+| IPP-F-020 | Charts for key metrics over 12 months | 3 | Kanishq Surendran | Sprint 2 | Medium |
+| IPP-F-021 | Export analytics as CSV/PDF | 3 | Harshith | Sprint 2 | Medium |
+| IPP-F-022 | Admin approval/rejection of recruiter accounts | 5 | Heemadhawala R | Sprint 2 | High |
+| IPP-F-023 | Role-based access control by user role | 5 | Joshwin Paul | Sprint 2 | High |
+| IPP-F-024 | Audit log of administrative actions | 3 | Kanishq Surendran | Sprint 2 | Medium |
+| IPP-NF-001 | Meet ≤3-second response time target for 90% of requests | 5 | Harshith | Sprint 1 | High |
+| IPP-NF-002 | Maintain 99.5% monthly uptime | 3 | Heemadhawala R | Sprint 2 | High |
+| IPP-NF-003 | Protect data in transit and sensitive data at rest | 5 | Joshwin Paul | Sprint 1 | High |
+| IPP-NF-004 | Meet WCAG 2.1 AA accessibility requirements | 3 | Kanishq Surendran | Sprint 2 | Medium |
+| IPP-NF-005 | Support horizontal API scaling to 5× baseline | 5 | Harshith | Sprint 2 | Medium |
+| IPP-NF-006 | Maintain modular code and ≥70% core test coverage | 5 | Heemadhawala R | Sprint 2 | Medium |
+| IPP-SR-001 | Enforce TLS 1.2+ for network connections | 3 | Joshwin Paul | Sprint 1 | High |
+| IPP-SR-002 | JWT maximum lifetime and refresh-token revocation | 5 | Kanishq Surendran | Sprint 1 | High |
+| IPP-SR-003 | Validate/sanitize inputs against NoSQL injection and XSS | 5 | Harshith | Sprint 1 | High |
+| IPP-SR-004 | Rate-limit authentication and file-upload endpoints | 3 | Heemadhawala R | Sprint 2 | Medium |
+| IPP-SR-005 | Validate resume PDF/5MB limit and scan uploads | 3 | Joshwin Paul | Sprint 2 | Medium |
+| IPP-SR-006 | Enforce RBAC on every API endpoint | 5 | Kanishq Surendran | Sprint 2 | High |
+
+5. Balanced workload check
+
+| Team member | Number of issues | Total proposed points | Assigned requirement IDs |
+| --- | --- | --- | --- |
+| Harshith | 9 | 37 | IPP-F-001, IPP-F-005, IPP-F-009, IPP-F-013, IPP-F-017, IPP-F-021, IPP-NF-001, IPP-NF-005, IPP-SR-003 |
+| Heemadhawala R | 9 | 44 | IPP-F-002, IPP-F-006, IPP-F-010, IPP-F-014, IPP-F-018, IPP-F-022, IPP-NF-002, IPP-NF-006, IPP-SR-004 |
+| Joshwin Paul | 9 | 42 | IPP-F-003, IPP-F-007, IPP-F-011, IPP-F-015, IPP-F-019, IPP-F-023, IPP-NF-003, IPP-SR-001, IPP-SR-005 |
+| Kanishq Surendran | 9 | 30 | IPP-F-004, IPP-F-008, IPP-F-012, IPP-F-016, IPP-F-020, IPP-F-024, IPP-NF-004, IPP-SR-002, IPP-SR-006 |
+
+Fairness note: the backlog is divided exactly equally by item count (9 issues per person). Story-point totals may differ because the SRS requirements have different complexity. Treat these as estimates to discuss as a team; if your instructor expects equal effort as well as equal item count, rebalance ownership after team estimation while preserving clear owners.
+
+6. Issue template to copy into GitHub
+
+Use this format for each GitHub Issue. Replace the example values with the specific requirement.
+
+Title: [IPP-F-001] Role-based registration with email verification
+
+User story:
+
+As a [user role], I want [capability], so that [benefit].
+
+Description:
+
+Implement the requirement described in SRS v1.0 for this requirement ID.
+
+Acceptance criteria:
+
+• List observable conditions that must be satisfied.
+
+• Include the SRS acceptance criterion/test case where applicable.
+
+• Include relevant error and security cases.
+
+Requirement ID: IPP-F-001
+
+Priority: High
+
+Story Points: 5 (enter this in the Project's Story Points field)
+
+Assignee: assigned team member
+
+Sprint: Sprint 1 (select the relevant iteration/field)
+
+7. Final submission checklist
+
+☐ Project exists and is linked to the correct IPP repository.
+
+☐ All 36 requirement issues have been created and added to the Project.
+
+☐ Each issue title includes its SRS requirement ID.
+
+☐ Each issue has a clear description and acceptance criteria.
+
+☐ Each issue has a proposed story-point value.
+
+☐ Each issue has one accountable assignee.
+
+☐ Sprint 1 and Sprint 2 are configured using the official dates.
+
+☐ Status field and labels are usable.
+
+☐ Team completed the 12–16 October dry run.
+
+☐ Team reviews and corrects entries on 19 October if needed.
+
+8. Source documents and assumptions
+
+Primary source: Team 6, Software Requirements Specification (SRS), Online Internship & Placement Preparation Portal, Version 1.0, dated 6 September 2026. Functional requirement IDs and NFR/security requirement IDs are retained from that SRS. The uploaded Software Test Plan (STP) was used for the listed team roles/responsibilities. The uploaded Software Architecture and Design Specification (SAD) supports the portal modules and architecture context.
+
+Assumptions: story points and sprint allocations are proposed estimates for team review. The formal sprint dates, team capacity, and exact GitHub usernames were not included in the provided instruction; confirm them with the faculty/team before finalizing.
+
+		Prepared for backlog setup and sprint dry run • October 2026

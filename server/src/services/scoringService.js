@@ -1,4 +1,6 @@
 const AppError = require('../utils/AppError');
+const config = require('../config/env');
+const logger = require('../utils/logger');
 const questionRepository = require('../repositories/questionRepository');
 
 // IPP-F-015 / IPP-F-017 scoring service layer.
@@ -66,11 +68,36 @@ async function nodeScorer({ answers }) {
   };
 }
 
-let scorer = nodeScorer;
+// Calls the Python/Flask service (SRS 2.5, 3.3) over internal REST. Node supplies the answer key, so the service is
+// stateless. Any transport/5xx failure falls back to the Node scorer so a test submission is never lost.
+async function httpScorer(payload) {
+  const questions = await questionRepository.findByIdsWithKey(payload.answers.map((a) => a.questionId));
+  const body = {
+    answers: payload.answers,
+    questions: questions.map((q) => ({ id: String(q._id), type: q.type, category: q.category, marks: q.marks, correctIndex: q.correctIndex })),
+  };
+  try {
+    const res = await fetch(`${config.scoring.url}/internal/analytics/score-test`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...(config.scoring.token && { 'X-Internal-Token': config.scoring.token }) },
+      body: JSON.stringify(body),
+      signal: AbortSignal.timeout(config.scoring.timeoutMs),
+    });
+    if (res.status === 422) throw new AppError(422, 'UNKNOWN_QUESTION', 'Answers reference an unknown question');
+    if (!res.ok) throw new Error(`scoring service responded ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    if (err instanceof AppError) throw err;
+    logger.warn(`Scoring service unavailable (${err.message}); using built-in scorer`);
+    return nodeScorer(payload);
+  }
+}
+
+let scorer = config.scoring.url ? httpScorer : nodeScorer;
 const scoreAttempt = (payload) => scorer(payload);
 // Swap point: install e.g. an HTTP client for a Python/Flask scorer that honours the same contract.
 const setScorer = (fn) => {
-  scorer = fn || nodeScorer;
+  scorer = fn || (config.scoring.url ? httpScorer : nodeScorer);
 };
 
-module.exports = { scoreAttempt, setScorer, nodeScorer };
+module.exports = { scoreAttempt, setScorer, nodeScorer, httpScorer };
