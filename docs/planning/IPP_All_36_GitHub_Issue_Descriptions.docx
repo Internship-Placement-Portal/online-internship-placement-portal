@@ -1,0 +1,811 @@
+**GITHUB ISSUE DESCRIPTIONS — COMPLETE BACKLOG**
+
+*Online Internship **&** Placement Preparation Portal (IPP) | Team 6*
+
+Copy each issue title, user story, and acceptance criteria into a separate GitHub Issue. Requirement names and measurable criteria are based on the submitted SRS; where criteria are operational or implementation-oriented, verify them against the team's approved design and testing setup.
+
+How to use
+
+- Open the IPP repository → Issues → New issue.
+
+- Copy the requirement ID and title into the issue title.
+
+- Copy the user story and acceptance criteria into the description.
+
+- Set the priority label, story points, assignee, and sprint in GitHub Projects.
+
+- Keep the requirement ID in the issue so the backlog stays traceable to the SRS.
+
+[IPP-F-001] Role-based registration with email verification - Harshith
+
+**Type: **Functional   **Priority: **High
+
+User story
+
+As a student, recruiter, or placement officer, I want to register for an account with email verification so that only verified users can access the portal with the appropriate role.
+
+Acceptance criteria
+
+- The registration form accepts the required user details and an allowed role.
+
+- An email OTP verification step is completed before the account is activated.
+
+- After successful verification, the account is stored with the correct role.
+
+- Invalid registration details or unsuccessful verification are rejected.
+
+**SRS reference: **IPP-F-001**    Suggested test reference: **TC-Auth-01
+
+**Story points: **Enter the team's agreed estimate in the GitHub Project field.    **Assignee / Sprint: **Use the team's approved allocation.
+
+[IPP-F-002] Login with email/password and JWT authentication - Heemadhawala R
+
+**Type: **Functional   **Priority: **High
+
+User story
+
+As a registered user, I want to log in with my email and password and receive a signed JWT so that I can access the portal securely.
+
+Acceptance criteria
+
+- Valid credentials are accepted and a signed JWT is issued with the configured expiry.
+
+- Invalid credentials are rejected.
+
+- The session identifies the authenticated user's role.
+
+- Protected endpoints reject missing or invalid authentication tokens.
+
+**SRS reference: **IPP-F-002**    Suggested test reference: **TC-Auth-02
+
+**Story points: **Enter the team's agreed estimate in the GitHub Project field.    **Assignee / Sprint: **Use the team's approved allocation.
+
+[IPP-F-003] Secure password hashing - Joshwin Paul
+
+**Type: **Functional   **Priority: **High
+
+User story
+
+As a user, I want my password stored securely so that my original password is not exposed if stored account data is accessed.
+
+Acceptance criteria
+
+- Passwords are hashed and salted using the selected bcrypt/Argon2 library before storage.
+
+- Plaintext passwords are never stored in the database.
+
+- Login verifies the submitted password against the stored hash.
+
+- The implementation is verified by inspecting stored test-account records.
+
+**SRS reference: **IPP-F-003**    Suggested test reference: **TC-Auth-03
+
+**Story points: **Enter the team's agreed estimate in the GitHub Project field.    **Assignee / Sprint: **Use the team's approved allocation.
+
+[IPP-F-004] Account lockout after failed login attempts -Kanishq Surendran
+
+**Type: **Functional   **Priority: **Medium
+
+User story
+
+As a user, I want repeated failed login attempts to trigger a temporary account lock so that the portal is better protected against repeated guessing attempts.
+
+Acceptance criteria
+
+- After five consecutive failed login attempts, the account is locked for 15 minutes.
+
+- The next login attempt during lockout is blocked and a clear message is shown.
+
+- The lockout event is logged for audit purposes.
+
+- A user can log in again after the lockout period, subject to valid credentials.
+
+**SRS reference: **IPP-F-004**    Suggested test reference: **TC-Auth-04
+
+**Story points: **Enter the team's agreed estimate in the GitHub Project field.    **Assignee / Sprint: **Use the team's approved allocation.
+
+[IPP-F-005] Time-limited password reset -Harshith
+
+**Type: **Functional   **Priority: **Medium
+
+User story
+
+As a user who has forgotten my password, I want to reset it using an emailed link so that I can regain access securely.
+
+Acceptance criteria
+
+- A password-reset link is sent through the configured email service.
+
+- The reset link expires after 30 minutes.
+
+- A used, expired, or invalid reset link is rejected.
+
+- A successful reset allows the user to log in with the new password.
+
+**SRS reference: **IPP-F-005**    Suggested test reference: **TC-Auth-05
+
+**Story points: **Enter the team's agreed estimate in the GitHub Project field.    **Assignee / Sprint: **Use the team's approved allocation.
+
+[IPP-F-006] Create and publish internship listings - Heemadhawala R
+
+**Type: **Functional   **Priority: **High
+
+User story
+
+As an approved recruiter, I want to create, edit, and publish internship listings so that students can discover relevant opportunities.
+
+Acceptance criteria
+
+- An approved recruiter can enter role, stipend, duration, skills, and application deadline.
+
+- A listing can be saved and edited by its authorized recruiter.
+
+- A listing becomes visible to students only after the required approval workflow.
+
+- Unauthorized or unapproved recruiters cannot publish listings.
+
+**SRS reference: **IPP-F-006**    Suggested test reference: **TC-List-01
+
+**Story points: **Enter the team's agreed estimate in the GitHub Project field.    **Assignee / Sprint: **Use the team's approved allocation.
+
+[IPP-F-007] Search and filter internship listings -Joshwin Paul
+
+**Type: **Functional   **Priority: **High
+
+User story
+
+As a student, I want to search and filter internships by domain, location, stipend, and duration so that I can find opportunities matching my preferences.
+
+Acceptance criteria
+
+- The listing page provides the specified search/filter criteria.
+
+- Results match all selected criteria.
+
+- The user can revise or clear filters.
+
+- Search results meet the SRS acceptance target of returning within two seconds.
+
+**SRS reference: **IPP-F-007**    Suggested test reference: **TC-List-02
+
+**Story points: **Enter the team's agreed estimate in the GitHub Project field.    **Assignee / Sprint: **Use the team's approved allocation.
+
+[IPP-F-008] Display internship details -Kanishq Surendran
+
+**Type: **Functional   **Priority: **Medium
+
+User story
+
+As a student, I want to view full details for an internship so that I can understand the role and eligibility before applying.
+
+Acceptance criteria
+
+- The details page displays the company profile, role, eligibility, stipend, duration, skills, and deadline where provided by the listing.
+
+- A valid listing opens without missing-data errors.
+
+- An unknown or unavailable listing displays a suitable error or not-found state.
+
+**SRS reference: **IPP-F-008**    Suggested test reference: **TC-List-03
+
+**Story points: **Enter the team's agreed estimate in the GitHub Project field.    **Assignee / Sprint: **Use the team's approved allocation.
+
+[IPP-F-009] Hide expired listings automatically - Harshith
+
+**Type: **Functional   **Priority: **Medium
+
+User story
+
+As a student, I want expired internship listings removed from active search results so that I do not apply after the deadline.
+
+Acceptance criteria
+
+- A listing is hidden from active search results after its application deadline passes.
+
+- Listings with future deadlines remain visible according to their publication status.
+
+- Deadline handling uses the stored deadline timestamp consistently.
+
+- The automatic hiding behaviour is tested with past and future deadlines.
+
+**SRS reference: **IPP-F-009**    Suggested test reference: **TC-List-04
+
+**Story points: **Enter the team's agreed estimate in the GitHub Project field.    **Assignee / Sprint: **Use the team's approved allocation.
+
+[IPP-F-010] Upload resume and apply to internships - Heemadhawala R
+
+**Type: **Functional   **Priority: **High
+
+User story
+
+As a student, I want to upload a PDF resume and apply to an internship in one action so that my application and resume are submitted together.
+
+Acceptance criteria
+
+- The user can select an eligible internship and upload a PDF resume no larger than 5 MB.
+
+- A successful application links the student, resume, and listing.
+
+- Duplicate applications to the same listing are blocked.
+
+- Invalid file types and oversized files are rejected.
+
+**SRS reference: **IPP-F-010**    Suggested test reference: **TC-App-01
+
+**Story points: **Enter the team's agreed estimate in the GitHub Project field.    **Assignee / Sprint: **Use the team's approved allocation.
+
+[IPP-F-011] Manage application statuses - Joshwin Paul
+
+**Type: **Functional   **Priority: **High
+
+User story
+
+As a recruiter, I want to view, filter, and update application statuses so that I can manage candidates through the selection process.
+
+Acceptance criteria
+
+- Recruiters can view and filter applications they are authorized to manage.
+
+- Supported statuses include Applied, Shortlisted, Rejected, and Selected.
+
+- A status change is persisted.
+
+- The updated status is reflected on the student's dashboard.
+
+**SRS reference: **IPP-F-011**    Suggested test reference: **TC-App-02
+
+**Story points: **Enter the team's agreed estimate in the GitHub Project field.    **Assignee / Sprint: **Use the team's approved allocation.
+
+[IPP-F-012] Notify students about application status changes - Kanishq Surendran
+
+**Type: **Functional   **Priority: **High
+
+User story
+
+As a student, I want to receive an email or in-app notification when my application status changes so that I can respond to updates promptly.
+
+Acceptance criteria
+
+- A status change generates the configured email and/or in-app notification.
+
+- The notification identifies the relevant application and updated status without exposing another user's information.
+
+- The notification is generated within one minute of the status change under the specified test conditions.
+
+- Notification-service errors are handled without silently losing the status update.
+
+**SRS reference: **IPP-F-012**    Suggested test reference: **TC-App-03
+
+**Story points: **Enter the team's agreed estimate in the GitHub Project field.    **Assignee / Sprint: **Use the team's approved allocation.
+
+[IPP-F-013] Schedule and record  interviews - Harshith
+
+**Type: **Functional   **Priority: **Medium
+
+User story
+
+As a recruiter, I want to schedule and record interview details for shortlisted candidates so that candidates can see when and how their interview will take place.
+
+Acceptance criteria
+
+- An authorized recruiter can record the interview date, mode, and link where applicable.
+
+- Interview details are associated with the relevant application.
+
+- The student can view interview details on the application detail page.
+
+- Invalid or incomplete interview information is handled with clear validation.
+
+**SRS reference: **IPP-F-013**    Suggested test reference: **TC-App-04
+
+**Story points: **Enter the team's agreed estimate in the GitHub Project field.    **Assignee / Sprint: **Use the team's approved allocation.
+
+[IPP-F-014] Timed aptitude/coding test engine - Heemadhawala R
+
+**Type: **Functional   **Priority: **High
+
+User story
+
+As a student, I want to take a timed aptitude or coding test using questions from a configurable question bank so that I can practise and demonstrate my skills.
+
+Acceptance criteria
+
+- A test can include MCQ and coding questions from the configured question bank.
+
+- The timer is visible and the test auto-submits when time reaches zero.
+
+- Questions are randomized per attempt as required by the SRS.
+
+- Test progress is handled appropriately during intermittent network conditions, including auto-save as specified.
+
+**SRS reference: **IPP-F-014**    Suggested test reference: **TC-Test-01
+
+**Story points: **Enter the team's agreed estimate in the GitHub Project field.    **Assignee / Sprint: **Use the team's approved allocation.
+
+[IPP-F-015] Automatic evaluation of MCQ answers - Joshwin paul
+
+**Type: **Functional   **Priority: **High
+
+User story
+
+As a student, I want my multiple-choice answers evaluated automatically after submission so that I can see my score without waiting for manual marking.
+
+Acceptance criteria
+
+- Submitted MCQ responses are evaluated against the configured answer key.
+
+- The displayed score matches the expected score for known test data.
+
+- The result is displayed after submission.
+
+- A submission is not scored more than once in a way that duplicates results.
+
+**SRS reference: **IPP-F-015**    Suggested test reference: **TC-Test-02
+
+**Story points: **Enter the team's agreed estimate in the GitHub Project field.    **Assignee / Sprint: **Use the team's approved allocation.
+
+[IPP-F-016] Restrict test reattempts with admin override - Kanishq Surendran
+
+**Type: **Functional   **Priority: **Medium
+
+User story
+
+As an administrator, I want completed tests to be protected from unauthorized reattempts so that test rules are applied consistently.
+
+Acceptance criteria
+
+- A student cannot reattempt a completed test unless an administrator explicitly re-enables it.
+
+- A blocked reattempt displays a clear message.
+
+- An authorized admin override allows a new attempt.
+
+- The new attempt is stored as a separate attempt record.
+
+**SRS reference: **IPP-F-016**    Suggested test reference: **TC-Test-03
+
+**Story points: **Enter the team's agreed estimate in the GitHub Project field.    **Assignee / Sprint: **Use the team's approved allocation.
+
+[IPP-F-017] Record per- attempt  test analytics -Harshith 
+
+**Type: **Functional   **Priority: **Medium
+
+User story
+
+As a student or administrator, I want each test attempt's performance analytics recorded so that progress can be reviewed over time.
+
+Acceptance criteria
+
+- Analytics record accuracy, time per question, and category-wise performance for each attempt.
+
+- Records can be queried by student and test.
+
+- Analytics are associated with the correct attempt.
+
+- The generated values are checked against known test data.
+
+**SRS reference: **IPP-F-017**    Suggested test reference: **TC-Test-04
+
+**Story points: **Enter the team's agreed estimate in the GitHub Project field.    **Assignee / Sprint: **Use the team's approved allocation.
+
+[IPP-F-018] Student progress dashboard- Heemadhawala R
+
+**Type: **Functional   **Priority: **High
+
+User story
+
+As a student, I want a dashboard showing my applications, scheduled interviews, and test scores so that I can track my placement preparation in one place.
+
+Acceptance criteria
+
+- The dashboard summarizes applications submitted, interviews scheduled, and test scores.
+
+- Displayed figures match the underlying records for a seeded test account.
+
+- Only the authenticated student can access their own dashboard data.
+
+- Empty states are handled when the student has no activity.
+
+**SRS reference: **IPP-F-018**    Suggested test reference: **TC-Dash-01
+
+**Story points: **Enter the team's agreed estimate in the GitHub Project field.    **Assignee / Sprint: **Use the team's approved allocation.
+
+[IPP-F-019] Placement analytics dashboard - Joshwin paul 
+
+**Type: **Functional   **Priority: **High
+
+User story
+
+As a placement officer, I want aggregate placement analytics so that I can understand placement rates, company-wise applications, and student performance trends.
+
+Acceptance criteria
+
+- The dashboard provides the specified aggregate metrics.
+
+- Aggregated figures reconcile with the underlying application and test records.
+
+- Access is restricted to authorized placement officers/admins.
+
+- Analytics failures are reported clearly rather than showing misleading figures.
+
+**SRS reference: **IPP-F-019**    Suggested test reference: **TC-Dash-02
+
+**Story points: **Enter the team's agreed estimate in the GitHub Project field.    **Assignee / Sprint: **Use the team's approved allocation.
+
+[IPP-F-020] Visual charts for placement metrics - Kanishq Surendran 
+
+**Type: **Functional   **Priority: **Medium
+
+User story
+
+As a placement officer, I want visual charts for key placement metrics across at least the last 12 months so that trends can be understood quickly.
+
+Acceptance criteria
+
+- The system provides appropriate bar, line, or pie charts for supported metrics.
+
+- Charts support date ranges covering at least the last 12 months of data.
+
+- Charts render correctly when data contains gaps and when no data exists.
+
+- Chart labels and values correspond to the underlying metrics.
+
+**SRS reference: **IPP-F-020**    Suggested test reference: **TC-Dash-03
+
+**Story points: **Enter the team's agreed estimate in the GitHub Project field.    **Assignee / Sprint: **Use the team's approved allocation.
+
+[IPP-F-021] Export analytics to CSV/PDF - Harshith 
+
+**Type: **Functional   **Priority: **Medium
+
+User story
+
+As an authorized user, I want to export analytics as CSV or PDF so that I can share or review reports outside the portal.
+
+Acceptance criteria
+
+- Authorized users can request CSV or PDF exports for supported analytics.
+
+- Exported records reflect the selected filters.
+
+- CSV headers and PDF content are readable and accurate.
+
+- Unauthorized users cannot export restricted analytics.
+
+**SRS reference: **IPP-F-021**    Suggested test reference: **TC-Dash-04
+
+**Story points: **Enter the team's agreed estimate in the GitHub Project field.    **Assignee / Sprint: **Use the team's approved allocation.
+
+[IPP-F-022]  Admin approval/rejection of recruiter accounts - Heemadhawala R
+
+**Type: **Functional   **Priority: **High
+
+User story
+
+As an administrator, I want to approve or reject recruiter/company registrations so that only approved recruiters can publish internship listings.
+
+Acceptance criteria
+
+- An admin can approve or reject a recruiter registration.
+
+- An unapproved recruiter cannot create or publish listings.
+
+- Approval enables listing privileges according to the SRS.
+
+- The approval outcome is stored and communicated where the workflow specifies.
+
+**SRS reference: **IPP-F-022**    Suggested test reference: **TC-Admin-01
+
+**Story points: **Enter the team's agreed estimate in the GitHub Project field.    **Assignee / Sprint: **Use the team's approved allocation.
+
+[IPP-F-023] Role-based access control by user role -Joshwin Paul
+
+**Type: **Functional   **Priority: **High
+
+User story
+
+As a system administrator, I want each module restricted to the appropriate student, recruiter, or admin role so that users cannot perform unauthorized actions.
+
+Acceptance criteria
+
+- Access permissions are enforced for the supported roles at the API layer.
+
+- A request made by an unauthorized role is rejected with HTTP 403 where appropriate.
+
+- Authorization is checked on every protected endpoint, not only in the UI.
+
+- Unauthorized access attempts are logged where specified.
+
+**SRS reference: **IPP-F-023**    Suggested test reference: **TC-Admin-02
+
+**Story points: **Enter the team's agreed estimate in the GitHub Project field.    **Assignee / Sprint: **Use the team's approved allocation.
+
+[IPP-F-024] Audit log of administrative actions -Kanishq Surendran
+
+**Type: **Functional   **Priority: **Medium
+
+User story
+
+As an administrator or auditor, I want sensitive administrative actions recorded so that changes can be traced to the actor and time.
+
+Acceptance criteria
+
+- Approval, deletion, and role-change actions create audit-log entries.
+
+- Each entry records a timestamp and actor ID, together with the action details needed for traceability.
+
+- Audit records can be retrieved by authorized personnel.
+
+- Normal users cannot modify or delete audit records through unauthorized endpoints.
+
+**SRS reference: **IPP-F-024**    Suggested test reference: **TC-Admin-03
+
+**Story points: **Enter the team's agreed estimate in the GitHub Project field.    **Assignee / Sprint: **Use the team's approved allocation.
+
+[IPP-NF-001] Meet <= 3-second response-time target for 90% of requests  Harshith 
+
+**Type: **Non-functional   **Priority: **High
+
+User story
+
+As a portal user, I want pages and APIs to respond quickly under normal load so that I can use the portal without excessive waiting.
+
+Acceptance criteria
+
+- Under normal load of up to 500 concurrent users, at least 90% of page/API requests complete within three seconds.
+
+- The team runs a documented load test using k6 or JMeter.
+
+- Results include the test setup, observed response times, and any failures.
+
+- Performance bottlenecks found during testing are recorded for follow-up.
+
+**SRS reference: **IPP-NF-001**    Suggested test reference: **TC-Perf-01
+
+**Story points: **Enter the team's agreed estimate in the GitHub Project field.    **Assignee / Sprint: **Use the team's approved allocation.
+
+[IPP-NF-002] Maintain 99.5% monthly uptime -Heemadhawala R
+
+**Type: **Non-functional   **Priority: **High
+
+User story
+
+As a portal user, I want the service to remain available so that I can access listings, applications, and preparation tools reliably.
+
+Acceptance criteria
+
+- Availability is measured and reported over the month, excluding scheduled maintenance windows.
+
+- The target is at least 99.5% monthly uptime.
+
+- Monitoring or operational evidence is retained for review.
+
+- Any outages and corrective actions are recorded.
+
+**SRS reference: **IPP-NF-002**    Suggested test reference: **Ops dashboard review
+
+**Story points: **Enter the team's agreed estimate in the GitHub Project field.    **Assignee / Sprint: **Use the team's approved allocation.
+
+[IPP-NF-003] Protect data in transit and sensitive data at rest -Joshwin Paul
+
+**Type: **Non-functional   **Priority: **High
+
+User story
+
+As a user, I want sensitive information protected during transmission and storage so that personal data and credentials are not exposed.
+
+Acceptance criteria
+
+- Client-server and server-to-microservice traffic uses TLS 1.2 or higher.
+
+- Passwords are hashed rather than stored in plaintext; sensitive fields such as tokens are handled according to the SRS security requirements.
+
+- A security scan finds no plaintext sensitive data in transit and checks the configured TLS posture.
+
+- Configuration and test evidence are documented.
+
+**SRS reference: **IPP-NF-003**    Suggested test reference: **TC-Sec-01
+
+**Story points: **Enter the team's agreed estimate in the GitHub Project field.    **Assignee / Sprint: **Use the team's approved allocation.
+
+[IPP-NF-004] Meet WCAG 2.1 AA accessibility requirements - Kanishq Surendran
+
+**Type: **Non-functional   **Priority: **Medium
+
+User story
+
+As a user with different accessibility needs, I want the web interface to support keyboard navigation and adequate color contrast so that I can use the portal accessibly.
+
+Acceptance criteria
+
+- Relevant interfaces support keyboard navigation.
+
+- Controls have accessible labels and focus states.
+
+- Color contrast is checked against WCAG 2.1 AA requirements.
+
+- Lighthouse or axe accessibility checks report no critical violations; findings are recorded.
+
+**SRS reference: **IPP-NF-004**    Suggested test reference: **TC-UX-01
+
+**Story points: **Enter the team's agreed estimate in the GitHub Project field.    **Assignee / Sprint: **Use the team's approved allocation.
+
+[IPP-NF-005] Support horizontal API scaling to 5x baseline - Harshith 
+
+**Type: **Non-functional   **Priority: **Medium
+
+User story
+
+As the project team, we want the API layer to scale horizontally so that it can handle increased concurrent use without code changes.
+
+Acceptance criteria
+
+- The API design supports running additional instances without requiring application-code changes.
+
+- A load test evaluates behaviour at up to five times the baseline load using additional instances as applicable.
+
+- Response time, throughput, and errors are recorded.
+
+- Any limits or deviations from near-linear scaling are documented.
+
+**SRS reference: **IPP-NF-005**    Suggested test reference: **TC-Scale-01
+
+**Story points: **Enter the team's agreed estimate in the GitHub Project field.    **Assignee / Sprint: **Use the team's approved allocation.
+
+[IPP-NF-006] Maintain modular code and 70% core test coverage - Heemadhawala R
+
+**Type: **Non-functional   **Priority: **Medium
+
+User story
+
+As a developer, I want the codebase to remain modular and adequately tested so that core features can be maintained and changed safely.
+
+Acceptance criteria
+
+- The code follows the modular MVC structure described in the project design where applicable.
+
+- Automated tests cover the core authentication, applications, and test modules.
+
+- The CI coverage report demonstrates at least 70% automated test coverage for the specified core modules.
+
+- Coverage gaps are documented and addressed.
+
+**SRS reference: **IPP-NF-006**    Suggested test reference: **CI pipeline report
+
+**Story points: **Enter the team's agreed estimate in the GitHub Project field.    **Assignee / Sprint: **Use the team's approved allocation.
+
+[IPP-SR-001] Enforce TLS 1.2 + for network connections - Joshwin Paul
+
+**Type: **Security   **Priority: **High
+
+User story
+
+As a user, I want network traffic between the client, API, and microservice encrypted so that data is not sent over unprotected connections.
+
+Acceptance criteria
+
+- TLS 1.2 or higher is required for all client-server and server-to-microservice connections.
+
+- No sensitive endpoint is exposed over unencrypted HTTP in the deployed configuration.
+
+- A network/security scan confirms the expected configuration.
+
+- Any local-development exceptions are documented and are not used in production.
+
+**SRS reference: **IPP-SR-001**    Suggested test reference: **TC-Sec-02
+
+**Story points: **Enter the team's agreed estimate in the GitHub Project field.    **Assignee / Sprint: **Use the team's approved allocation.
+
+[IPP-SR-002]  JWT maximum lifetime and refresh-token revocation - Kanishq Surendran
+
+**Type: **Security   **Priority: **High
+
+User story
+
+As a system administrator, I want access tokens to expire and refresh tokens to be revocable so that old or revoked sessions cannot continue obtaining access.
+
+Acceptance criteria
+
+- JWT access tokens have a maximum lifetime of 60 minutes.
+
+- Refresh tokens can be revoked.
+
+- Expired access tokens are rejected.
+
+- A revoked refresh token cannot mint a new access token.
+
+**SRS reference: **IPP-SR-002**    Suggested test reference: **TC-Sec-03
+
+**Story points: **Enter the team's agreed estimate in the GitHub Project field.    **Assignee / Sprint: **Use the team's approved allocation.
+
+[IPP-SR-003] Validate inputs against NoSQL injection and XSS - Harshith
+
+**Type: **Security   **Priority: **High
+
+User story
+
+As a user, I want the portal to validate and safely handle input so that malicious input cannot compromise data or execute unwanted scripts.
+
+Acceptance criteria
+
+- Client and server validate and sanitize applicable user inputs.
+
+- NoSQL injection payloads are rejected or safely handled.
+
+- XSS payloads are safely handled and are not executed in the browser.
+
+- OWASP ZAP or equivalent security testing records no high-severity injection findings for the tested scope.
+
+**SRS reference: **IPP-SR-003**    Suggested test reference: **TC-Sec-04
+
+**Story points: **Enter the team's agreed estimate in the GitHub Project field.    **Assignee / Sprint: **Use the team's approved allocation.
+
+[IPP-SR-004] Rate-limit authentication and file-upload endpoints - Heemadhawala R
+
+**Type: **Security   **Priority: **Medium
+
+User story
+
+As a system administrator, I want authentication and file-upload endpoints rate-limited so that repeated requests cannot easily be used for brute-force or denial-of-service attempts.
+
+Acceptance criteria
+
+- Rate limiting is applied to authentication and file-upload endpoints.
+
+- Requests beyond the configured threshold receive HTTP 429.
+
+- Normal permitted requests continue to work.
+
+- The chosen thresholds and test results are documented.
+
+**SRS reference: **IPP-SR-004**    Suggested test reference: **TC-Sec-05
+
+**Story points: **Enter the team's agreed estimate in the GitHub Project field.    **Assignee / Sprint: **Use the team's approved allocation.
+
+[IPP-SR-005] Validate and scan uploaded resumes -Joshwin Paul
+
+**Type: **Security   **Priority: **Medium
+
+User story
+
+As a student, I want resume uploads validated and checked before storage so that invalid or malicious files are not accepted by the portal.
+
+Acceptance criteria
+
+- Only PDF resumes of at most 5 MB are accepted.
+
+- Non-PDF and oversized files are rejected.
+
+- The upload flow invokes the configured malicious-content scanning mechanism where available.
+
+- Rejected uploads are not stored as valid application resumes.
+
+**SRS reference: **IPP-SR-005**    Suggested test reference: **TC-Sec-06
+
+**Story points: **Enter the team's agreed estimate in the GitHub Project field.    **Assignee / Sprint: **Use the team's approved allocation.
+
+[IPP-SR-006] Enforce role-based access on every  API  endpoint - Kanishq Surendran
+
+**Type: **Security   **Priority: **High
+
+User story
+
+As a system administrator, I want every API endpoint to enforce role permissions so that a user cannot access functions reserved for another role.
+
+Acceptance criteria
+
+- Every protected endpoint checks the authenticated user's role and permissions at the API layer.
+
+- Requests from roles without permission are rejected.
+
+- Automated RBAC tests cover allowed and denied role/endpoint combinations.
+
+- The test suite verifies that unauthorized roles cannot reach restricted endpoints.
+
+**SRS reference: **IPP-SR-006**    Suggested test reference: **TC-Sec-07
+
+**Story points: **Enter the team's agreed estimate in the GitHub Project field.    **Assignee / Sprint: **Use the team's approved allocation.
+
+Backlog completion check
+
+The set includes 24 functional requirements, 6 non-functional requirements, and 6 security requirements (36 issues total). Confirm that each issue has a description, acceptance criteria, priority, story-point estimate, assignee, and sprint allocation.

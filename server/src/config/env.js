@@ -66,6 +66,8 @@ const config = {
   // reverse proxy / load balancer (then set TRUST_PROXY=true and keep FORCE_HTTPS on so plain HTTP is never served).
   forceHttps: process.env.FORCE_HTTPS ? process.env.FORCE_HTTPS === 'true' : isProd,
   tls: { certFile: process.env.TLS_CERT_FILE || '', keyFile: process.env.TLS_KEY_FILE || '', minVersion: 'TLSv1.2' },
+  // Optional Python/Flask scoring microservice (SRS 2.5). Unset = score in Node.
+  scoring: { url: (process.env.SCORING_SERVICE_URL || '').replace(/\/$/, ''), token: process.env.SCORING_SERVICE_TOKEN || '', timeoutMs: int(process.env.SCORING_SERVICE_TIMEOUT_MS, 3000) },
   // Background jobs (listing expiry, test auto-submit) can be limited to one instance when scaling out (IPP-NF-005).
   jobsEnabled: process.env.JOBS_ENABLED !== 'false',
 };

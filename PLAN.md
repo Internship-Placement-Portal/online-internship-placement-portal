@@ -7,7 +7,7 @@ Nothing here adds features beyond those documents. Where the documents leave a d
 
 | Topic | Decision |
 |---|---|
-| Python/Flask scoring service | Skipped for now. Scoring runs in Node behind `ScoringService` (a small interface: `scoreAttempt(payload) -> { score, accuracy, timePerQuestion[], categoryBreakdown }`). The shape matches `POST /internal/analytics/score-test` in the SAD, so a Flask-backed implementation can replace the Node one without touching controllers. |
+| Python/Flask scoring service | Built in `scoring-service/` (SRS 2.5, 3.3). Node calls `POST /internal/analytics/score-test` when `SCORING_SERVICE_URL` is set (via `httpScorer`), and falls back to the Node scorer (`ScoringService`) if the service is unset or unreachable. |
 | Email / SMS provider | `Mailer` interface. Dev implementation logs the message (OTP / reset link) to the server console; a real provider (SMTP/SendGrid) can be added later. Retry-with-backoff wrapper per SRS 3.4. |
 | File storage | Local disk (`server/uploads/`) in dev behind a `StorageService` interface (SRS 3.3 allows "local disk in development"). |
 | Admin accounts | Register only allows `student` / `recruiter` (SAD 4.3). Placement Officer/Admin accounts are created by a seed script. |

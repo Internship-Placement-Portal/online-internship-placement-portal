@@ -367,4 +367,4 @@ Password for all demo users: `Demo@12345`. Admin: `ADMIN_EMAIL` / `ADMIN_PASSWOR
 | Recruiter (pending approval) | `pending.recruiter@ipp.demo` |
 
 More docs: [PLAN.md](PLAN.md), [docs/SECURITY.md](docs/SECURITY.md), [docs/PERFORMANCE.md](docs/PERFORMANCE.md), [docs/ACCESSIBILITY.md](docs/ACCESSIBILITY.md).
-Aptitude scoring runs in Node behind `scoringService`; a Flask service can replace it via `setScorer()`.
+Aptitude scoring is done by the Python/Flask service in `scoring-service/` when `SCORING_SERVICE_URL` is set (see its README); otherwise, or if it is unreachable, the built-in Node scorer behind `scoringService` is used.
