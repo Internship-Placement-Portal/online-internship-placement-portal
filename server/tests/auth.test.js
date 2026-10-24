@@ -8,6 +8,8 @@ const AuditLog = require('../src/models/AuditLog');
 const RefreshToken = require('../src/models/RefreshToken');
 const { createRateLimiter } = require('../src/middleware/rateLimit');
 const { startDb, stopDb, clearDb, lastOtp, registerVerified, createAdmin, creds } = require('./helpers');
+const bcrypt = require('bcryptjs');
+
 
 before(startDb);
 after(stopDb);
@@ -34,6 +36,36 @@ describe('registration + email OTP (IPP-F-001, IPP-F-003)', () => {
     expect(user.passwordHash).not.toContain(creds.password);
     expect(user.passwordHash).toMatch(/^\$2[aby]\$/);
   });
+
+  it('uses a unique salt when hashing the same password for different users', async () => {
+    const first = await request(app)
+      .post('/api/auth/register')
+      .send(creds);
+
+    const second = await request(app)
+      .post('/api/auth/register')
+      .send({
+        ...creds,
+        email: 'another-student@example.com',
+      });
+    expect(first.status).toBe(201);
+    expect(second.status).toBe(201);
+    expect(first.body.passwordHash).toBeUndefined();
+    expect(second.body.passwordHash).toBeUndefined();
+
+    const firstUser = await User.findById(first.body.userId)
+      .select('+passwordHash');
+    const secondUser = await User.findById(second.body.userId)
+      .select('+passwordHash');
+
+    expect(firstUser.passwordHash).not.toBe(secondUser.passwordHash);
+    expect(firstUser.passwordHash).toMatch(/^\$2[aby]\$/);
+    expect(secondUser.passwordHash).toMatch(/^\$2[aby]\$/);
+    expect(await bcrypt.compare(creds.password, firstUser.passwordHash)).toBe(true);
+    expect(await bcrypt.compare(creds.password, secondUser.passwordHash)).toBe(true);
+    expect(await bcrypt.compare('WrongPassword123!', firstUser.passwordHash)).toBe(false);
+  });
+
 
   it('recruiters start with approvalStatus pending', async () => {
     const res = await request(app).post('/api/auth/register').send({ ...creds, role: 'recruiter' });
