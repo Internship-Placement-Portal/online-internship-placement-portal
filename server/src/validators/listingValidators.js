@@ -49,6 +49,7 @@ const create = Joi.object({
 const update = Joi.object({ ...fields, publish: Joi.boolean() }).min(1);
 
 const num = Joi.number().min(0);
+
 const search = Joi.object({
   q: Joi.string().trim().max(100),
   domain: Joi.string().valid(...DOMAINS),
@@ -60,7 +61,28 @@ const search = Joi.object({
   sort: Joi.string().valid('relevance', 'newest', 'stipend_desc', 'deadline_asc'),
   page: Joi.number().integer().min(1),
   limit: Joi.number().integer().min(1).max(50),
+}).custom((value, helpers) => {
+  if (
+    value.minStipend !== undefined &&
+    value.maxStipend !== undefined &&
+    value.minStipend > value.maxStipend
+  ) {
+    return helpers.error('any.invalid');
+  }
+
+  if (
+    value.minDuration !== undefined &&
+    value.maxDuration !== undefined &&
+    value.minDuration > value.maxDuration
+  ) {
+    return helpers.error('any.invalid');
+  }
+
+  return value;
+}).messages({
+  'any.invalid': 'Minimum filter values cannot exceed maximum filter values',
 });
+
 
 const mine = Joi.object({
   status: Joi.string().valid('draft', 'pending_approval', 'approved', 'rejected', 'closed'),
