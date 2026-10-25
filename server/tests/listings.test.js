@@ -71,7 +71,29 @@ describe('listing CRUD + ownership (IPP-F-006)', () => {
     expect(res.body.code).toBe('RECRUITER_NOT_APPROVED');
   });
 
+  it('blocks an unapproved recruiter from publishing an existing draft', async () => {
+    const r = await createUser({ role: 'recruiter' });
 
+    // Create a draft while the recruiter is approved.
+    const created = await post('/api/listings', r, listingBody());
+    expect(created.status).toBe(201);
+    expect(created.body.listing.status).toBe('draft');
+
+    // Simulate the recruiter account becoming unapproved.
+    await require('../src/models/User').findByIdAndUpdate(
+      r.user._id,
+      { approvalStatus: 'pending' }
+    );
+
+    const publish = await patch(
+      `/api/listings/${created.body.listing.id}`,
+      r,
+      { publish: true }
+    );
+
+    expect(publish.status).toBe(403);
+    expect(publish.body.code).toBe('RECRUITER_NOT_APPROVED');
+  });
   it('validates input: missing fields, invalid deadlines, bad domain, negative stipend', async () => {
     const r = await createUser({ role: 'recruiter' });
     expect((await post('/api/listings', r, { title: 'x' })).status).toBe(400);
