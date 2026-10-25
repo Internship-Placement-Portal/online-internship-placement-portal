@@ -211,6 +211,32 @@ describe('search, filter, pagination (IPP-F-007)', () => {
     expect((await get('/api/listings?maxDuration=2', student)).body.total).toBe(1);
   });
 
+it('combines multiple filters into one search', async () => {
+  const res = await get(
+    '/api/listings?domain=Data%20Science&location=bengal&minStipend=20000&maxStipend=30000&minDuration=4&maxDuration=8',
+    student
+  );
+
+  expect(res.status).toBe(200);
+  expect(res.body.total).toBe(1);
+  expect(res.body.items[0].title).toBe('Data Analyst Intern');
+});
+
+it('rejects minimum stipend or duration greater than the maximum', async () => {
+  const stipendRes = await get(
+    '/api/listings?minStipend=20000&maxStipend=10000',
+    student
+  );
+  expect(stipendRes.status).toBe(400);
+
+  const durationRes = await get(
+    '/api/listings?minDuration=6&maxDuration=2',
+    student
+  );
+  expect(durationRes.status).toBe(400);
+});
+
+
   it('full-text search matches title and skills', async () => {
     expect((await get('/api/listings?q=python', student)).body.items[0].title).toBe('Data Analyst Intern');
     expect((await get('/api/listings?q=react', student)).body.total).toBe(1);
