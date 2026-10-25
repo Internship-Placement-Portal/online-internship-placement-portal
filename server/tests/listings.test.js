@@ -43,6 +43,27 @@ describe('listing CRUD + ownership (IPP-F-006)', () => {
     expect(res.body.listing.status).toBe('pending_approval');
   });
 
+  it('does not allow recruiters to set listing status directly', async () => {
+    const r = await createUser({ role: 'recruiter' });
+
+    // A forged status must not approve a newly created listing.
+    const created = await post('/api/listings', r, {
+      ...listingBody(),
+      status: 'approved',
+    });
+
+    expect(created.status).toBe(201);
+    expect(created.body.listing.status).toBe('draft');
+
+    // A forged status must not approve an existing draft.
+    const edited = await patch(
+      `/api/listings/${created.body.listing.id}`,
+      r,
+      { status: 'approved' }
+    );
+
+    expect(edited.status).toBe(400);
+  });
   it('blocks recruiters who are not approved', async () => {
     const r = await createUser({ role: 'recruiter', approvalStatus: 'pending' });
     const res = await post('/api/listings', r, listingBody());
@@ -50,14 +71,74 @@ describe('listing CRUD + ownership (IPP-F-006)', () => {
     expect(res.body.code).toBe('RECRUITER_NOT_APPROVED');
   });
 
-  it('validates input: missing fields, past deadline, bad domain, negative stipend', async () => {
+  it('blocks an unapproved recruiter from publishing an existing draft', async () => {
+    const r = await createUser({ role: 'recruiter' });
+
+    // Create a draft while the recruiter is approved.
+    const created = await post('/api/listings', r, listingBody());
+    expect(created.status).toBe(201);
+    expect(created.body.listing.status).toBe('draft');
+
+    // Simulate the recruiter account becoming unapproved.
+    await require('../src/models/User').findByIdAndUpdate(
+      r.user._id,
+      { approvalStatus: 'pending' }
+    );
+
+    const publish = await patch(
+      `/api/listings/${created.body.listing.id}`,
+      r,
+      { publish: true }
+    );
+
+    expect(publish.status).toBe(403);
+    expect(publish.body.code).toBe('RECRUITER_NOT_APPROVED');
+  });
+
+  it('rejects each missing required listing field', async () => {
+    const r = await createUser({ role: 'recruiter' });
+    const requiredFields = [
+      'title',
+      'description',
+      'domain',
+      'location',
+      'stipend',
+      'duration',
+      'deadline',
+    ];
+
+    for (const field of requiredFields) {
+      const body = listingBody();
+      delete body[field];
+
+      const res = await post('/api/listings', r, body);
+
+      expect(res.status).toBe(400);
+    }
+  });
+  it('validates input: missing fields, invalid deadlines, bad domain, negative stipend', async () => {
     const r = await createUser({ role: 'recruiter' });
     expect((await post('/api/listings', r, { title: 'x' })).status).toBe(400);
     expect((await post('/api/listings', r, listingBody({ deadline: '2020-01-01' }))).status).toBe(400);
     expect((await post('/api/listings', r, listingBody({ domain: 'Nope' }))).status).toBe(400);
     expect((await post('/api/listings', r, listingBody({ stipend: -5 }))).status).toBe(400);
+    // Impossible calendar date.
+    expect(
+      (await post('/api/listings', r, listingBody({ deadline: '2027-02-31' }))).status
+    ).toBe(400);
+    // Valid leap-year date.
+    expect(
+      (await post('/api/listings', r, listingBody({ deadline: '2028-02-29' }))).status
+    ).toBe(201);
+    // February 29 in a non-leap year.
+    expect(
+      (await post('/api/listings', r, listingBody({ deadline: '2027-02-29' }))).status
+    ).toBe(400);
+    // April has only 30 days.
+    expect(
+      (await post('/api/listings', r, listingBody({ deadline: '2027-04-31' }))).status
+    ).toBe(400);
   });
-
   it('only the owner can edit; others get 403 and unknown ids 404', async () => {
     const owner = await createUser({ role: 'recruiter' });
     const other = await createUser({ role: 'recruiter' });

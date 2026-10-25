@@ -2,11 +2,18 @@ const Joi = require('joi');
 const { DOMAINS } = require('../models/Listing');
 
 // Deadlines are entered as YYYY-MM-DD and stored as the end of that day (UTC), so a listing stays open all day.
+
 const deadline = Joi.string()
   .pattern(/^\d{4}-\d{2}-\d{2}$/)
   .custom((value, helpers) => {
     const d = new Date(`${value}T23:59:59.999Z`);
-    if (Number.isNaN(d.getTime())) return helpers.error('date.base');
+    // Reject impossible calendar dates, such as 2026-02-31.
+    if (
+      Number.isNaN(d.getTime()) ||
+      d.toISOString().slice(0, 10) !== value
+    ) {
+      return helpers.error('date.base');
+    }
     if (d < new Date()) return helpers.error('deadline.past');
     return d;
   })
@@ -15,6 +22,7 @@ const deadline = Joi.string()
     'date.base': 'deadline must be a valid date',
     'deadline.past': 'deadline cannot be in the past',
   });
+
 
 const fields = {
   title: Joi.string().trim().min(3).max(120),
