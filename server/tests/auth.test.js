@@ -138,8 +138,8 @@ describe('login + JWT (IPP-F-002, IPP-SR-002)', () => {
     expect(decoded.role).toBe('student');
     expect(decoded.iss).toBe(config.jwt.issuer);
     expect(typeof decoded.iat).toBe('number');
-expect(typeof decoded.exp).toBe('number');
-expect(decoded.exp - decoded.iat).toBe(900);
+    expect(typeof decoded.exp).toBe('number');
+    expect(decoded.exp - decoded.iat).toBe(config.jwt.accessExpiresMin * 60);
   });
   it('rejects wrong password and unknown email with the same 401', async () => {
     await registerVerified(app);
