@@ -8,6 +8,8 @@ const AuditLog = require('../src/models/AuditLog');
 const RefreshToken = require('../src/models/RefreshToken');
 const { createRateLimiter } = require('../src/middleware/rateLimit');
 const { startDb, stopDb, clearDb, lastOtp, registerVerified, createAdmin, creds } = require('./helpers');
+const jwt = require('jsonwebtoken');
+const config = require('../src/config/env');
 const bcrypt = require('bcryptjs');
 
 
@@ -115,12 +117,33 @@ describe('login + JWT (IPP-F-002, IPP-SR-002)', () => {
     await registerVerified(app);
     const res = await login(creds.email, creds.password);
     expect(res.status).toBe(200);
-    expect(res.body).toMatchObject({ role: 'student', expiresIn: 900 });
+    expect(res.body).toMatchObject({
+      role: 'student',
+      expiresIn: config.jwt.accessExpiresMin * 60,
+    });
     expect(typeof res.body.token).toBe('string');
     expect(res.body.passwordHash).toBeUndefined();
     expect(res.headers['set-cookie'][0]).toMatch(/ipp_rt=.*HttpOnly/);
   });
-
+  it('issues a JWT with the expected subject, role, issuer, and expiry', async () => {
+    const user = await registerVerified(app);
+    const res = await login(creds.email, creds.password);
+    expect(res.status).toBe(200);
+    const decoded = jwt.verify(
+      res.body.token,
+      config.jwt.accessSecret,
+      {
+        issuer: config.jwt.issuer,
+        algorithms: ['HS256'],
+      }
+    );
+    expect(decoded.sub).toBe(String(user.id || user.userId || user._id));
+    expect(decoded.role).toBe('student');
+    expect(decoded.iss).toBe(config.jwt.issuer);
+    expect(typeof decoded.iat).toBe('number');
+    expect(typeof decoded.exp).toBe('number');
+    expect(decoded.exp - decoded.iat).toBe(config.jwt.accessExpiresMin * 60);
+  });
   it('rejects wrong password and unknown email with the same 401', async () => {
     await registerVerified(app);
     const a = await login(creds.email, 'WrongPass1');
