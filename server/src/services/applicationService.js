@@ -103,7 +103,10 @@ async function getOne(user, id) {
 async function openResume(user, id) {
   const app = await loadFor(user, id, { withResume: true });
   if (!(await storageService.exists(app.resumeKey))) throw new AppError(404, 'RESUME_MISSING', 'The resume file is no longer available');
-  return { stream: storageService.open(app.resumeKey), filename: app.resumeOriginalName };
+  return {
+  stream: await storageService.open(app.resumeKey),
+  filename: app.resumeOriginalName,
+};
 }
 
 // IPP-F-011 + IPP-F-012: persist the change, audit it, and notify the student (in-app + email).
