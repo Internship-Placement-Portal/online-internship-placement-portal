@@ -117,7 +117,10 @@ describe('login + JWT (IPP-F-002, IPP-SR-002)', () => {
     await registerVerified(app);
     const res = await login(creds.email, creds.password);
     expect(res.status).toBe(200);
-    expect(res.body).toMatchObject({ role: 'student', expiresIn: 900 });
+    expect(res.body).toMatchObject({
+      role: 'student',
+      expiresIn: config.jwt.accessExpiresMin * 60,
+    });
     expect(typeof res.body.token).toBe('string');
     expect(res.body.passwordHash).toBeUndefined();
     expect(res.headers['set-cookie'][0]).toMatch(/ipp_rt=.*HttpOnly/);
