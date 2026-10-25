@@ -65,9 +65,14 @@ What the code enforces regardless of deployment (`middleware/httpsOnly.js`, `app
 | Passwords | bcrypt with per-password salt (`BCRYPT_ROUNDS`, default 12); `passwordHash` is `select: false` and never returned. |
 | Email OTPs, password-reset tokens, refresh tokens | Only a SHA-256 hash is stored; raw values exist only in the email / cookie. OTPs are single-use, expiring, attempt-limited. |
 | JWT secret | Environment variable only; ≥ 32 characters enforced in production. |
-| Resumes | Stored under random 128-bit names (never user-supplied), outside the web root, served only through an authorised endpoint (`Cache-Control: private, no-store`). |
+| Resumes | Newly uploaded resumes are encrypted at rest using AES-256-GCM with a random IV and authentication tag. Encryption keys are supplied through `RESUME_ENCRYPTION_KEY` and must be stored securely outside source control. Files are stored under random 128-bit names, outside the web root, and served only through an authorised endpoint (`Cache-Control: private, no-store`). Existing plaintext files remain readable until migrated. |
 | Database files | Enable encryption at rest on the cluster (Atlas encrypts at rest by default; self-hosted: WiredTiger encryption / encrypted volumes). |
 | Logs | Request metadata only — never bodies, headers, tokens or passwords. Audit metadata contains no secrets. |
+### Resume encryption configuration
+
+Set `RESUME_ENCRYPTION_KEY` to a securely generated 32-byte key encoded as 64 hexadecimal characters. Keep the key out of source control and back it up securely. Every application instance that accesses the same resumes must use the same key. Losing the key makes encrypted resumes unrecoverable.
+
+New uploads are encrypted before being written to disk. Existing plaintext resumes remain readable for backward compatibility; encrypt them through a separate migration before claiming all stored resumes are encrypted.
 
 ## 3. Authentication and sessions (IPP-SR-002)
 

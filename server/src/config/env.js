@@ -12,6 +12,9 @@ if (missing.length && !isTest) {
 if (isProd && process.env.JWT_ACCESS_SECRET.length < 32) {
   throw new Error('JWT_ACCESS_SECRET must be at least 32 characters in production');
 }
+if (isProd && !/^[a-f0-9]{64}$/i.test(process.env.RESUME_ENCRYPTION_KEY || '')) {
+  throw new Error('RESUME_ENCRYPTION_KEY must be a 64-character hexadecimal key in production');
+}
 
 const int = (v, d) => (v === undefined || v === '' ? d : parseInt(v, 10));
 
@@ -46,9 +49,12 @@ const config = {
   },
   // Resume storage (local disk in development; swap StorageService for cloud storage later).
   upload: {
-    dir: path.resolve(process.env.UPLOAD_DIR || path.join(__dirname, '../../uploads')),
-    maxBytes: 5 * 1024 * 1024, // IPP-SR-005 / IPP-F-010: 5 MB
-  },
+  dir: path.resolve(process.env.UPLOAD_DIR || path.join(__dirname, '../../uploads')),
+  maxBytes: 5 * 1024 * 1024,
+  encryptionKey:
+    process.env.RESUME_ENCRYPTION_KEY ||
+    (isTest ? '00112233445566778899aabbccddeeff00112233445566778899aabbccddeeff' : ''),
+},
   clamav: { host: process.env.CLAMAV_HOST || '', port: int(process.env.CLAMAV_PORT, 3310) },
   // "console" prints mails (incl. OTPs) for local development only; never allowed in production.
   mailTransport: process.env.MAIL_TRANSPORT || (process.env.SMTP_HOST ? 'smtp' : isProd ? 'none' : isTest ? 'memory' : 'console'),
