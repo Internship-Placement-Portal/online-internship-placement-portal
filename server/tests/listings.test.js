@@ -43,6 +43,27 @@ describe('listing CRUD + ownership (IPP-F-006)', () => {
     expect(res.body.listing.status).toBe('pending_approval');
   });
 
+  it('does not allow recruiters to set listing status directly', async () => {
+    const r = await createUser({ role: 'recruiter' });
+
+    // A forged status must not approve a newly created listing.
+    const created = await post('/api/listings', r, {
+      ...listingBody(),
+      status: 'approved',
+    });
+
+    expect(created.status).toBe(201);
+    expect(created.body.listing.status).toBe('draft');
+
+    // A forged status must not approve an existing draft.
+    const edited = await patch(
+      `/api/listings/${created.body.listing.id}`,
+      r,
+      { status: 'approved' }
+    );
+
+    expect(edited.status).toBe(400);
+  });
   it('blocks recruiters who are not approved', async () => {
     const r = await createUser({ role: 'recruiter', approvalStatus: 'pending' });
     const res = await post('/api/listings', r, listingBody());
