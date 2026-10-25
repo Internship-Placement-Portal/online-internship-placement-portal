@@ -94,4 +94,13 @@ describe('TLS 1.2+ only when Node terminates TLS (IPP-SR-001)', () => {
   it('is configured with a TLS 1.2 floor', () => {
     expect(require('../src/config/env').tls.minVersion).toBe('TLSv1.2');
   });
+  it('does not allow the Node TLS server minimum to be lowered below TLS 1.2', () => {
+  expect(() =>
+    createServer(app, {
+      certFile: '/unused/cert.pem',
+      keyFile: '/unused/key.pem',
+      minVersion: 'TLSv1.1',
+    })
+  ).toThrow();
+});
 });
