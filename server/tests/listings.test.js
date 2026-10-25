@@ -50,14 +50,30 @@ describe('listing CRUD + ownership (IPP-F-006)', () => {
     expect(res.body.code).toBe('RECRUITER_NOT_APPROVED');
   });
 
-  it('validates input: missing fields, past deadline, bad domain, negative stipend', async () => {
+
+  it('validates input: missing fields, invalid deadlines, bad domain, negative stipend', async () => {
     const r = await createUser({ role: 'recruiter' });
     expect((await post('/api/listings', r, { title: 'x' })).status).toBe(400);
     expect((await post('/api/listings', r, listingBody({ deadline: '2020-01-01' }))).status).toBe(400);
     expect((await post('/api/listings', r, listingBody({ domain: 'Nope' }))).status).toBe(400);
     expect((await post('/api/listings', r, listingBody({ stipend: -5 }))).status).toBe(400);
+    // Impossible calendar date.
+    expect(
+      (await post('/api/listings', r, listingBody({ deadline: '2027-02-31' }))).status
+    ).toBe(400);
+    // Valid leap-year date.
+    expect(
+      (await post('/api/listings', r, listingBody({ deadline: '2028-02-29' }))).status
+    ).toBe(201);
+    // February 29 in a non-leap year.
+    expect(
+      (await post('/api/listings', r, listingBody({ deadline: '2027-02-29' }))).status
+    ).toBe(400);
+    // April has only 30 days.
+    expect(
+      (await post('/api/listings', r, listingBody({ deadline: '2027-04-31' }))).status
+    ).toBe(400);
   });
-
   it('only the owner can edit; others get 403 and unknown ids 404', async () => {
     const owner = await createUser({ role: 'recruiter' });
     const other = await createUser({ role: 'recruiter' });
