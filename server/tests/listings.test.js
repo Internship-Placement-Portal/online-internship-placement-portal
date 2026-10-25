@@ -94,6 +94,28 @@ describe('listing CRUD + ownership (IPP-F-006)', () => {
     expect(publish.status).toBe(403);
     expect(publish.body.code).toBe('RECRUITER_NOT_APPROVED');
   });
+
+  it('rejects each missing required listing field', async () => {
+    const r = await createUser({ role: 'recruiter' });
+    const requiredFields = [
+      'title',
+      'description',
+      'domain',
+      'location',
+      'stipend',
+      'duration',
+      'deadline',
+    ];
+
+    for (const field of requiredFields) {
+      const body = listingBody();
+      delete body[field];
+
+      const res = await post('/api/listings', r, body);
+
+      expect(res.status).toBe(400);
+    }
+  });
   it('validates input: missing fields, invalid deadlines, bad domain, negative stipend', async () => {
     const r = await createUser({ role: 'recruiter' });
     expect((await post('/api/listings', r, { title: 'x' })).status).toBe(400);
