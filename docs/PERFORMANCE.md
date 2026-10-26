@@ -129,3 +129,29 @@ RPS at p90 ≤ 3 s, then `PEAK_VUS=500` against five instances behind a load bal
 All configured k6 thresholds passed during this local smoke test. The run completed 448 iterations, generated 2,242 HTTP requests, and recorded no failed HTTP requests or application endpoint checks.
 
 These measurements establish a local baseline only. They do not demonstrate performance under 500 concurrent users or five-times horizontal scaling. Those acceptance tests remain pending until executed against a suitable controlled deployment. Record the deployment configuration, database configuration, instance count, and raw k6 output when those tests are performed.
+
+## 500-User k6 Load Test
+
+**Environment:** Local development environment on Windows  
+**Tool:** k6 v2.3.0  
+**Peak virtual users:** 500  
+**Ramp-up:** 1 minute  
+**Hold duration:** 1 minute  
+**Total test duration:** Approximately 2 minutes 11 seconds
+
+### Results
+
+| Metric | Observed result | Acceptance criterion | Status |
+|---|---:|---:|---|
+| HTTP requests | 56,092 | — | Recorded |
+| Checks succeeded | 56,092 / 56,092 | All checks pass | PASS |
+| Overall HTTP response-time p90 | 1.24 s | Under 3 s | PASS |
+| Listing-search response-time p90 | 858.3 ms | Under 2 s | PASS |
+| HTTP failure rate | 0.00% | Under 1% | PASS |
+| Application error rate | 0.00% | Under 1% | PASS |
+
+### Conclusion
+
+The local k6 test reached 500 virtual users. All 56,092 checks succeeded, and all four configured performance thresholds passed during this run. These results provide evidence of performance under the tested local conditions; they do not guarantee identical results in production.
+
+**Remaining work:** The five-instance horizontal scaling test is separate and remains pending until a suitable multi-instance environment is available.
