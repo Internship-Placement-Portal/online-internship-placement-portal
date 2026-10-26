@@ -92,3 +92,40 @@ The API keeps **no per-user state in process memory**, so any instance can serve
 
 Suggested scaling test (TC-Scale-01): run `perf/k6/load.js` with `PEAK_VUS=100` against one instance to establish the baseline
 RPS at p90 ≤ 3 s, then `PEAK_VUS=500` against five instances behind a load balancer, and compare RPS per instance.
+
+
+## k6 API Smoke Test — 10 Virtual Users
+
+**Status:** Passed
+
+**Test environment:** Local development environment  
+**Maximum virtual users:** 10  
+**Test duration:** Approximately 56 seconds  
+**Completed iterations:** 448  
+**Total HTTP requests:** 2,242
+
+### Results
+
+| Metric | Measured result | Acceptance threshold | Outcome |
+|---|---:|---:|---|
+| Overall HTTP response time, p90 | 18.79 ms | Below 3,000 ms | Pass |
+| Listing search response time, p90 | 18.60 ms | Below 2,000 ms | Pass |
+| HTTP request failure rate | 0.00% | Below 1% | Pass |
+| Application error rate | 0.00% | Below 1% | Pass |
+| Endpoint checks | 2,242 passed; 0 failed | All checks pass | Pass |
+
+### Endpoint measurements
+
+| Endpoint | Average response time | p90 response time |
+|---|---:|---:|
+| Listing search | 12.47 ms | 18.60 ms |
+| Listing details | 14.51 ms | 21.58 ms |
+| Student dashboard | 10.93 ms | 18.12 ms |
+| My applications | 12.35 ms | 18.69 ms |
+| Assessment list | 11.32 ms | 16.95 ms |
+
+### Interpretation and limitations
+
+All configured k6 thresholds passed during this local smoke test. The run completed 448 iterations, generated 2,242 HTTP requests, and recorded no failed HTTP requests or application endpoint checks.
+
+These measurements establish a local baseline only. They do not demonstrate performance under 500 concurrent users or five-times horizontal scaling. Those acceptance tests remain pending until executed against a suitable controlled deployment. Record the deployment configuration, database configuration, instance count, and raw k6 output when those tests are performed.
