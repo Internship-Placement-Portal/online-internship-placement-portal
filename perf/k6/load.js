@@ -42,8 +42,17 @@ function record(res, name, trend) {
   const passed = check(res, {
     [`${name} returned HTTP 200`]: (r) => r.status === 200,
   });
+
+  if (!passed) {
+    const body = String(res.body || '').replace(/\s+/g, ' ').slice(0, 200);
+    console.error(`${name} failed: HTTP ${res.status}; response: ${body}`);
+  }
+
   errors.add(!passed);
-  if (trend) trend.add(res.timings.duration);
+
+  if (trend) {
+    trend.add(res.timings.duration);
+  }
 }
 
 export function setup() {
@@ -70,11 +79,18 @@ export function setup() {
   const auth = { headers: { Authorization: `Bearer ${token}` } };
   const list = http.get(`${BASE}/listings?limit=20`, auth);
 
-  check(list, {
+  const listOk = check(list, {
     'initial listing request succeeded': (r) => r.status === 200,
   });
 
-  const body = list.status === 200 ? list.json() : {};
+  if (!listOk) {
+    const body = String(list.body || '').replace(/\s+/g, ' ').slice(0, 200);
+    throw new Error(
+      `Initial listing request failed: HTTP ${list.status}; response: ${body}`
+    );
+  }
+
+  const body = list.json();
   const items = Array.isArray(body.items) ? body.items : [];
 
   return {
@@ -91,6 +107,7 @@ export default function (data) {
   group('browse and search', () => {
     const q = QUERIES[Math.floor(Math.random() * QUERIES.length)];
     const domain = DOMAINS[Math.floor(Math.random() * DOMAINS.length)];
+
     const url =
       `${BASE}/listings?q=${encodeURIComponent(q)}` +
       `&domain=${encodeURIComponent(domain)}&page=1&limit=9`;
@@ -103,6 +120,7 @@ export default function (data) {
   group('listing details', () => {
     if (data.ids.length > 0) {
       const index = Math.floor(Math.random() * data.ids.length);
+
       record(
         http.get(`${BASE}/listings/${data.ids[index]}`, auth),
         'listing detail',
@@ -133,6 +151,6 @@ export default function (data) {
     );
   });
 
-  // Deliberately do not create applications or start/submit assessments.
+  // Avoid creating applications or starting/submitting assessments during load tests.
   sleep(0.5);
 }
