@@ -92,3 +92,22 @@ The API keeps **no per-user state in process memory**, so any instance can serve
 
 Suggested scaling test (TC-Scale-01): run `perf/k6/load.js` with `PEAK_VUS=100` against one instance to establish the baseline
 RPS at p90 ≤ 3 s, then `PEAK_VUS=500` against five instances behind a load balancer, and compare RPS per instance.
+
+
+### Local k6 smoke test — 10 virtual users
+
+**Environment:** Local Windows development machine, API running on port 5000, local MongoDB, and k6.
+
+**Configuration:** 10 maximum virtual users, 15-second ramp-up, 30-second hold.
+
+| Metric | Result | Configured threshold | Status |
+|---|---:|---:|---|
+| HTTP requests | 492 | — | Informational |
+| HTTP request failure rate | 0.00% | Below 1% | Pass |
+| Application error rate | 0.00% | Below 1% | Pass |
+| HTTP response p90 | 99.04 ms | Below 3,000 ms | Pass |
+| Listing search p90 | 79.93 ms | Below 2,000 ms | Pass |
+
+All configured k6 thresholds passed in this local smoke test. This result demonstrates successful API behavior at a maximum of 10 virtual users in the tested environment. It does not establish performance at 500 concurrent users or prove horizontal scaling to five times the baseline.
+
+**Note:** The local rate-limit settings were raised for this test. Production rate limits must remain appropriately configured and should be tested separately.
