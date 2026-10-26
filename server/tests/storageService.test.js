@@ -1,9 +1,20 @@
 
+const {
+  describe,
+  it,
+  beforeEach,
+  after,
+} = require('node:test');
+
+const assert = require('node:assert/strict');
 const fs = require('fs/promises');
 const os = require('os');
 const path = require('path');
 
-const tempDir = path.join(os.tmpdir(), `ipp-storage-test-${process.pid}`);
+const tempDir = path.join(
+  os.tmpdir(),
+  `ipp-storage-test-${process.pid}`
+);
 
 process.env.UPLOAD_DIR = tempDir;
 process.env.RESUME_ENCRYPTION_KEY =
@@ -18,7 +29,7 @@ describe('resume storage encryption (IPP-NF-003)', () => {
     await fs.mkdir(tempDir, { recursive: true });
   });
 
-  afterAll(async () => {
+  after(async () => {
     await fs.rm(tempDir, { recursive: true, force: true });
   });
 
@@ -27,25 +38,31 @@ describe('resume storage encryption (IPP-NF-003)', () => {
     const key = await storageService.save(pdf);
     const stored = await fs.readFile(path.join(tempDir, key));
 
-    expect(stored).not.toEqual(pdf);
-    expect(stored.includes(pdf)).toBe(false);
+    assert.notDeepEqual(stored, pdf);
+    assert.equal(stored.includes(pdf), false);
 
     const stream = await storageService.open(key);
     const chunks = [];
-    for await (const chunk of stream) chunks.push(chunk);
 
-    expect(Buffer.concat(chunks)).toEqual(pdf);
+    for await (const chunk of stream) {
+      chunks.push(chunk);
+    }
+
+    assert.deepEqual(Buffer.concat(chunks), pdf);
   });
 
   it('rejects a tampered encrypted resume', async () => {
-    const key = await storageService.save(Buffer.from('%PDF-1.7\nresume\n%%EOF'));
+    const key = await storageService.save(
+      Buffer.from('%PDF-1.7\nresume\n%%EOF')
+    );
+
     const filePath = path.join(tempDir, key);
     const stored = await fs.readFile(filePath);
 
     stored[stored.length - 1] ^= 0xff;
     await fs.writeFile(filePath, stored);
 
-    await expect(storageService.open(key)).rejects.toThrow();
+    await assert.rejects(storageService.open(key));
   });
 
   it('rejects an encrypted file whose format marker has been altered', async () => {
@@ -59,21 +76,25 @@ describe('resume storage encryption (IPP-NF-003)', () => {
     stored[0] ^= 0xff;
     await fs.writeFile(filePath, stored);
 
-    await expect(storageService.open(key)).rejects.toThrow(
-      'Resume storage format is invalid'
+    await assert.rejects(
+      storageService.open(key),
+      /Resume storage format is invalid/
     );
   });
-
 
   it('continues to read an existing plaintext resume', async () => {
     const pdf = Buffer.from('%PDF-1.7\nlegacy resume\n%%EOF');
     const key = `${'a'.repeat(32)}.pdf`;
+
     await fs.writeFile(path.join(tempDir, key), pdf);
 
     const stream = await storageService.open(key);
     const chunks = [];
-    for await (const chunk of stream) chunks.push(chunk);
 
-    expect(Buffer.concat(chunks)).toEqual(pdf);
+    for await (const chunk of stream) {
+      chunks.push(chunk);
+    }
+
+    assert.deepEqual(Buffer.concat(chunks), pdf);
   });
 });
