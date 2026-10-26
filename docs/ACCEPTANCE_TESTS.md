@@ -62,3 +62,13 @@ Per the SRS Section 6 and STP Section 5, do not declare acceptance until:
 3. All planned test cases have been executed.
 4. All mapped test cases in the RTM are passed.
 5. The 500-user performance and 5× scaling claims are supported by actual measurements, not extrapolated from the 10-VU smoke run.
+## Automated Server Regression Test Evidence
+
+**Execution date:** 26 October 2026  
+**Environment:** Local Windows development environment  
+**Test suites:** 43  
+**Tests:** 168 passed, 0 failed, 0 skipped.
+
+The complete server regression test suite passed. The HTTPS enforcement test file was also executed independently, with all 7 tests passing and no skips after making the Git-bundled OpenSSL executable available on the current PowerShell PATH.
+
+This result verifies the automated server tests executed by the current test command. It does not by itself establish that every manual acceptance scenario, the 500-concurrent-user requirement, or the 5× horizontal-scaling requirement has passed.
