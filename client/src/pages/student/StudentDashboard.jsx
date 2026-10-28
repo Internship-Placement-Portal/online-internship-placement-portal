@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, CalendarClock, ClipboardCheck, FileText, Sparkles, Target, Timer, Trophy, Video } from 'lucide-react';
+import { ArrowRight, CalendarClock, ClipboardCheck, FileText, GraduationCap, Target, Timer, Trophy, Video } from 'lucide-react';
 import { studentDashboardApi } from '../../api/dashboard.js';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { ChartCard, LineChart } from '../../components/charts.jsx';
@@ -15,7 +15,7 @@ export default function StudentDashboard() {
 
   return (
     <>
-      <DashHero eyebrow="Student dashboard" greeting={`Hey ${user.name.split(' ')[0]},`} title="here's your progress" search orbIcon={Sparkles}>
+      <DashHero eyebrow="Student dashboard" greeting={`Hey ${user.name.split(' ')[0]},`} title="here's your progress" search orbIcon={GraduationCap}>
         <Link to="/student/tests" className="btn btn-secondary">
           <Timer size={17} aria-hidden="true" /> Practice tests
         </Link>

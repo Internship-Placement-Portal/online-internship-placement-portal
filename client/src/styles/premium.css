@@ -530,9 +530,9 @@ textarea:focus-visible {
   width: var(--orb-size);
   height: var(--orb-size);
   color: var(--a1);
-  background: var(--orb);
+  background: radial-gradient(circle at 35% 30%, color-mix(in srgb, #ffffff 45%, var(--a7)), color-mix(in srgb, var(--accent) 78%, #ffffff) 62%, color-mix(in srgb, var(--accent) 88%, #ffffff));
   border-radius: 50%;
-  box-shadow: 0 20px 50px -12px var(--glow), inset 0 -8px 18px color-mix(in srgb, var(--a1) 30%, transparent), inset 0 6px 14px color-mix(in srgb, #ffffff 40%, transparent);
+  box-shadow: 0 20px 50px -12px var(--glow), inset 0 -8px 18px color-mix(in srgb, var(--accent) 18%, transparent), inset 0 6px 14px color-mix(in srgb, #ffffff 55%, transparent);
   animation: float 6s ease-in-out infinite;
 }
 @keyframes breathe {
