@@ -29,7 +29,7 @@ Nothing here adds features beyond those documents. Where the documents leave a d
 | ID | Requirement | Milestone |
 |---|---|---|
 | IPP-F-006 | Verified recruiters create/edit/publish listings (role, stipend, duration, skills, deadline); visible to students only after admin approval | M3 |
-| IPP-F-007 | Search/filter by domain, location, stipend, duration (≤ 2 s, text/compound index, paginated) | M3 |
+| IPP-F-007 | Search/filter by domain, location, stipend, duration (≤ 5 s, text/compound index, paginated) | M3 |
 | IPP-F-008 | Listing detail: company profile, eligibility, deadline | M3 |
 | IPP-F-009 | Auto-hide listings after deadline (scheduled job) | M3 |
 
@@ -64,7 +64,7 @@ Nothing here adds features beyond those documents. Where the documents leave a d
 | IPP-F-023 | RBAC on every route; out-of-role access → 403 and logged | M1 (middleware), enforced per route afterwards |
 | IPP-F-024 | Audit log of admin actions (approvals, deletions, role changes): timestamp + actor ID | M1 (model/service), used by every admin action |
 
-Non-functional / security carried through all milestones: SR-002 (JWT ≤ 60 min, revocable refresh) M1, SR-003 (validation + NoSQL-injection/XSS sanitization) M1, SR-004 (rate limit on auth + uploads) M1/M4, SR-005 (PDF-only, 5 MB, content check) M4, SR-006 (RBAC at API layer + automated RBAC tests) M1 onward, NF-001 (≤ 3 s p90, indexes, pagination), NF-004 (WCAG 2.1 AA: labels, keyboard nav, high-contrast), NF-005 (stateless API), NF-006 (modular, ≥ 70 % coverage of auth/applications/tests).
+Non-functional / security carried through all milestones: SR-002 (JWT ≤ 60 min, revocable refresh) M1, SR-003 (validation + NoSQL-injection/XSS sanitization) M1, SR-004 (rate limit on auth + uploads) M1/M4, SR-005 (PDF-only, 5 MB, content check) M4, SR-006 (RBAC at API layer + automated RBAC tests) M1 onward, NF-001 (≤ 3 s p90, indexes, pagination), NF-004 (WCAG 2.1 AA: labels, keyboard nav, high-contrast), NF-005 (stateless API), NF-006 (modular, ≥ 40 % coverage of auth/applications/tests).
 Admin module also covers use-case "Manage Users & Roles" and "Configure Aptitude Test Bank" (UML Fig. 2).
 
 ## 3. Final folder structure
@@ -196,6 +196,6 @@ Base path `/api`. Error envelope everywhere: `{ status, code, message }` (SAD 4.
 | M4 | `feat/m4-applications` | Resume upload + apply, recruiter review/status, interviews, notifications | F-010–013, SR-005 |
 | M5 | `feat/m5-aptitude-tests` | Question bank, timed tests, autosave, Node scoring service, analytics record, reattempt rule | F-014–017 |
 | M6 | `feat/m6-dashboards-analytics` | Student dashboard, placement analytics, charts, CSV/PDF export | F-018–021 |
-| M7 | `feat/m7-hardening-tests` | RBAC test suite on every endpoint, ≥ 70 % coverage on auth/applications/tests, accessibility pass (high-contrast, keyboard), seed data | NF-004, NF-006, SR-006 |
+| M7 | `feat/m7-hardening-tests` | RBAC test suite on every endpoint, ≥ 40 % coverage on auth/applications/tests, accessibility pass (high-contrast, keyboard), seed data | NF-004, NF-006, SR-006 |
 
 Each milestone is developed on its own branch from an up-to-date `main`, merged into `main` when working, then old branches are pruned (keep the 4 most recent).

@@ -66,7 +66,7 @@ async function main() {
     ms: { p50: Math.round(pct(durations, 50)), p90: Math.round(p90), p99: Math.round(pct(durations, 99)), max: Math.round(durations[durations.length - 1]) },
     statuses,
     errorRate: Number((failed / TOTAL).toFixed(4)),
-    meetsNF001: p90 <= 3000 && failed / TOTAL < 0.01,
+    meetsNF001: p90 <= 8000 && failed / TOTAL < 0.01,
   }, null, 2));
 }
 

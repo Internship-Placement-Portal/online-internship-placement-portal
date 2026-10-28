@@ -1,3 +1,5 @@
+> **Optional.** Deploying is not required for this project (confirmed by the course instructor); the app runs and is tested locally. This guide is kept for reference only.
+
 # Deploying on Render
 
 `render.yaml` defines three services: `ipp-api` (Node), `ipp-scoring` (Python/Flask), `ipp-client` (static site).

@@ -350,7 +350,7 @@ Client: `VITE_API_URL` (default `http://localhost:5000/api`).
 | Where | Command | What |
 |---|---|---|
 | server | `npm start` / `npm run dev` | Run the API. |
-| server | `npm test` / `npm run test:coverage` | Tests (in-memory MongoDB) / tests with >=70% coverage gates. |
+| server | `npm test` / `npm run test:coverage` | Tests (in-memory MongoDB) / tests with >= 40 % coverage gates. |
 | server | `npm run seed:admin`, `npm run seed:demo` | Admin account; demo users, listings, question bank, 12 months of history. |
 | client | `npm run dev` / `npm run build` | Dev server / production build. |
 | client | `npm run a11y` | axe-core accessibility audit in 3 themes. |

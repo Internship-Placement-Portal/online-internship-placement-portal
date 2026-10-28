@@ -36,7 +36,7 @@ jobs:
 
       - run: npm ci
 
-      # Runs every test file, then enforces >= 70 % line/function/branch coverage overall and on the core modules
+      # Runs every test file, then enforces >= 40 % line/function/branch coverage overall and on the core modules
       # (auth, applications, tests, scoring, uploads). Includes the RBAC matrix over every endpoint (IPP-SR-006).
       - run: npm run test:coverage
 

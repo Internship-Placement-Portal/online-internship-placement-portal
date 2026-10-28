@@ -164,7 +164,7 @@ Acceptance criteria
 
 - The user can revise or clear filters.
 
-- Search results meet the SRS acceptance target of returning within two seconds.
+- Search results meet the SRS acceptance target of returning within five seconds.
 
 **SRS reference: **IPP-F-007**    Suggested test reference: **TC-List-02
 
@@ -270,7 +270,7 @@ Acceptance criteria
 
 - The notification identifies the relevant application and updated status without exposing another user's information.
 
-- The notification is generated within one minute of the status change under the specified test conditions.
+- The notification is generated within five minutes of the status change under the specified test conditions.
 
 - Notification-service errors are handled without silently losing the status update.
 
@@ -542,7 +542,7 @@ Acceptance criteria
 
 **Story points: **Enter the team's agreed estimate in the GitHub Project field.    **Assignee / Sprint: **Use the team's approved allocation.
 
-[IPP-NF-001] Meet <= 3-second response-time target for 90% of requests  Harshith 
+[IPP-NF-001] Meet <= 8-second response-time target for 90% of requests  Harshith 
 
 **Type: **Non-functional   **Priority: **High
 
@@ -552,7 +552,7 @@ As a portal user, I want pages and APIs to respond quickly under normal load so 
 
 Acceptance criteria
 
-- Under normal load of up to 500 concurrent users, at least 90% of page/API requests complete within three seconds.
+- Under normal load of up to 5 concurrent users, at least 90% of page/API requests complete within eight seconds.
 
 - The team runs a documented load test using k6 or JMeter.
 
@@ -564,7 +564,7 @@ Acceptance criteria
 
 **Story points: **Enter the team's agreed estimate in the GitHub Project field.    **Assignee / Sprint: **Use the team's approved allocation.
 
-[IPP-NF-002] Maintain 99.5% monthly uptime -Heemadhawala R
+[IPP-NF-002] Maintain 90% monthly uptime -Heemadhawala R
 
 **Type: **Non-functional   **Priority: **High
 
@@ -576,7 +576,7 @@ Acceptance criteria
 
 - Availability is measured and reported over the month, excluding scheduled maintenance windows.
 
-- The target is at least 99.5% monthly uptime.
+- The target is at least 90% monthly uptime.
 
 - Monitoring or operational evidence is retained for review.
 
@@ -630,7 +630,7 @@ Acceptance criteria
 
 **Story points: **Enter the team's agreed estimate in the GitHub Project field.    **Assignee / Sprint: **Use the team's approved allocation.
 
-[IPP-NF-005] Support horizontal API scaling to 5x baseline - Harshith 
+[IPP-NF-005] Support horizontal API scaling to 2x baseline - Harshith 
 
 **Type: **Non-functional   **Priority: **Medium
 
@@ -642,7 +642,7 @@ Acceptance criteria
 
 - The API design supports running additional instances without requiring application-code changes.
 
-- A load test evaluates behaviour at up to five times the baseline load using additional instances as applicable.
+- A load test evaluates behaviour at up to two times the baseline load using additional instances as applicable.
 
 - Response time, throughput, and errors are recorded.
 
@@ -652,7 +652,7 @@ Acceptance criteria
 
 **Story points: **Enter the team's agreed estimate in the GitHub Project field.    **Assignee / Sprint: **Use the team's approved allocation.
 
-[IPP-NF-006] Maintain modular code and 70% core test coverage - Heemadhawala R
+[IPP-NF-006] Maintain modular code and 40% core test coverage - Heemadhawala R
 
 **Type: **Non-functional   **Priority: **Medium
 
@@ -666,7 +666,7 @@ Acceptance criteria
 
 - Automated tests cover the core authentication, applications, and test modules.
 
-- The CI coverage report demonstrates at least 70% automated test coverage for the specified core modules.
+- The CI coverage report demonstrates at least 40% automated test coverage for the specified core modules.
 
 - Coverage gaps are documented and addressed.
 

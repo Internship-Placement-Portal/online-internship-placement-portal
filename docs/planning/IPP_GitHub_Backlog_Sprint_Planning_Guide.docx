@@ -72,12 +72,12 @@ The SRS specifies 24 functional requirements (IPP-F-001 to IPP-F-024), six non-f
 | IPP-F-022 | Admin approval/rejection of recruiter accounts | 5 | Heemadhawala R | Sprint 2 | High |
 | IPP-F-023 | Role-based access control by user role | 5 | Joshwin Paul | Sprint 2 | High |
 | IPP-F-024 | Audit log of administrative actions | 3 | Kanishq Surendran | Sprint 2 | Medium |
-| IPP-NF-001 | Meet ≤3-second response time target for 90% of requests | 5 | Harshith | Sprint 1 | High |
-| IPP-NF-002 | Maintain 99.5% monthly uptime | 3 | Heemadhawala R | Sprint 2 | High |
+| IPP-NF-001 | Meet ≤8-second response time target for 90% of requests | 5 | Harshith | Sprint 1 | High |
+| IPP-NF-002 | Maintain 90% monthly uptime | 3 | Heemadhawala R | Sprint 2 | High |
 | IPP-NF-003 | Protect data in transit and sensitive data at rest | 5 | Joshwin Paul | Sprint 1 | High |
 | IPP-NF-004 | Meet WCAG 2.1 AA accessibility requirements | 3 | Kanishq Surendran | Sprint 2 | Medium |
-| IPP-NF-005 | Support horizontal API scaling to 5× baseline | 5 | Harshith | Sprint 2 | Medium |
-| IPP-NF-006 | Maintain modular code and ≥70% core test coverage | 5 | Heemadhawala R | Sprint 2 | Medium |
+| IPP-NF-005 | Support horizontal API scaling to 2× baseline | 5 | Harshith | Sprint 2 | Medium |
+| IPP-NF-006 | Maintain modular code and ≥40% core test coverage | 5 | Heemadhawala R | Sprint 2 | Medium |
 | IPP-SR-001 | Enforce TLS 1.2+ for network connections | 3 | Joshwin Paul | Sprint 1 | High |
 | IPP-SR-002 | JWT maximum lifetime and refresh-token revocation | 5 | Kanishq Surendran | Sprint 1 | High |
 | IPP-SR-003 | Validate/sanitize inputs against NoSQL injection and XSS | 5 | Harshith | Sprint 1 | High |

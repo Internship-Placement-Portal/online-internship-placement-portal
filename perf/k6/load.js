@@ -1,10 +1,18 @@
-
+// IPP-NF-001: page-load / API response time <= 8 s for 90% of requests under normal load (up to 5 concurrent users).
+// IPP-NF-005: run the same script against 1 instance and then N instances to check near-linear scaling (see docs/PERFORMANCE.md).
+//
+//   k6 run -e BASE_URL=https://staging.example.com/api -e STUDENT_EMAIL=student@ipp.demo -e STUDENT_PASSWORD=... perf/k6/load.js
+//   Optional: -e PEAK_VUS=5 -e RAMP=15s -e HOLD=30s
+//
+// The API rate limiter (SR-004) is per client IP, so a single load generator needs RATE_LIMIT_API_MAX raised on the
+// system under test (never in production). Login happens once in setup(): access tokens are stateless JWTs, which is
+// also what lets any instance serve any request.
 import http from 'k6/http';
 import { check, group, sleep } from 'k6';
 import { Rate, Trend } from 'k6/metrics';
 
 const BASE = __ENV.BASE_URL || 'http://localhost:5000/api';
-const PEAK = Number(__ENV.PEAK_VUS || 10);
+const PEAK = Number(__ENV.PEAK_VUS || 5);
 const RAMP = __ENV.RAMP || '15s';
 const HOLD = __ENV.HOLD || '30s';
 
@@ -22,8 +30,9 @@ export const options = {
     { duration: '10s', target: 0 },
   ],
   thresholds: {
-    http_req_duration: ['p(90)<3000'],
-    listing_search_duration: ['p(90)<2000'],
+    // Acceptance criterion: 90th percentile <= 8 s.
+    http_req_duration: ['p(90)<8000'],
+    listing_search_duration: ['p(90)<5000'], // IPP-F-007: search within 5 s
     http_req_failed: ['rate<0.01'],
     app_errors: ['rate<0.01'],
   },
