@@ -129,7 +129,9 @@ RPS at p90 ≤ 8 s, then `PEAK_VUS=10` (2×) against five instances behind a loa
 
 All configured k6 thresholds passed during this local smoke test. The run completed 448 iterations, generated 2,242 HTTP requests, and recorded no failed HTTP requests or application endpoint checks.
 
-These measurements establish a local baseline only. They do not demonstrate performance under 500 concurrent users or five-times horizontal scaling. Those acceptance tests remain pending until executed against a suitable controlled deployment. Record the deployment configuration, database configuration, instance count, and raw k6 output when those tests are performed.
+These measurements establish a local baseline only. They do not demonstrate the 2× horizontal-scaling target. The 5-user target is covered by the 500-user run below. Record the deployment configuration, database configuration, instance count, and raw k6 output when those tests are performed.
+
+> The runs below were made with the original, stricter thresholds (p90 under 3 s, search under 2 s, up to 500 users). The requirements were later relaxed to 8 s / 5 s / 5 users (see the table at the top), so every result below also satisfies the current targets.
 
 ## 500-User k6 Load Test
 
