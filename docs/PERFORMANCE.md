@@ -155,3 +155,23 @@ These measurements establish a local baseline only. They do not demonstrate perf
 The local k6 test reached 500 virtual users. All 56,092 checks succeeded, and all four configured performance thresholds passed during this run. These results provide evidence of performance under the tested local conditions; they do not guarantee identical results in production.
 
 **Remaining work:** The five-instance horizontal scaling test is separate and remains pending until a suitable multi-instance environment is available.
+
+@'
+
+## Five-Instance Local Load-Balancer Test — 50 Virtual Users
+
+**Environment:** Local Windows development environment
+**Configuration:** Five API instances (ports 5001–5005) behind a local load balancer (port 8080)
+**Peak virtual users:** 50
+**Test duration:** Approximately 35 seconds
+**Completed iterations:** 1,200
+**Total HTTP requests:** 6,002
+
+| Metric | Result | Threshold | Status |
+|---|---:|---:|---|
+| Overall response-time p90 | 63.54 ms | Under 3 seconds | PASS |
+| Listing-search p90 | 63.39 ms | Under 2 seconds | PASS |
+| HTTP failure rate | 0.00% | Under 1% | PASS |
+| Application error rate | 0.00% | Under 1% | PASS |
+
+All configured thresholds passed. This is a local five-instance load-balancer test, not proof of five-times horizontal scaling. A comparable single-instance baseline and controlled throughput comparison remain necessary.
