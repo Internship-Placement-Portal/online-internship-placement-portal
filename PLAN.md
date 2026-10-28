@@ -64,7 +64,7 @@ Nothing here adds features beyond those documents. Where the documents leave a d
 | IPP-F-023 | RBAC on every route; out-of-role access → 403 and logged | M1 (middleware), enforced per route afterwards |
 | IPP-F-024 | Audit log of admin actions (approvals, deletions, role changes): timestamp + actor ID | M1 (model/service), used by every admin action |
 
-Non-functional / security carried through all milestones: SR-002 (JWT ≤ 60 min, revocable refresh) M1, SR-003 (validation + NoSQL-injection/XSS sanitization) M1, SR-004 (rate limit on auth + uploads) M1/M4, SR-005 (PDF-only, 5 MB, content check) M4, SR-006 (RBAC at API layer + automated RBAC tests) M1 onward, NF-001 (≤ 3 s p90, indexes, pagination), NF-004 (WCAG 2.1 AA: labels, keyboard nav, high-contrast), NF-005 (stateless API), NF-006 (modular, ≥ 40 % coverage of auth/applications/tests).
+Non-functional / security carried through all milestones: SR-002 (JWT ≤ 60 min, revocable refresh) M1, SR-003 (validation + NoSQL-injection/XSS sanitization) M1, SR-004 (rate limit on auth + uploads) M1/M4, SR-005 (PDF-only, 5 MB, content check) M4, SR-006 (RBAC at API layer + automated RBAC tests) M1 onward, NF-001 (≤ 8 s p90, indexes, pagination), NF-004 (WCAG 2.1 AA: labels, keyboard nav, high-contrast), NF-005 (stateless API), NF-006 (modular, ≥ 40 % coverage of auth/applications/tests).
 Admin module also covers use-case "Manage Users & Roles" and "Configure Aptitude Test Bank" (UML Fig. 2).
 
 ## 3. Final folder structure
