@@ -83,6 +83,8 @@ async function student(user) {
       company: a.listing?.company,
       date: a.interview.date,
       mode: a.interview.mode,
+      link: a.interview.link || '',
+      notes: a.interview.notes || '',
       upcoming: new Date(a.interview.date) >= now,
     }))
     .sort((x, y) => new Date(x.date) - new Date(y.date));
