@@ -107,14 +107,35 @@ describe('auto-save (IPP-F-014)', () => {
     const { student, test } = await setup();
     const { attempt } = (await start(student, test)).body;
     const [q1, q2] = attempt.questions;
-    const put = (answers) => request(app).put(`/api/attempts/${attempt.id}/answers`).set(student.auth).send({ answers });
 
-    expect((await put([{ questionId: q1.id, selectedIndex: 2, timeSpentSec: 7 }])).status).toBe(200);
-    expect((await put([{ questionId: q2.id, selectedIndex: 1 }])).status).toBe(200);
-    expect((await put([{ questionId: q1.id, selectedIndex: 3 }])).status).toBe(200); // change an answer; keeps timeSpent
+    const put = (answers) =>
+      request(app)
+        .put(`/api/attempts/${attempt.id}/answers`)
+        .set(student.auth)
+        .send({ answers });
 
-    const reopened = (await request(app).get(`/api/attempts/${attempt.id}`).set(student.auth)).body.attempt;
-    const byQ = Object.fromEntries(reopened.answers.map((a) => [a.questionId, a]));
+    expect((await put([
+      { questionId: q1.id, selectedIndex: 2, timeSpentSec: 7 },
+    ])).status).toBe(200);
+
+    expect((await put([
+      { questionId: q2.id, selectedIndex: 1 },
+    ])).status).toBe(200);
+
+    expect((await put([
+      { questionId: q1.id, selectedIndex: 3 },
+    ])).status).toBe(200);
+
+    const reopened = (
+      await request(app)
+        .get(`/api/attempts/${attempt.id}`)
+        .set(student.auth)
+    ).body.attempt;
+
+    const byQ = Object.fromEntries(
+      reopened.answers.map((a) => [a.questionId, a])
+    );
+
     expect(byQ[q1.id].selectedIndex).toBe(3);
     expect(byQ[q1.id].timeSpentSec).toBe(7);
     expect(byQ[q2.id].selectedIndex).toBe(1);
@@ -124,15 +145,151 @@ describe('auto-save (IPP-F-014)', () => {
     const { student, test } = await setup();
     const other = await createUser({ role: 'student' });
     const { attempt } = (await start(student, test)).body;
-    const outside = await Question.findOne({ _id: { $nin: attempt.questions.map((q) => q.id) } });
-    const put = (who, answers) => request(app).put(`/api/attempts/${attempt.id}/answers`).set(who.auth).send({ answers });
-    expect((await put(student, [{ questionId: String(outside._id), selectedIndex: 0 }])).status).toBe(400);
-    expect((await put(student, [{ questionId: attempt.questions[0].id, selectedIndex: 99 }])).status).toBe(400);
-    expect((await put(other, [{ questionId: attempt.questions[0].id, selectedIndex: 0 }])).status).toBe(403);
-    expect((await request(app).get(`/api/attempts/${attempt.id}`).set(other.auth)).status).toBe(403);
+
+    const outside = await Question.findOne({
+      _id: { $nin: attempt.questions.map((q) => q.id) },
+    });
+
+    const put = (who, answers) =>
+      request(app)
+        .put(`/api/attempts/${attempt.id}/answers`)
+        .set(who.auth)
+        .send({ answers });
+
+    expect(
+      (await put(student, [
+        { questionId: String(outside._id), selectedIndex: 0 },
+      ])).status
+    ).toBe(400);
+
+    expect(
+      (await put(student, [
+        { questionId: attempt.questions[0].id, selectedIndex: 99 },
+      ])).status
+    ).toBe(400);
+
+    expect(
+      (await put(other, [
+        { questionId: attempt.questions[0].id, selectedIndex: 0 },
+      ])).status
+    ).toBe(403);
+
+    expect(
+      (
+        await request(app)
+          .get(`/api/attempts/${attempt.id}`)
+          .set(other.auth)
+      ).status
+    ).toBe(403);
+  });
+
+  it('rejects MCQ indexes outside the actual option count', async () => {
+    const { student, test } = await setup();
+    const { attempt } = (await start(student, test)).body;
+    const mcq = attempt.questions[0];
+
+    const response = await request(app)
+      .put(`/api/attempts/${attempt.id}/answers`)
+      .set(student.auth)
+      .send({
+        answers: [{
+          questionId: mcq.id,
+          selectedIndex: mcq.options.length,
+        }],
+      });
+
+    expect(response.status).toBe(400);
+  });
+
+  it('rejects answer fields that do not match the question type', async () => {
+    const student = await createUser({ role: 'student' });
+
+    await Question.create([
+      {
+        text: 'What is 2 + 2?',
+        type: 'mcq',
+        options: ['3', '4'],
+        correctIndex: 1,
+        category: 'Quant',
+      },
+      {
+        text: 'Write a program to reverse a string.',
+        type: 'coding',
+        category: 'Coding',
+        marks: 5,
+      },
+    ]);
+
+    const test = await makeTest({
+      questionCount: 2,
+      categories: ['Quant', 'Coding'],
+    });
+
+    const { attempt } = (await start(student, test)).body;
+
+    const mcq = attempt.questions.find((q) => q.type === 'mcq');
+    const coding = attempt.questions.find((q) => q.type === 'coding');
+
+    const put = (answers) =>
+      request(app)
+        .put(`/api/attempts/${attempt.id}/answers`)
+        .set(student.auth)
+        .send({ answers });
+
+    expect(
+      (await put([
+        { questionId: mcq.id, codeAnswer: 'wrong' },
+      ])).status
+    ).toBe(400);
+
+    expect(
+      (await put([
+        { questionId: coding.id, selectedIndex: 0 },
+      ])).status
+    ).toBe(400);
+
+    expect(
+      (await put([
+        {
+          questionId: mcq.id,
+          selectedIndex: 1,
+          codeAnswer: 'wrong',
+        },
+      ])).status
+    ).toBe(400);
+  });
+
+  it('allows unanswered questions to save time spent', async () => {
+    const { student, test } = await setup();
+    const { attempt } = (await start(student, test)).body;
+    const mcq = attempt.questions[0];
+
+    const response = await request(app)
+      .put(`/api/attempts/${attempt.id}/answers`)
+      .set(student.auth)
+      .send({
+        answers: [{
+          questionId: mcq.id,
+          timeSpentSec: 12,
+        }],
+      });
+
+    expect(response.status).toBe(200);
+
+    const reopened = (
+      await request(app)
+        .get(`/api/attempts/${attempt.id}`)
+        .set(student.auth)
+    ).body.attempt;
+
+    const saved = reopened.answers.find(
+      (a) => a.questionId === mcq.id
+    );
+
+    expect(saved.timeSpentSec).toBe(12);
+    expect(saved.selectedIndex).toBe(null);
   });
 });
-
 describe('MCQ auto-scoring (IPP-F-015)', () => {
   it('scores to the known answer key and returns the result immediately', async () => {
     const { student, test } = await setup();
