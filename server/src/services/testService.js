@@ -201,29 +201,90 @@ async function getAttempt(student, id) {
 // IPP-F-014: progress auto-save. Merges answers by question; rejected once the attempt is closed or out of time.
 async function saveAnswers(student, id, { answers }) {
   const attempt = await loadOwn(student, id);
-  if (attempt.status !== 'in_progress') throw new AppError(409, 'ATTEMPT_CLOSED', 'This attempt is already finished');
+
+  if (attempt.status !== 'in_progress') {
+    throw new AppError(409, 'ATTEMPT_CLOSED', 'This attempt is already finished');
+  }
+
   if (new Date(attempt.expiresAt) <= new Date()) {
     await finalizeAttempt(attempt, 'auto_submitted');
     throw new AppError(409, 'ATTEMPT_EXPIRED', 'Time is up. Your attempt was submitted automatically.');
   }
-  attempt.answers = mergeAnswers(attempt, answers);
+
+  const fullAttempt = await attemptRepository.findByIdFull(attempt._id);
+  attempt.answers = mergeAnswers(fullAttempt, answers);
+
   await attemptRepository.saveAnswers(attempt._id, attempt.answers);
-  return { savedAt: new Date(), remainingSeconds: remainingSeconds(attempt) };
+
+  return {
+    savedAt: new Date(),
+    remainingSeconds: remainingSeconds(attempt),
+  };
 }
 
 function mergeAnswers(attempt, incoming) {
-  const allowed = new Set(attempt.questions.map((q) => idOf(q.question)));
-  const merged = new Map(attempt.answers.map((a) => [idOf(a.question), a.toObject ? a.toObject() : a]));
+  const questions = new Map(
+    attempt.questions.map((q) => {
+      const question = q.question;
+      return [idOf(question), question];
+    })
+  );
+
+  const merged = new Map(
+    attempt.answers.map((a) => [
+      idOf(a.question),
+      a.toObject ? a.toObject() : a,
+    ])
+  );
+
   for (const a of incoming || []) {
-    if (!allowed.has(a.questionId)) throw new AppError(400, 'VALIDATION_ERROR', 'Answer refers to a question that is not part of this attempt');
+    const question = questions.get(a.questionId);
+
+    if (!question) {
+      throw new AppError(
+        400,
+        'VALIDATION_ERROR',
+        'Answer refers to a question that is not part of this attempt'
+      );
+    }
+
+    const hasSelectedIndex = Object.hasOwn(a, 'selectedIndex');
+    const hasCodeAnswer = Object.hasOwn(a, 'codeAnswer');
+
+    if (hasSelectedIndex && hasCodeAnswer) {
+      throw new AppError(400, 'VALIDATION_ERROR', 'An answer cannot contain both answer types');
+    }
+
+    if (question.type === 'mcq') {
+      if (hasCodeAnswer) {
+        throw new AppError(400, 'VALIDATION_ERROR', 'MCQ questions require a selected option');
+      }
+
+      if (
+        hasSelectedIndex &&
+        a.selectedIndex !== null &&
+        a.selectedIndex >= question.options.length
+      ) {
+        throw new AppError(400, 'VALIDATION_ERROR', 'Selected option does not exist');
+      }
+    } else if (question.type === 'coding' && hasSelectedIndex) {
+      throw new AppError(400, 'VALIDATION_ERROR', 'Coding questions require a code answer');
+    }
+
     const prev = merged.get(a.questionId) || { question: a.questionId };
+
     merged.set(a.questionId, {
       question: a.questionId,
-      selectedIndex: a.selectedIndex === undefined ? prev.selectedIndex : a.selectedIndex === null ? undefined : a.selectedIndex,
-      codeAnswer: a.codeAnswer === undefined ? prev.codeAnswer : a.codeAnswer,
-      timeSpentSec: a.timeSpentSec === undefined ? prev.timeSpentSec : Math.min(a.timeSpentSec, 24 * 3600),
+      selectedIndex: hasSelectedIndex
+        ? a.selectedIndex === null ? undefined : a.selectedIndex
+        : prev.selectedIndex,
+      codeAnswer: hasCodeAnswer ? a.codeAnswer : prev.codeAnswer,
+      timeSpentSec: a.timeSpentSec === undefined
+        ? prev.timeSpentSec
+        : Math.min(a.timeSpentSec, 24 * 3600),
     });
   }
+
   return [...merged.values()];
 }
 
@@ -234,8 +295,8 @@ async function submit(student, id, { answers } = {}) {
 
   const onTime = Date.now() <= new Date(attempt.expiresAt).getTime() + GRACE_MS;
   if (onTime && answers?.length) {
-    attempt.answers = mergeAnswers(attempt, answers);
-    await attemptRepository.saveAnswers(attempt._id, attempt.answers);
+    const fullAttempt = await attemptRepository.findByIdFull(attempt._id);
+    attempt.answers = mergeAnswers(fullAttempt, answers);    await attemptRepository.saveAnswers(attempt._id, attempt.answers);
   }
   // Past the deadline (even inside the grace window) it counts as an automatic submission.
   const expired = new Date(attempt.expiresAt) <= new Date();
