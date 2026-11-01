@@ -19,9 +19,32 @@ export default function ApplyPanel({ listing }) {
 
   function pick(f) {
     setError('');
-    if (!f) return setFile(null);
-    if (f.type !== 'application/pdf' || !/\.pdf$/i.test(f.name)) return setError('Only PDF files are accepted.');
-    if (f.size > MAX) return setError('Resume must be 5 MB or smaller.');
+    if (!f) {
+      setFile(null);
+      return;
+    }
+    const rejectFile = (message) => {
+      setFile(null);
+
+      if (input.current) {
+        input.current.value = '';
+      }
+
+      setError(message);
+    };
+
+    if (f.type !== 'application/pdf' || !/\.pdf$/i.test(f.name)) {
+      return rejectFile('Only PDF files are accepted.');
+    }
+
+    if (f.size === 0) {
+      return rejectFile('The selected PDF is empty.');
+    }
+
+    if (f.size > MAX) {
+      return rejectFile('Resume must be 5 MB or smaller.');
+    }
+
     setFile(f);
   }
 
@@ -68,17 +91,52 @@ export default function ApplyPanel({ listing }) {
         Upload your resume (PDF, up to 5 MB) and submit in one step.
       </p>
 
-      <input ref={input} id="resume" type="file" accept="application/pdf,.pdf" className="sr-only" onChange={(e) => pick(e.target.files?.[0])} />
-      {file ? (
-        <div className="file-chip" style={{ marginTop: 14 }}>
-          <FileText size={18} aria-hidden="true" />
-          <span className="file-name">{file.name}</span>
-          <span className="muted small">{(file.size / 1024).toFixed(0)} KB</span>
-          <button type="button" className="icon-btn" aria-label="Remove file" onClick={() => { setFile(null); if (input.current) input.current.value = ''; }}>
-            <X size={16} aria-hidden="true" />
-          </button>
-        </div>
-      ) : (
+      <input
+  ref={input}
+  id="resume"
+  type="file"
+  accept="application/pdf,.pdf"
+  className="sr-only"
+  onChange={(e) => {
+    const selected = e.target.files?.[0];
+    pick(selected);
+    e.target.value = '';
+  }}
+/>
+   {file ? (
+  <div className="file-chip" style={{ marginTop: 14 }}>
+    <FileText size={18} aria-hidden="true" />
+
+    <span className="file-name">{file.name}</span>
+
+    <span className="muted small">
+      {(file.size / (1024 * 1024)).toFixed(2)} MB
+    </span>
+
+    <button
+      type="button"
+      className="btn btn-secondary"
+      onClick={() => input.current?.click()}
+      disabled={busy}
+    >
+      Change resume
+    </button>
+
+    <button
+      type="button"
+      className="icon-btn"
+      aria-label="Remove file"
+      disabled={busy}
+      onClick={() => {
+        setFile(null);
+        setError('');
+        if (input.current) input.current.value = '';
+      }}
+    >
+      <X size={16} aria-hidden="true" />
+    </button>
+  </div>
+) : (
         <label
           htmlFor="resume"
           className={`dropzone${dragging ? ' drag' : ''}`}
