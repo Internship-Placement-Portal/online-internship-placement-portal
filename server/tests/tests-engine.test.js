@@ -324,6 +324,31 @@ describe('MCQ auto-scoring (IPP-F-015)', () => {
     expect(r.review.every((x) => Number.isInteger(x.correctIndex))).toBe(true);
   });
 
+  it('rejects duplicate question IDs in a single submission', async () => {
+  const { student, test } = await setup();
+
+  const { attempt } = (await start(student, test)).body;
+
+  const questionId = attempt.questions[0].id;
+
+  const duplicateAnswers = [
+    { questionId, selectedIndex: 1 },
+    { questionId, selectedIndex: 2 },
+  ];
+
+  const res = await request(app)
+    .post(`/api/attempts/${attempt.id}/submit`)
+    .set(student.auth)
+    .send({ answers: duplicateAnswers });
+
+  expect(res.status).toBe(400);
+
+  // The invalid submission must not complete the attempt.
+  const storedAttempt = await TestAttempt.findById(attempt.id);
+
+  expect(storedAttempt.status).toBe('in_progress');
+});
+
   it('computes category-wise analytics and time per question (IPP-F-017)', async () => {
     const { student, test } = await setup({ bank: 10, test: { questionCount: 10 } });
     const { attempt } = (await start(student, test)).body;
