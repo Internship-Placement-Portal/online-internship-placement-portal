@@ -51,11 +51,31 @@ async function placementFacets(range) {
 
 async function monthlyTests({ from, to }) {
   return TestAttempt.aggregate([
-    { $match: { status: { $in: FINISHED }, submittedAt: { $gte: from, $lte: to } } },
-    { $group: { _id: byMonth('$submittedAt'), attempts: { $sum: 1 }, avgAccuracy: { $avg: '$accuracy' } } },
+    {
+      $match: {
+        status: { $in: FINISHED },
+        submittedAt: { $gte: from, $lte: to },
+      },
+    },
+    {
+      $group: {
+        _id: byMonth('$submittedAt'),
+
+        // Count every completed attempt.
+        attempts: { $sum: 1 },
+
+        // Count only attempts with a numeric accuracy.
+        scoredAttempts: {
+          $sum: {
+            $cond: [{ $isNumber: '$accuracy' }, 1, 0],
+          },
+        },
+
+        avgAccuracy: { $avg: '$accuracy' },
+      },
+    },
   ]);
 }
-
 const companies = () => Listing.distinct('company');
 
 async function platformCounts(now = new Date()) {
