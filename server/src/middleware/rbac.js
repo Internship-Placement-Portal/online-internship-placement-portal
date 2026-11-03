@@ -6,8 +6,22 @@ const auditService = require('../services/auditService');
 // Out-of-role access returns 403 and is logged (audit log + application log).
 const authorize = (...roles) => async (req, res, next) => {
   if (!req.user) return next(new AppError(401, 'UNAUTHENTICATED', 'Authentication required'));
-  if (roles.includes(req.user.role)) return next();
-
+  if (roles.includes(req.user.role)) {
+    if (
+      req.user.role === 'recruiter' &&
+      req.user.approvalStatus !== 'approved'
+    ) {
+      return next(
+        new AppError(
+          403,
+          'RECRUITER_NOT_APPROVED',
+          'Your recruiter account must be approved by an administrator first'
+        )
+      );
+    }
+  
+    return next();
+  }
   logger.warn('RBAC violation', {
     userId: String(req.user._id),
     role: req.user.role,
