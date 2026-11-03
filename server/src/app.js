@@ -1,4 +1,5 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const helmet = require('helmet');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
@@ -8,7 +9,6 @@ const sanitize = require('./middleware/sanitize');
 const httpsOnly = require('./middleware/httpsOnly');
 const { apiLimiter } = require('./middleware/rateLimit');
 const { notFound, errorHandler } = require('./middleware/errorHandler');
-
 const app = express();
 
 if (config.trustProxy) app.set('trust proxy', 1);
@@ -29,7 +29,31 @@ app.use((req, res, next) => {
   next();
 });
 
-app.get('/health', (req, res) => res.json({ status: 'ok' }));
+app.get('/health', (req, res) => {
+  const isDatabaseAvailable = mongoose.connection.readyState === 1;
+
+  return res.status(200).json({
+    status: 'ok',
+    checks: {
+      api: 'ok',
+      database: isDatabaseAvailable ? 'ok' : 'unavailable',
+    },
+    timestamp: new Date().toISOString(),
+  });
+});
+app.get('/ready', (req, res) => {
+  const isDatabaseAvailable = mongoose.connection.readyState === 1;
+
+  return res.status(isDatabaseAvailable ? 200 : 503).json({
+    status: isDatabaseAvailable ? 'ok' : 'unavailable',
+    checks: {
+      api: 'ok',
+      database: isDatabaseAvailable ? 'ok' : 'unavailable',
+    },
+    timestamp: new Date().toISOString(),
+  });
+});
+
 app.use('/api', apiLimiter, require('./routes'));
 
 app.use(notFound);
