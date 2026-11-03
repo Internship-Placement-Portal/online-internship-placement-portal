@@ -67,7 +67,31 @@ const answer = Joi.object({
   codeAnswer: Joi.string().max(5000).allow(''),
   timeSpentSec: Joi.number().min(0).max(86400),
 });
-const saveAnswers = Joi.object({ answers: Joi.array().items(answer).max(100).required() });
-const submit = Joi.object({ answers: Joi.array().items(answer).max(100) });
+const saveAnswers = Joi.object({
+  answers: uniqueAnswers.required(),
+});
+
+const submit = Joi.object({
+  answers: uniqueAnswers,
+});
+
+// Prevent the same question from appearing more than once
+// in a single answer submission.
+const uniqueAnswers = Joi.array()
+  .items(answer)
+  .max(100)
+  .custom((answers, helpers) => {
+    const questionIds = answers.map(
+      (item) => item.questionId.toLowerCase()
+    );
+
+    if (new Set(questionIds).size !== questionIds.length) {
+      return helpers.message(
+        'Each question can only be answered once per submission'
+      );
+    }
+
+    return answers;
+  });
 
 module.exports = { idParam, createQuestion, updateQuestion, listQuestions, createTest, updateTest, list, saveAnswers, submit };
