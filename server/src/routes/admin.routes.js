@@ -19,8 +19,12 @@ router.patch('/listings/:id', validate(idParam, 'params'), validate(v.decision),
 const dv = require('../validators/dashboardValidators');
 router.get('/audit-logs', validate(dv.auditLogs, 'query'), controller.auditLogs);
 router.get('/audit-logs/actions', controller.auditActions);
-
-// Question bank (IPP-F-014)
+// Uptime monitoring (IPP-NF-002)
+router.get(
+    '/uptime',
+    validate(v.uptimeReport, 'query'),
+    controller.uptimeReport
+  );// Question bank (IPP-F-014)
 router.get('/questions', validate(tv.listQuestions, 'query'), testController.qList);
 router.get('/questions/categories', testController.qCategories);
 router.post('/questions', validate(tv.createQuestion), testController.qCreate);
