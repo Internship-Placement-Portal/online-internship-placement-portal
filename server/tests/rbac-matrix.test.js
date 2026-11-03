@@ -20,6 +20,7 @@ const PUBLIC = 'public';
 const MATRIX = {
   'GET /health': PUBLIC,
   'GET /api/health': PUBLIC,
+  'GET /ready': PUBLIC,
   'POST /api/auth/register': PUBLIC,
   'POST /api/auth/verify-email': PUBLIC,
   'POST /api/auth/resend-otp': PUBLIC,
@@ -81,6 +82,7 @@ const MATRIX = {
   'POST /api/admin/attempts/:id/reenable': [A],
   'GET /api/admin/audit-logs': [A],
   'GET /api/admin/audit-logs/actions': [A],
+  'GET /api/admin/uptime': [A],
 };
 
 const ID = '64b000000000000000000000';

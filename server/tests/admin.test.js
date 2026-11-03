@@ -157,3 +157,52 @@ describe('profile (IPP-F-008 company profile)', () => {
     expect(res.body.user.name).toBe('New Name');
   });
 });
+
+describe('monthly uptime report (IPP-NF-002)', () => {
+  it('allows admins to view the monthly uptime report', async () => {
+    const admin = await createUser({ role: 'admin' });
+
+    const res = await request(app)
+      .get('/api/admin/uptime?year=2026&month=10')
+      .set(admin.auth);
+
+    expect(res.status).toBe(200);
+    expect(res.body.report.year).toBe(2026);
+    expect(res.body.report.month).toBe(10);
+    expect(res.body.report.uptimePercentage).toBe(100);
+    expect(res.body.report.target).toBe(99.5);
+    expect(res.body.report.targetMet).toBe(true);
+  });
+
+  it('blocks students, recruiters and unauthenticated users', async () => {
+    const student = await createUser({ role: 'student' });
+    const recruiter = await createUser({ role: 'recruiter' });
+
+    expect(
+      (await request(app).get('/api/admin/uptime').set(student.auth)).status
+    ).toBe(403);
+
+    expect(
+      (await request(app).get('/api/admin/uptime').set(recruiter.auth)).status
+    ).toBe(403);
+
+    expect(
+      (await request(app).get('/api/admin/uptime')).status
+    ).toBe(401);
+  });
+
+  it('rejects invalid month and year values', async () => {
+    const admin = await createUser({ role: 'admin' });
+
+    const invalidMonth = await request(app)
+      .get('/api/admin/uptime?year=2026&month=13')
+      .set(admin.auth);
+
+    const invalidYear = await request(app)
+      .get('/api/admin/uptime?year=1800&month=10')
+      .set(admin.auth);
+
+    expect(invalidMonth.status).toBe(400);
+    expect(invalidYear.status).toBe(400);
+  });
+});

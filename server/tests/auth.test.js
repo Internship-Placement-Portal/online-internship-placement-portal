@@ -20,12 +20,22 @@ beforeEach(clearDb);
 const login = (email, password) => request(app).post('/api/auth/login').send({ email, password });
 
 describe('GET /health', () => {
-  it('returns ok', async () => {
+  it('returns API and database health status', async () => {
     const res = await request(app).get('/health');
+
     expect(res.status).toBe(200);
-    expect(res.body).toEqual({ status: 'ok' });
+    expect(res.body).toMatchObject({
+      status: 'ok',
+      checks: {
+        api: 'ok',
+        database: 'ok',
+      },
+    });
+
+    expect(typeof res.body.timestamp).toBe('string');
   });
 });
+
 
 describe('registration + email OTP (IPP-F-001, IPP-F-003)', () => {
   it('registers a student as pending_verification and stores only a bcrypt hash', async () => {

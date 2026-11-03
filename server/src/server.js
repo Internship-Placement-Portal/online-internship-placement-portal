@@ -1,11 +1,14 @@
 const config = require('./config/env');
 const logger = require('./utils/logger');
 const { connectDb } = require('./config/db');
+const uptimeService = require('./services/uptimeService');
 const app = require('./app');
 const { createServer } = require('./utils/createServer');
 
 async function start() {
   await connectDb();
+  await uptimeService.initialize();
+  uptimeService.startMonitoring();
   if (config.jobsEnabled) {
     require('./jobs/expireListings').start();
     require('./jobs/autoSubmitAttempts').start();
@@ -15,6 +18,8 @@ async function start() {
 
   const shutdown = (signal) => {
     logger.info(`${signal} received, shutting down`);
+    uptimeService.stopMonitoring();
+
     server.close(() => process.exit(0));
   };
   process.on('SIGINT', () => shutdown('SIGINT'));

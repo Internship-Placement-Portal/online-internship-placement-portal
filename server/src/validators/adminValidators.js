@@ -11,5 +11,13 @@ const decision = Joi.object({
   decision: Joi.string().valid('approved', 'rejected').required(),
   reason: Joi.string().trim().max(500).allow(''),
 });
-
-module.exports = { listRecruiters, listListings, decision };
+const uptimeReport = Joi.object({
+  year: Joi.number().integer().min(2000).max(2100),
+  month: Joi.number().integer().min(1).max(12),
+});
+module.exports = {
+  listRecruiters,
+  listListings,
+  decision,
+  uptimeReport,
+};

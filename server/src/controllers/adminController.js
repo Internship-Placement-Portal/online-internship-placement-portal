@@ -1,7 +1,7 @@
 const asyncHandler = require('../utils/asyncHandler');
 const adminService = require('../services/adminService');
 const auditService = require('../services/auditService');
-
+const uptimeReportService = require('../services/uptimeReportService');
 const ctxOf = (req) => ({ ip: req.ip });
 
 const listRecruiters = asyncHandler(async (req, res) => res.json(await adminService.listRecruiters(req.query)));
@@ -15,7 +15,22 @@ const decideListing = asyncHandler(async (req, res) =>
 
 const auditLogs = asyncHandler(async (req, res) => res.json(await auditService.list(req.query)));
 const auditActions = asyncHandler(async (req, res) => res.json({ actions: await auditService.actions() }));
+const uptimeReport = asyncHandler(async (req, res) => {
+  const now = new Date();
 
+  const year = Number(req.query.year) || now.getUTCFullYear();
+  const month = Number(req.query.month) || now.getUTCMonth() + 1;
+
+  const report = await uptimeReportService.getMonthlyUptime(year, month);
+
+  res.json({ report });
+});
 module.exports = {
   auditLogs,
-  auditActions, listRecruiters, decideRecruiter, listListings, decideListing };
+  auditActions,
+  listRecruiters,
+  decideRecruiter,
+  listListings,
+  decideListing,
+  uptimeReport,
+};

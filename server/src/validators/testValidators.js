@@ -60,19 +60,12 @@ const createTest = Joi.object({
 const updateTest = Joi.object(testFields).min(1);
 const list = Joi.object({ ...paging });
 
-// ── Attempts ───────────────────────────────────────────────────
+/// ── Attempts ───────────────────────────────────────────────────
 const answer = Joi.object({
   questionId: id.required(),
   selectedIndex: Joi.number().integer().min(0).max(5).allow(null),
   codeAnswer: Joi.string().max(5000).allow(''),
   timeSpentSec: Joi.number().min(0).max(86400),
-});
-const saveAnswers = Joi.object({
-  answers: uniqueAnswers.required(),
-});
-
-const submit = Joi.object({
-  answers: uniqueAnswers,
 });
 
 // Prevent the same question from appearing more than once
@@ -94,4 +87,24 @@ const uniqueAnswers = Joi.array()
     return answers;
   });
 
-module.exports = { idParam, createQuestion, updateQuestion, listQuestions, createTest, updateTest, list, saveAnswers, submit };
+
+const saveAnswers = Joi.object({
+  answers: uniqueAnswers.required(),
+});
+
+const submit = Joi.object({
+  answers: uniqueAnswers,
+});
+
+module.exports = {
+    idParam,
+    createQuestion,
+    updateQuestion,
+    listQuestions,
+    createTest,
+    updateTest,
+    list,
+    saveAnswers,
+    submit,
+  };
+  
