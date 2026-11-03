@@ -14,6 +14,7 @@ beforeEach(clearDb);
 
 describe('recruiter approval (IPP-F-022)', () => {
   it('lists pending recruiters and approves them, with audit log + email', async () => {
+  
     const admin = await createUser({ role: 'admin' });
     const rec = await createUser({ role: 'recruiter', approvalStatus: 'pending' });
     await createUser({ role: 'recruiter', approvalStatus: 'approved' });
@@ -32,6 +33,34 @@ describe('recruiter approval (IPP-F-022)', () => {
     const log = await AuditLog.findOne({ action: 'RECRUITER_APPROVED' });
     expect(String(log.actor)).toBe(String(admin.user._id));
     expect(String(log.targetId)).toBe(String(rec.user._id));
+  });
+  it('prevents approving or rejecting a recruiter more than once', async () => {
+    const admin = await createUser({ role: 'admin' });
+    const rec = await createUser({
+      role: 'recruiter',
+      approvalStatus: 'pending',
+    });
+
+    outbox.length = 0;
+
+    const first = await request(app)
+      .patch(`/api/admin/recruiters/${rec.user._id}`)
+      .set(admin.auth)
+      .send({ decision: 'approved' });
+
+    expect(first.status).toBe(200);
+
+    const second = await request(app)
+      .patch(`/api/admin/recruiters/${rec.user._id}`)
+      .set(admin.auth)
+      .send({ decision: 'rejected', reason: 'Already reviewed' });
+
+    expect(second.status).toBe(409);
+    expect(second.body.code).toBe('RECRUITER_ALREADY_REVIEWED');
+
+    expect(await AuditLog.countDocuments({ action: 'RECRUITER_APPROVED' })).toBe(1);
+    expect(await AuditLog.countDocuments({ action: 'RECRUITER_REJECTED' })).toBe(0);
+    expect(outbox).toHaveLength(1);
   });
 
   it('rejects with a reason and the recruiter then cannot create listings', async () => {
