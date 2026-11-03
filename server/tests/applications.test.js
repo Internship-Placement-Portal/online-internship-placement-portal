@@ -11,7 +11,7 @@ const Notification = require('../src/models/Notification');
 const scanService = require('../src/services/scanService');
 const mailer = require('../src/services/mailer');
 const { startDb, stopDb, clearDb, createUser, listingBody, futureDate } = require('./helpers');
-
+const applicationRepository = require('../src/repositories/applicationRepository');
 before(startDb);
 after(async () => {
   fs.rmSync(config.upload.dir, { recursive: true, force: true });
@@ -53,7 +53,50 @@ describe('apply with resume (IPP-F-010)', () => {
     expect(String(doc.listing)).toBe(String(listing._id));
     expect(doc.resumeKey).toMatch(/^[a-f0-9]{32}\.pdf$/);
   });
+  it('removes the uploaded resume when a duplicate-key race occurs', async () => {
+    const { student, listing } = await setup();
+    const before = filesOnDisk();
 
+    const originalCreate = applicationRepository.create;
+
+    applicationRepository.create = async () => {
+      const error = new Error('Duplicate application');
+      error.code = 11000;
+      throw error;
+    };
+
+    try {
+      const res = await apply(student, listing._id);
+
+      expect(res.status).toBe(409);
+      expect(res.body.code).toBe('ALREADY_APPLIED');
+      expect(filesOnDisk()).toBe(before);
+      expect(await Application.countDocuments()).toBe(0);
+    } finally {
+      applicationRepository.create = originalCreate;
+    }
+  });
+
+  it('removes the uploaded resume when application creation fails unexpectedly', async () => {
+    const { student, listing } = await setup();
+    const before = filesOnDisk();
+
+    const originalCreate = applicationRepository.create;
+
+    applicationRepository.create = async () => {
+      throw new Error('Database unavailable');
+    };
+
+    try {
+      const res = await apply(student, listing._id);
+
+      expect(res.status).toBe(500);
+      expect(filesOnDisk()).toBe(before);
+      expect(await Application.countDocuments()).toBe(0);
+    } finally {
+      applicationRepository.create = originalCreate;
+    }
+  });
   it('tells the student on the listing page whether they already applied', async () => {
     const { student, listing } = await setup();
     const before = await request(app).get(`/api/listings/${listing._id}`).set(student.auth);
