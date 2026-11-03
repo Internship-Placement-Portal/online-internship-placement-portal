@@ -250,8 +250,18 @@ describe('RBAC (IPP-F-023, IPP-SR-006)', () => {
   it('admin and recruiter only reach their own routes; anonymous gets 401', async () => {
     const admin = await createAdmin();
     const adminToken = (await login(admin.email, admin.password)).body.token;
-    const recruiterToken = await tokenFor({ email: 'r@example.com', role: 'recruiter' });
-
+    const recruiter = await registerVerified(app, {
+      email: 'r@example.com',
+      role: 'recruiter'
+    });
+    
+    // Simulate admin approval before logging in.
+    await User.updateOne(
+      { email: recruiter.email },
+      { $set: { approvalStatus: 'approved' } }
+    );
+    
+    const recruiterToken = (await login(recruiter.email, recruiter.password)).body.token;
     expect((await request(app).get('/api/admin/recruiters').set('Authorization', `Bearer ${adminToken}`)).status).toBe(200);
     expect((await request(app).get('/api/applications/mine').set('Authorization', `Bearer ${adminToken}`)).status).toBe(403);
     expect((await request(app).get('/api/listings/mine').set('Authorization', `Bearer ${recruiterToken}`)).status).toBe(200);

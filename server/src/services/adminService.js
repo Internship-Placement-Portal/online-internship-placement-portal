@@ -23,31 +23,52 @@ async function listRecruiters(query) {
 }
 
 // IPP-F-022 + IPP-F-024: every decision is audit-logged with the acting admin.
+// IPP-F-022 + IPP-F-024: every decision is audit-logged with the acting admin.
 async function decideRecruiter(admin, id, { decision, reason }, ctx = {}) {
   const user = await userRepository.findById(id);
-  if (!user || user.role !== 'recruiter') throw new AppError(404, 'RECRUITER_NOT_FOUND', 'Recruiter not found');
 
-  await userRepository.updateById(user._id, { approvalStatus: decision });
+  if (!user || user.role !== 'recruiter') {
+    throw new AppError(
+      404,
+      'RECRUITER_NOT_FOUND',
+      'Recruiter not found'
+    );
+  }
+
+  const updatedUser = await userRepository.decideRecruiterApproval(
+    user._id,
+    decision
+  );
+
+  if (!updatedUser) {
+    throw new AppError(
+      409,
+      'RECRUITER_ALREADY_REVIEWED',
+      'This recruiter account has already been reviewed'
+    );
+  }
+
   await auditService.record({
     actor: admin._id,
     action: decision === 'approved' ? 'RECRUITER_APPROVED' : 'RECRUITER_REJECTED',
     targetType: 'User',
-    targetId: user._id,
+    targetId: updatedUser._id,
     metadata: { reason: reason || undefined },
     ip: ctx.ip,
   });
-  await mailer.sendWithRetry({
-    to: user.email,
-    subject: decision === 'approved' ? 'Your IPP recruiter account is approved' : 'Your IPP recruiter registration was not approved',
-    text:
-      decision === 'approved'
-        ? 'Good news: you can now create and publish internship listings on IPP.'
-        : `Your recruiter registration was not approved.${reason ? ` Reason: ${reason}` : ''}`,
-  });
-  user.approvalStatus = decision;
-  return recruiterDto(user);
-}
 
+  await mailer.sendWithRetry({
+    to: updatedUser.email,
+    subject: decision === 'approved'
+      ? 'Your IPP recruiter account is approved'
+      : 'Your IPP recruiter registration was not approved',
+    text: decision === 'approved'
+      ? 'Good news: you can now create and publish internship listings on IPP.'
+      : `Your recruiter registration was not approved.${reason ? ` Reason: ${reason}` : ''}`,
+  });
+
+  return recruiterDto(updatedUser);
+}
 async function listListings(query) {
   const paging = parsePaging(query);
   const { items, total } = await listingRepository.listByStatus(query.status, paging);

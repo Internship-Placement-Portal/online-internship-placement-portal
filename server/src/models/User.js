@@ -18,8 +18,13 @@ const userSchema = new mongoose.Schema(
     otpAttempts: { type: Number, default: 0, select: false },
 
     // IPP-F-022: recruiters need admin approval before posting
-    approvalStatus: { type: String, enum: APPROVAL, default: 'approved' },
-
+    approvalStatus: {
+      type: String,
+      enum: APPROVAL,
+      default: function () {
+        return this.role === 'recruiter' ? 'pending' : 'approved';
+      },
+    },
     // IPP-F-004: account lockout
     failedLoginAttempts: { type: Number, default: 0 },
     lockUntil: { type: Date },
