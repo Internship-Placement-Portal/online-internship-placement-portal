@@ -9,7 +9,22 @@ const findById = (id) => User.findById(id);
 const findByIdWithOtp = (id) => User.findById(id).select('+otpHash +otpExpiresAt +otpAttempts');
 const create = (data) => User.create(data);
 const updateById = (id, update) => User.updateOne({ _id: id }, update);
-
+// IPP-F-022: Atomically approve or reject only recruiters awaiting review.
+const decideRecruiterApproval = (id, decision) =>
+  User.findOneAndUpdate(
+    {
+      _id: id,
+      role: 'recruiter',
+      approvalStatus: 'pending',
+    },
+    {
+      $set: { approvalStatus: decision },
+    },
+    {
+      returnDocument: 'after',
+      runValidators: true,
+    }
+  );
 // Atomic increment so concurrent failed logins cannot dodge the lockout counter.
 const incrementFailedLogins = (id) =>
   User.findByIdAndUpdate(id, { $inc: { failedLoginAttempts: 1 } }, { returnDocument: 'after' });
@@ -35,5 +50,6 @@ module.exports = {
   listByRole,
   create,
   updateById,
+  decideRecruiterApproval,
   incrementFailedLogins,
 };
