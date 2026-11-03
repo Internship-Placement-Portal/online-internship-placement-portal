@@ -87,6 +87,7 @@ const uniqueAnswers = Joi.array()
     return answers;
   });
 
+
 const saveAnswers = Joi.object({
   answers: uniqueAnswers.required(),
 });
@@ -94,4 +95,16 @@ const saveAnswers = Joi.object({
 const submit = Joi.object({
   answers: uniqueAnswers,
 });
-module.exports = { idParam, createQuestion, updateQuestion, listQuestions, createTest, updateTest, list, saveAnswers, submit };
+
+module.exports = {
+    idParam,
+    createQuestion,
+    updateQuestion,
+    listQuestions,
+    createTest,
+    updateTest,
+    list,
+    saveAnswers,
+    submit,
+  };
+  
