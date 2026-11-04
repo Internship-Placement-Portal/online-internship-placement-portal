@@ -6,13 +6,13 @@
 //   3. Audit-DB failure does NOT turn a 403 denial into a 500 error.
 //   4. Unapproved recruiter receives 403 RECRUITER_NOT_APPROVED.
 //   5. Smoke-checks that anonymous → 401 and wrong-role → 403 still hold.
-const { describe, it, before, after, afterEach } = require('node:test');
+const { describe, it, before, after, beforeEach } = require('node:test');
 const request = require('supertest');
 const expect = require('./expect');
 const app = require('../src/app');
 const AuditLog = require('../src/models/AuditLog');
 const auditService = require('../src/services/auditService');
-const { signAccessToken } = require('../src/utils/tokens');
+const { authorize } = require('../src/middleware/rbac');
 const { startDb, stopDb, clearDb, createUser } = require('./helpers');
 
 // A protected endpoint that only admins may call — used as a stable test target.
@@ -25,7 +25,8 @@ before(async () => {
   await clearDb();
 });
 after(stopDb);
-afterEach(clearDb);
+// Clear between tests so audit log counts are isolated per test.
+beforeEach(clearDb);
 
 // ─── 1. Anonymous access ─────────────────────────────────────────────────────
 describe('TC-Admin-02 | Anonymous callers (IPP-F-023)', () => {
@@ -74,19 +75,29 @@ describe('TC-Admin-02 | Wrong-role callers (IPP-F-023)', () => {
   });
 });
 
-// ─── 3. Invalid / unknown role ────────────────────────────────────────────────
+// ─── 3. Invalid / unknown role (unit test of the middleware directly) ─────────
+// The authenticate middleware always loads req.user from the DB, so the only way
+// a req.user with an unknown role can reach authorize() is via direct middleware
+// invocation (e.g. a future alternative auth strategy). We test it as a unit test.
 describe('TC-Admin-02 | Invalid role in token (IPP-F-023)', () => {
-  it('returns 400 INVALID_ROLE when the token contains an unrecognised role', async () => {
-    // Forge a user object in memory — never saved to DB — with a bogus role.
-    const fakeUser = { _id: '64b000000000000000000001', role: 'superuser' };
-    const badToken = signAccessToken(fakeUser);
+  it('calls next with 400 INVALID_ROLE when req.user has an unrecognised role', async () => {
+    // Build a fake req/res/next to call the middleware directly.
+    const fakeReq = {
+      user: { _id: '64b000000000000000000001', role: 'superuser' },
+      method: 'GET',
+      originalUrl: '/api/admin/recruiters',
+      ip: '127.0.0.1',
+    };
+    const fakeRes = {};
+    let capturedError = null;
+    const next = (err) => { capturedError = err; };
 
-    const res = await request(app)
-      .get(ADMIN_ONLY)
-      .set('Authorization', `Bearer ${badToken}`);
+    // authorize('admin') returns a middleware function; invoke it directly.
+    await authorize('admin')(fakeReq, fakeRes, next);
 
-    expect(res.status).toBe(400);
-    expect(res.body.code).toBe('INVALID_ROLE');
+    expect(capturedError).toBeDefined();
+    expect(capturedError.statusCode).toBe(400);
+    expect(capturedError.code).toBe('INVALID_ROLE');
   });
 });
 
