@@ -110,12 +110,24 @@ async function openResume(user, id) {
 }
 
 // IPP-F-011 + IPP-F-012: persist the change, audit it, and notify the student (in-app + email).
+// State lifecycle rules:
+//   - An application cannot be reverted back to 'Applied' once processed.
+//   - An application that has reached 'Selected' cannot be rolled back to 'Shortlisted'.
+const FORBIDDEN_TRANSITIONS = {
+  Shortlisted: ['Applied'],
+  Selected: ['Applied', 'Shortlisted'],
+  Rejected: ['Applied'],
+};
+
 async function updateStatus(recruiter, id, { status }, ctx = {}) {
   const app = await loadFor(recruiter, id);
   if (app.status === status) throw new AppError(409, 'STATUS_UNCHANGED', `Application is already ${status}`);
+  if (FORBIDDEN_TRANSITIONS[app.status]?.includes(status)) {
+    throw new AppError(400, 'INVALID_TRANSITION', `Cannot transition application status from ${app.status} to ${status}`);
+  }
   const previous = app.status;
   app.status = status;
-  app.statusHistory.push({ status, by: recruiter._id });
+  app.statusHistory.push({ status, from: previous, by: recruiter._id });
   await applicationRepository.save(app);
 
   await app.populate('listing', 'title company');
