@@ -13,7 +13,15 @@ const applicationSchema = new mongoose.Schema(
     resumeOriginalName: { type: String, required: true },
     resumeSize: Number,
     status: { type: String, enum: STATUSES, default: 'Applied' },
-    statusHistory: [{ status: String, at: { type: Date, default: Date.now }, by: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }, _id: false }],
+    statusHistory: [
+      {
+        status: String,
+        from: String,
+        at: { type: Date, default: Date.now },
+        by: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+        _id: false,
+      },
+    ],
     // IPP-F-013
     interview: {
       date: Date,
