@@ -7,8 +7,17 @@ const logger = require('../utils/logger');
 // The built-in heuristic scanner blocks PDFs carrying active content. If CLAMAV_HOST is set, a ClamAV
 // daemon (clamd INSTREAM) is added to the chain. Any scanner that throws fails closed (upload rejected).
 
-// Active-content markers that have no place in a resume.
-const ACTIVE_CONTENT = [/\/JavaScript/i, /\/JS\b/, /\/Launch\b/, /\/EmbeddedFile/i, /\/RichMedia/i];
+// Active-content and exploit markers that have no place in a resume.
+const ACTIVE_CONTENT = [
+  /\/JavaScript/i,
+  /\/JS\b/,
+  /\/Launch\b/,
+  /\/EmbeddedFile/i,
+  /\/RichMedia/i,
+  /\/OpenAction\b/i,
+  /\/SubmitForm\b/i,
+  /\/ImportData\b/i,
+];
 
 async function heuristicScanner(buffer) {
   const text = buffer.toString('latin1');
