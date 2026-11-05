@@ -45,6 +45,14 @@ async function apply(student, { listingId }, file) {
   if (problem) throw new AppError(400, 'INVALID_FILE', problem);
   const verdict = await scanService.scan(file.buffer);
   if (!verdict.clean) {
+    if (!verdict.unavailable) {
+      await auditService.record({
+        actor: student._id,
+        action: 'MALICIOUS_UPLOAD_BLOCKED',
+        targetType: 'Application',
+        metadata: { reason: verdict.reason, filename: safeFileName(file.originalname), size: file.size },
+      });
+    }
     throw new AppError(verdict.unavailable ? 503 : 422, verdict.unavailable ? 'SCAN_UNAVAILABLE' : 'FILE_REJECTED', verdict.reason || 'File rejected');
   }
 
