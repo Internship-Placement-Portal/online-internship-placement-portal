@@ -138,8 +138,8 @@ describe('TC-App-02 | Student dashboard status reflection (IPP-F-011)', () => {
     // Check dashboard before status change
     const initialDash = await request(app).get('/api/dashboard/student').set(student.auth);
     expect(initialDash.status).toBe(200);
-    expect(initialDash.body.byStatus.Applied).toBe(1);
-    expect(initialDash.body.byStatus.Shortlisted).toBe(0);
+    expect(initialDash.body.applications.byStatus.Applied).toBe(1);
+    expect(initialDash.body.applications.byStatus.Shortlisted).toBe(0);
 
     // Recruiter updates status to Shortlisted
     await request(app)
@@ -150,8 +150,8 @@ describe('TC-App-02 | Student dashboard status reflection (IPP-F-011)', () => {
     // Verify student dashboard now reflects Shortlisted: 1, Applied: 0
     const updatedDash = await request(app).get('/api/dashboard/student').set(student.auth);
     expect(updatedDash.status).toBe(200);
-    expect(updatedDash.body.byStatus.Applied).toBe(0);
-    expect(updatedDash.body.byStatus.Shortlisted).toBe(1);
+    expect(updatedDash.body.applications.byStatus.Applied).toBe(0);
+    expect(updatedDash.body.applications.byStatus.Shortlisted).toBe(1);
 
     // Verify student application list also reflects new status
     const mine = await request(app).get('/api/applications/mine').set(student.auth);
