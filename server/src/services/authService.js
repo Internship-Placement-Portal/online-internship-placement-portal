@@ -276,5 +276,27 @@ function validatePasswordStrength(password, { email = '', name = '' } = {}) {
   };
 }
 
-module.exports = { register, verifyEmail, resendOtp, login, refresh, logout, forgotPassword, resetPassword, validatePasswordStrength };
+// IPP-F-003: Timing-safe bcrypt storage and cost-factor audit helper
+async function auditPasswordStorage(candidatePassword, storedHash) {
+  if (typeof storedHash !== 'string') {
+    return { isBcrypt: false, costFactor: 0, matches: false, meetsSecurityStandard: false };
+  }
+  const match = storedHash.match(/^\$2[aby]\$(\d\d)\$/);
+  if (!match) {
+    return { isBcrypt: false, costFactor: 0, matches: false, meetsSecurityStandard: false };
+  }
+  const costFactor = parseInt(match[1], 10);
+  const matches = typeof candidatePassword === 'string'
+    ? await bcrypt.compare(candidatePassword, storedHash)
+    : false;
+  return {
+    isBcrypt: true,
+    costFactor,
+    matches,
+    meetsSecurityStandard: costFactor >= 10,
+  };
+}
+
+module.exports = { register, verifyEmail, resendOtp, login, refresh, logout, forgotPassword, resetPassword, validatePasswordStrength, auditPasswordStorage };
+
 
