@@ -207,4 +207,106 @@ describe('TC-Dash-02 | Placement analytics reconciliation with raw data (IPP-F-0
     expect(audit.metrics.applications).toBe(2);
     expect(audit.metrics.selections).toBe(1);
   });
+
+  it('reconciles weighted average test accuracy with scored attempts across assessment cohorts', async () => {
+    const admin = await createUser({ role: 'admin' });
+    const s1 = await createUser({ role: 'student' });
+    const s2 = await createUser({ role: 'student' });
+    const s3 = await createUser({ role: 'student' });
+    const s4 = await createUser({ role: 'student' });
+
+    const assessment = await Test.create({
+      title: 'Fullstack Aptitude Assessment',
+      durationMinutes: 45,
+      questionCount: 10,
+    });
+
+    const createAttempt = (student, accuracy, date, scored = true) => ({
+      _id: new mongoose.Types.ObjectId(),
+      student: student.user._id,
+      test: assessment._id,
+      attemptNo: 1,
+      status: 'submitted',
+      score: scored ? accuracy : 0,
+      maxScore: 100,
+      accuracy: scored ? accuracy : undefined,
+      startedAt: date,
+      submittedAt: date,
+      answers: [],
+      questions: [],
+    });
+
+    // Month 2: two scored attempts (70% and 90%) -> avg = 80.0%
+    // Month 1: one scored attempt (60%) and one unscored/in-progress attempt (null accuracy) -> avg = 60.0%
+    // Total scored attempts = 3. Weighted accuracy = (70 + 90 + 60) / 3 = 220 / 3 = 73.3%
+    await TestAttempt.collection.insertMany([
+      createAttempt(s1, 70, monthsAgo(2)),
+      createAttempt(s2, 90, monthsAgo(2)),
+      createAttempt(s3, 60, monthsAgo(1)),
+      createAttempt(s4, 0, monthsAgo(1), false),
+    ]);
+
+    const res = await request(app).get('/api/dashboard/placement').set(admin.auth);
+    expect(res.status).toBe(200);
+
+    const { kpis, monthly } = res.body;
+    expect(kpis.testAttempts).toBe(4);
+    expect(kpis.avgTestAccuracy).toBe(73.3);
+
+    const m2 = monthly.find((m) => m.month === monthsAgo(2).toISOString().slice(0, 7));
+    expect(m2.testAttempts).toBe(2);
+    expect(m2.avgAccuracy).toBe(80.0);
+
+    const m1 = monthly.find((m) => m.month === monthsAgo(1).toISOString().slice(0, 7));
+    expect(m1.testAttempts).toBe(2);
+    expect(m1.avgAccuracy).toBe(60.0);
+  });
+
+  it('reconciles CSV placement export rows and protects against spreadsheet formula injection', async () => {
+    const admin = await createUser({ role: 'admin' });
+    const recruiter = await createUser({ role: 'recruiter' });
+    // Student with malicious formula name that must be sanitized with leading apostrophe
+    const student = await createUser({
+      role: 'student',
+      name: '=SUM(A1:A10)',
+      email: '+malicious@exploit.com',
+    });
+
+    const listing = await createListing(recruiter.user, 'CyberSec Dynamics');
+    await createRawApplication({
+      studentUser: student.user,
+      listingDoc: listing,
+      status: 'Selected',
+      createdAt: monthsAgo(0),
+    });
+
+    const res = await request(app).get('/api/dashboard/placement/export?format=csv').set(admin.auth);
+    expect(res.status).toBe(200);
+    expect(res.headers['content-type']).toContain('text/csv');
+
+    const csvText = res.text;
+    expect(csvText).toContain('Application ID,Student,Email,College,Company,Internship,Domain,Location,Applied on,Status,Last updated');
+    // Verify formula characters = and + are escaped with leading '
+    expect(csvText).toContain("'=SUM(A1:A10)");
+    expect(csvText).toContain("'+malicious@exploit.com");
+    expect(csvText).toContain('CyberSec Dynamics');
+    expect(csvText).toContain('Selected');
+  });
+
+  it('strictly enforces role-based access control on placement analytics endpoints', async () => {
+    const student = await createUser({ role: 'student' });
+    const recruiter = await createUser({ role: 'recruiter' });
+
+    // Students are forbidden
+    expect((await request(app).get('/api/dashboard/placement').set(student.auth)).status).toBe(403);
+    expect((await request(app).get('/api/dashboard/placement/export?format=csv').set(student.auth)).status).toBe(403);
+
+    // Recruiters are forbidden
+    expect((await request(app).get('/api/dashboard/placement').set(recruiter.auth)).status).toBe(403);
+    expect((await request(app).get('/api/dashboard/placement/export?format=csv').set(recruiter.auth)).status).toBe(403);
+
+    // Unauthenticated requests are rejected with 401
+    expect((await request(app).get('/api/dashboard/placement')).status).toBe(401);
+    expect((await request(app).get('/api/dashboard/placement/export?format=csv')).status).toBe(401);
+  });
 });
