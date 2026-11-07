@@ -271,6 +271,27 @@ describe('student dashboard (IPP-F-018)', () => {
     expect(d.tests.attempts).toBe(2);
     expect(d.tests.avgAccuracy).toBe(70);
     expect(d.tests.bestAccuracy).toBe(80);
+    // Verify individual attempts are returned newest first.
+    expect(d.tests.recent).toHaveLength(2);
+
+    expect(d.tests.recent[0]).toMatchObject({
+    test: 'Quant',
+    score: 8,
+    maxScore: 10,
+    accuracy: 80,
+   });
+
+   expect(d.tests.recent[0].submittedAt).toBeDefined();
+
+   expect(d.tests.recent[1]).toMatchObject({
+   test: 'Quant',
+   score: 6,
+   maxScore: 10,
+   accuracy: 60,
+   });
+
+expect(new Date(d.tests.recent[0].submittedAt).getTime())
+  .toBeGreaterThan(new Date(d.tests.recent[1].submittedAt).getTime());
     expect(d.tests.trend.map((t) => t.accuracy)).toEqual([60, 80]); // oldest → newest
     expect(d.tests.categoryAccuracy[0]).toMatchObject({ category: 'Quant', accuracy: 70, total: 10 });
   });
