@@ -59,9 +59,9 @@ async function seedListings(recruiterId) {
     },
     {
       ...listingBody(),
-      title: 'Product Associate Intern',
+      title: 'Marketing Associate Intern',
       company: 'GammaCorp',
-      domain: 'Product Management',
+      domain: 'Business & Marketing',
       location: 'Pune',
       stipend: 15000,
       duration: 4,
