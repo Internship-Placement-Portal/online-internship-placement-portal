@@ -99,10 +99,12 @@ describe('TC-Test-02 | Automatic MCQ evaluation and answer key reconciliation (I
     expect(result.correctCount).toBe(6);
 
     // 6. Inspect per-question review and answer key reveal post-submission
+    // review items use field `correct` (not `isCorrect`)
     expect(result.review).toHaveLength(6);
     for (const r of result.review) {
-      expect(r.answered).toBe(true);
-      expect(r.isCorrect).toBe(true);
+      // selectedIndex is non-null when answered
+      expect(r.selectedIndex).not.toBe(null);
+      expect(r.correct).toBe(true);
       expect(r.selectedIndex).toBe(answerKeyMap[r.questionId]);
       expect(r.correctIndex).toBe(answerKeyMap[r.questionId]);
     }
@@ -154,15 +156,17 @@ describe('TC-Test-02 | Automatic MCQ evaluation and answer key reconciliation (I
     // Accuracy = (3 correct / 6 MCQ) * 100 = 50.0%
     expect(result.accuracy).toBe(50.0);
 
-    // Verify per-question review
+    // Verify per-question review; field is `correct`, not `isCorrect`
+    // `selectedIndex` is null when unanswered (omitted)
     const reviewByQ = Object.fromEntries(result.review.map((r) => [r.questionId, r]));
-    expect(reviewByQ[attempt.questions[0].id].isCorrect).toBe(true);
-    expect(reviewByQ[attempt.questions[1].id].isCorrect).toBe(true);
-    expect(reviewByQ[attempt.questions[2].id].isCorrect).toBe(true);
-    expect(reviewByQ[attempt.questions[3].id].isCorrect).toBe(false);
-    expect(reviewByQ[attempt.questions[4].id].isCorrect).toBe(false);
-    expect(reviewByQ[attempt.questions[5].id].answered).toBe(false);
-    expect(reviewByQ[attempt.questions[5].id].isCorrect).toBe(false);
+    expect(reviewByQ[attempt.questions[0].id].correct).toBe(true);
+    expect(reviewByQ[attempt.questions[1].id].correct).toBe(true);
+    expect(reviewByQ[attempt.questions[2].id].correct).toBe(true);
+    expect(reviewByQ[attempt.questions[3].id].correct).toBe(false);
+    expect(reviewByQ[attempt.questions[4].id].correct).toBe(false);
+    // Question 5 was omitted — selectedIndex is null and correct is false
+    expect(reviewByQ[attempt.questions[5].id].selectedIndex).toBe(null);
+    expect(reviewByQ[attempt.questions[5].id].correct).toBe(false);
   });
 
   it('guarantees idempotency on repeated submit calls and blocks unauthorized access', async () => {
@@ -217,10 +221,12 @@ describe('TC-Test-02 | Automatic MCQ evaluation and answer key reconciliation (I
 
     const result = submitRes.body.result;
     expect(result.accuracy).toBe(100);
+    // categoryBreakdown is returned as an array: [{ category, total, correct, accuracy }]
     expect(result.categoryBreakdown).toBeDefined();
+    expect(Array.isArray(result.categoryBreakdown)).toBe(true);
 
     // Verify all present categories have 100% accuracy
-    for (const [category, stats] of Object.entries(result.categoryBreakdown)) {
+    for (const stats of result.categoryBreakdown) {
       expect(stats.total).toBeGreaterThan(0);
       expect(stats.correct).toBe(stats.total);
       expect(stats.accuracy).toBe(100);
@@ -252,6 +258,7 @@ describe('TC-Test-02 | Automatic MCQ evaluation and answer key reconciliation (I
       .send({ answers: [{ questionId: String(foreignQuestion._id), selectedIndex: 0 }] });
 
     expect(badSave.status).toBe(400);
-    expect(badSave.body.error.code).toBe('VALIDATION_ERROR');
+    // Error response shape: { status: 'error', code: '...', message: '...' } (flat, not nested under .error)
+    expect(badSave.body.code).toBe('VALIDATION_ERROR');
   });
 });
