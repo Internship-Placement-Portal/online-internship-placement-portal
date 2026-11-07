@@ -11,21 +11,22 @@ const create = (data) => Listing.create(data);
 const findById = (id) => Listing.findById(id);
 const findByIdPopulated = (id) => Listing.findById(id).populate('recruiter', 'name profile');
 
+// IPP-F-007: multi-filter criteria conjunction builder (domain, location, stipend range, duration range, full-text).
 // IPP-F-009: expired listings are excluded at query time as well as by the scheduled job.
 function buildStudentFilter({ q, domain, location, minStipend, maxStipend, minDuration, maxDuration }, now = new Date()) {
   const filter = { status: 'approved', deadline: { $gte: now } };
-  if (q) filter.$text = { $search: q };
-  if (domain) filter.domain = domain;
-  if (location) filter.location = new RegExp(escapeRegex(location), 'i');
+  if (q && q.trim()) filter.$text = { $search: q.trim() };
+  if (domain && domain.trim()) filter.domain = domain.trim();
+  if (location && location.trim()) filter.location = new RegExp(escapeRegex(location.trim()), 'i');
   if (minStipend !== undefined || maxStipend !== undefined) {
     filter.stipend = {};
-    if (minStipend !== undefined) filter.stipend.$gte = minStipend;
-    if (maxStipend !== undefined) filter.stipend.$lte = maxStipend;
+    if (minStipend !== undefined && minStipend !== null) filter.stipend.$gte = Number(minStipend);
+    if (maxStipend !== undefined && maxStipend !== null) filter.stipend.$lte = Number(maxStipend);
   }
   if (minDuration !== undefined || maxDuration !== undefined) {
     filter.duration = {};
-    if (minDuration !== undefined) filter.duration.$gte = minDuration;
-    if (maxDuration !== undefined) filter.duration.$lte = maxDuration;
+    if (minDuration !== undefined && minDuration !== null) filter.duration.$gte = Number(minDuration);
+    if (maxDuration !== undefined && maxDuration !== null) filter.duration.$lte = Number(maxDuration);
   }
   return filter;
 }
@@ -48,16 +49,15 @@ async function listForRecruiter(recruiter, { status }, { skip, limit }) {
   return { items, total };
 }
 
-async function listByStatus(status, { skip, limit }) {
+const listAllForAdmin = async ({ status }, { skip, limit }) => {
+  const filter = status ? { status } : {};
   const [items, total] = await Promise.all([
-    Listing.find({ status }).sort({ updatedAt: -1 }).skip(skip).limit(limit).populate('recruiter', 'name email profile').lean(),
-    Listing.countDocuments({ status }),
+    Listing.find(filter).populate('recruiter', 'name email').sort({ createdAt: -1 }).skip(skip).limit(limit).lean(),
+    Listing.countDocuments(filter),
   ]);
   return { items, total };
-}
+};
 
-const save = (doc) => doc.save();
-const closeExpired = (now = new Date()) =>
-  Listing.updateMany({ status: 'approved', deadline: { $lt: now } }, { status: 'closed' });
+const save = (listing) => listing.save();
 
-module.exports = { create, findById, findByIdPopulated, search, listForRecruiter, listByStatus, save, closeExpired, buildStudentFilter };
+module.exports = { create, findById, findByIdPopulated, search, listForRecruiter, listAllForAdmin, save };
