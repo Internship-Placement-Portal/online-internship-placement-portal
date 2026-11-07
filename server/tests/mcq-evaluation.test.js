@@ -191,4 +191,67 @@ describe('TC-Test-02 | Automatic MCQ evaluation and answer key reconciliation (I
     const otherResult = await request(app).get(`/api/attempts/${attemptId}/result`).set(student2.auth);
     expect(otherResult.status).toBe(403);
   });
+
+  it('computes category-level accuracy breakdown and time spent metrics', async () => {
+    const student = await createUser({ role: 'student' });
+    await seedQuestionBank();
+    const test = await createAptitudeTest(6);
+
+    const startRes = await request(app).post(`/api/tests/${test._id}/start`).set(student.auth);
+    const attempt = startRes.body.attempt;
+    const attemptId = attempt.id;
+
+    const questionIds = attempt.questions.map((q) => q.id);
+    const dbQuestions = await Question.find({ _id: { $in: questionIds } }).select('+correctIndex');
+    const answerKeyMap = Object.fromEntries(dbQuestions.map((q) => [String(q._id), q.correctIndex]));
+
+    // Answer with explicit timeSpentSec per question
+    const answers = attempt.questions.map((q, idx) => ({
+      questionId: q.id,
+      selectedIndex: answerKeyMap[q.id],
+      timeSpentSec: (idx + 1) * 10,
+    }));
+
+    const submitRes = await request(app).post(`/api/attempts/${attemptId}/submit`).set(student.auth).send({ answers });
+    expect(submitRes.status).toBe(200);
+
+    const result = submitRes.body.result;
+    expect(result.accuracy).toBe(100);
+    expect(result.categoryBreakdown).toBeDefined();
+
+    // Verify all present categories have 100% accuracy
+    for (const [category, stats] of Object.entries(result.categoryBreakdown)) {
+      expect(stats.total).toBeGreaterThan(0);
+      expect(stats.correct).toBe(stats.total);
+      expect(stats.accuracy).toBe(100);
+    }
+  });
+
+  it('rejects answers targeting foreign questions outside the active attempt', async () => {
+    const student = await createUser({ role: 'student' });
+    await seedQuestionBank();
+    const test = await createAptitudeTest(4);
+
+    const startRes = await request(app).post(`/api/tests/${test._id}/start`).set(student.auth);
+    const attemptId = startRes.body.attempt.id;
+
+    // Create an unassigned question not in this attempt
+    const foreignQuestion = await Question.create({
+      text: 'What is foreign key?',
+      type: 'mcq',
+      options: ['A', 'B', 'C', 'D'],
+      correctIndex: 0,
+      category: 'Databases',
+      marks: 1,
+    });
+
+    // Try to save an answer targeting the foreign question
+    const badSave = await request(app)
+      .put(`/api/attempts/${attemptId}/answers`)
+      .set(student.auth)
+      .send({ answers: [{ questionId: String(foreignQuestion._id), selectedIndex: 0 }] });
+
+    expect(badSave.status).toBe(400);
+    expect(badSave.body.error.code).toBe('VALIDATION_ERROR');
+  });
 });
