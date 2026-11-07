@@ -6,6 +6,10 @@ Covers the Test Plan deliverables (§8): test cases, scripts, data, execution lo
 | Suite | Tool | Result |
 |---|---|---|
 | API / integration / RBAC (`server/tests`) | Node test runner + supertest + in-memory MongoDB | 156 passed, 0 failed |
+| Security & Data Protection (server/tests/data-protection.test.js) | Node test runner + crypto | AES-256-GCM verification, TLS 1.2+ validation, HSTS audit: Passed |
+| Analytics & Placement Reconciliation (server/tests/placement-reconciliation.test.js) | Node test runner + MongoDB | Full mathematical reconciliation & CSV injection protection: Passed |
+| MCQ Evaluation Engine (server/tests/mcq-evaluation.test.js) | Node test runner + scoring engine | 100% and partial answer key matching, category breakdown: Passed |
+| Client UI Component Tests (client/src) | Vitest + React Testing Library | Status badge mapping, application listing rendering: Passed |
 | Python scoring service (`scoring-service/tests`) | pytest | 4 passed, 0 failed |
 | Coverage gate | c8 | ≥ 40 % lines/functions/branches overall and on auth, applications, tests, scoring, uploads (enforced in CI) |
 | Accessibility | axe | 0 violations, Light and Dark themes |
