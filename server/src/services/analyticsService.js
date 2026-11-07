@@ -141,4 +141,54 @@ async function exportData(query = {}) {
   return { summary, rows };
 }
 
-module.exports = { placement, student, exportData };
+// IPP-F-019 / TC-Dash-02: Comprehensive placement analytics reconciliation and integrity verification helper.
+// Cross-checks computed KPI aggregates against raw application, selection, and student breakdown totals.
+async function reconcilePlacementData(query = {}) {
+  const summary = await placement(query);
+  const { kpis, statusBreakdown, companyWise, monthly } = summary;
+
+  const sumStatus = statusBreakdown.reduce((sum, s) => sum + s.count, 0);
+  const isStatusSumValid = sumStatus === kpis.applications;
+
+  const sumMonthlyApps = monthly.reduce((sum, m) => sum + m.applications, 0);
+  const isMonthlyAppsValid = sumMonthlyApps === kpis.applications;
+
+  const sumCompanyApps = companyWise.reduce((sum, c) => sum + c.applications, 0);
+  const isCompanyAppsValid = query.company ? true : sumCompanyApps === kpis.applications;
+
+  const calculatedConversion = kpis.applications > 0
+    ? round1((kpis.selections / kpis.applications) * 100)
+    : 0;
+  const isConversionValid = calculatedConversion === kpis.conversionRate;
+
+  const calculatedPlacementRate = kpis.totalStudents > 0
+    ? round1((kpis.placedStudents / kpis.totalStudents) * 100)
+    : 0;
+  const isPlacementRateValid = calculatedPlacementRate === kpis.placementRate;
+
+  return {
+    reconciled:
+      isStatusSumValid &&
+      isMonthlyAppsValid &&
+      isCompanyAppsValid &&
+      isConversionValid &&
+      isPlacementRateValid,
+    checks: {
+      statusSumMatchesTotal: isStatusSumValid,
+      monthlySumMatchesTotal: isMonthlyAppsValid,
+      companySumMatchesTotal: isCompanyAppsValid,
+      conversionRateMatches: isConversionValid,
+      placementRateMatches: isPlacementRateValid,
+    },
+    metrics: {
+      totalStudents: kpis.totalStudents,
+      placedStudents: kpis.placedStudents,
+      placementRate: kpis.placementRate,
+      applications: kpis.applications,
+      selections: kpis.selections,
+      conversionRate: kpis.conversionRate,
+    },
+  };
+}
+
+module.exports = { placement, student, exportData, reconcilePlacementData };
