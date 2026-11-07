@@ -100,4 +100,31 @@ const setScorer = (fn) => {
   scorer = fn || (config.scoring.url ? httpScorer : nodeScorer);
 };
 
-module.exports = { scoreAttempt, setScorer, nodeScorer, httpScorer };
+// IPP-F-015 / TC-Test-02: Direct answer key verification and comparison utility.
+function verifyAnswerKey(answers, answerKeyMap) {
+  let matched = 0;
+  let total = 0;
+  const comparisons = [];
+
+  for (const a of answers || []) {
+    total += 1;
+    const expected = answerKeyMap[String(a.questionId)];
+    const isCorrect = Number.isInteger(a.selectedIndex) && a.selectedIndex === expected;
+    if (isCorrect) matched += 1;
+    comparisons.push({
+      questionId: String(a.questionId),
+      submittedIndex: a.selectedIndex ?? null,
+      expectedIndex: expected ?? null,
+      isCorrect,
+    });
+  }
+
+  return {
+    totalQuestions: total,
+    matchedCount: matched,
+    reconciledAccuracy: total ? round1((matched / total) * 100) : 0,
+    comparisons,
+  };
+}
+
+module.exports = { scoreAttempt, setScorer, nodeScorer, httpScorer, verifyAnswerKey };
