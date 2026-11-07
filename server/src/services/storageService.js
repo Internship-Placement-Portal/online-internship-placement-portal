@@ -94,4 +94,46 @@ const exists = (key) =>
 
 const remove = (key) => fsp.rm(pathFor(key), { force: true });
 
-module.exports = { save, open, exists, remove };
+// IPP-NF-003 / TC-Sec-01: Audit and verify sensitive resume encryption at rest.
+// Inspects on-disk storage format, validates format marker, checks for plaintext leakage,
+// and verifies cryptographic authentication tag integrity.
+async function inspectEncryptedFile(key) {
+  const data = await fsp.readFile(pathFor(key));
+  const isEncrypted = data.subarray(0, FORMAT_MARKER.length).equals(FORMAT_MARKER);
+  const containsPlaintextPdfMarker = data.includes(Buffer.from('%PDF-'));
+
+  let authentic = false;
+  let decryptedSize = 0;
+
+  if (isEncrypted) {
+    const headerLength = FORMAT_MARKER.length + IV_LENGTH + TAG_LENGTH;
+    if (data.length >= headerLength) {
+      const offset = FORMAT_MARKER.length;
+      const iv = data.subarray(offset, offset + IV_LENGTH);
+      const tag = data.subarray(offset + IV_LENGTH, headerLength);
+      const ciphertext = data.subarray(headerLength);
+
+      try {
+        const decipher = crypto.createDecipheriv('aes-256-gcm', getEncryptionKey(), iv);
+        decipher.setAuthTag(tag);
+        const plaintext = Buffer.concat([decipher.update(ciphertext), decipher.final()]);
+        authentic = true;
+        decryptedSize = plaintext.length;
+      } catch {
+        authentic = false;
+      }
+    }
+  }
+
+  return {
+    key,
+    fileSizeOnDisk: data.length,
+    isEncrypted,
+    containsPlaintextPdfMarker,
+    algorithm: 'aes-256-gcm',
+    authentic,
+    decryptedSize,
+  };
+}
+
+module.exports = { save, open, exists, remove, inspectEncryptedFile };
