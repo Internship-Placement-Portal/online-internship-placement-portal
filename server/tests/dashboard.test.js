@@ -296,16 +296,50 @@ expect(new Date(d.tests.recent[0].submittedAt).getTime())
     expect(d.tests.categoryAccuracy[0]).toMatchObject({ category: 'Quant', accuracy: 70, total: 10 });
   });
 
-  it('only ever shows the signed-in student their own data, and handles a brand-new account', async () => {
-    const { students } = await dataset();
-    const fresh = await createUser({ role: 'student' });
-    const res = await request(app).get('/api/dashboard/student').set(fresh.auth);
-    expect(res.body.applications.total).toBe(0);
-    expect(res.body.tests.attempts).toBe(0);
-    expect(res.body.interviews.upcoming).toEqual([]);
-    expect((await request(app).get('/api/dashboard/student').set(students[0].auth)).body.applications.total).toBe(2);
+   it('only ever shows the signed-in student their own data, and handles a brand-new account', async () => {
+  const { students } = await dataset();
+  const fresh = await createUser({ role: 'student' });
+
+  // Create a test attempt belonging to the first student.
+  const test = await Test.create({
+    title: 'Privacy Test',
+    durationMinutes: 10,
+    questionCount: 5,
   });
 
+  await TestAttempt.create({
+    student: students[0].user._id,
+    test: test._id,
+    attemptNo: 1,
+    status: 'submitted',
+    score: 75,
+    maxScore: 100,
+    accuracy: 75,
+    submittedAt: new Date(),
+  });
+
+  // A new student must not see another student's test attempt.
+  const freshDashboard = await request(app)
+    .get('/api/dashboard/student')
+    .set(fresh.auth);
+
+  expect(freshDashboard.status).toBe(200);
+  expect(freshDashboard.body.applications.total).toBe(0);
+  expect(freshDashboard.body.tests.attempts).toBe(0);
+  expect(freshDashboard.body.tests.recent).toHaveLength(0);
+  expect(freshDashboard.body.interviews.upcoming).toEqual([]);
+
+  // The student who owns the attempt should see it.
+  const ownDashboard = await request(app)
+    .get('/api/dashboard/student')
+    .set(students[0].auth);
+
+  expect(ownDashboard.status).toBe(200);
+  expect(ownDashboard.body.applications.total).toBe(2);
+  expect(ownDashboard.body.tests.attempts).toBe(1);
+  expect(ownDashboard.body.tests.recent).toHaveLength(1);
+  expect(ownDashboard.body.tests.recent[0].accuracy).toBe(75);
+});
   it('is student only', async () => {
     const admin = await createUser({ role: 'admin' });
     const recruiter = await createUser({ role: 'recruiter' });
