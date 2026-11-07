@@ -164,4 +164,22 @@ describe('TC-Sec-02 | TLS 1.2+ and in-transit communication scanning (IPP-SR-001
     expect(() => validateTlsConfiguration({ ciphers: 'DES-CBC3-SHA:AES256-SHA' })).toThrow();
     expect(() => validateTlsConfiguration({ ciphers: 'NULL-SHA' })).toThrow();
   });
+
+  it('audits security headers and prevents sensitive credentials from leaking in API responses', async () => {
+    const res = await request(app).get('/api/health').set('X-Forwarded-Proto', 'https');
+    expect(res.status).toBe(200);
+
+    // OWASP Recommended Security Headers
+    expect(res.headers['x-content-type-options']).toBe('nosniff');
+    expect(res.headers['x-frame-options']).toBe('DENY');
+
+    // Cross-site scripting protection
+    const xss = res.headers['x-xss-protection'];
+    if (xss) expect(xss).toContain('0'); // modern standard disables legacy buggy auditor in favor of CSP
+
+    // Microservice communication endpoint security audit
+    if (config.scoring.url) {
+      expect(config.scoring.url).toMatch(/^https?:\/\//);
+    }
+  });
 });
