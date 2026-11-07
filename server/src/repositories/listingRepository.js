@@ -18,16 +18,33 @@ function buildStudentFilter({ q, domain, location, minStipend, maxStipend, minDu
   if (q && q.trim()) filter.$text = { $search: q.trim() };
   if (domain && domain.trim()) filter.domain = domain.trim();
   if (location && location.trim()) filter.location = new RegExp(escapeRegex(location.trim()), 'i');
-  if (minStipend !== undefined || maxStipend !== undefined) {
-    filter.stipend = {};
-    if (minStipend !== undefined && minStipend !== null) filter.stipend.$gte = Number(minStipend);
-    if (maxStipend !== undefined && maxStipend !== null) filter.stipend.$lte = Number(maxStipend);
+
+  const stipendFilter = {};
+  if (minStipend !== undefined && minStipend !== null && minStipend !== '') {
+    const num = Number(minStipend);
+    if (!Number.isNaN(num)) stipendFilter.$gte = num;
   }
-  if (minDuration !== undefined || maxDuration !== undefined) {
-    filter.duration = {};
-    if (minDuration !== undefined && minDuration !== null) filter.duration.$gte = Number(minDuration);
-    if (maxDuration !== undefined && maxDuration !== null) filter.duration.$lte = Number(maxDuration);
+  if (maxStipend !== undefined && maxStipend !== null && maxStipend !== '') {
+    const num = Number(maxStipend);
+    if (!Number.isNaN(num)) stipendFilter.$lte = num;
   }
+  if (Object.keys(stipendFilter).length > 0) {
+    filter.stipend = stipendFilter;
+  }
+
+  const durationFilter = {};
+  if (minDuration !== undefined && minDuration !== null && minDuration !== '') {
+    const num = Number(minDuration);
+    if (!Number.isNaN(num)) durationFilter.$gte = num;
+  }
+  if (maxDuration !== undefined && maxDuration !== null && maxDuration !== '') {
+    const num = Number(maxDuration);
+    if (!Number.isNaN(num)) durationFilter.$lte = num;
+  }
+  if (Object.keys(durationFilter).length > 0) {
+    filter.duration = durationFilter;
+  }
+
   return filter;
 }
 
@@ -49,15 +66,27 @@ async function listForRecruiter(recruiter, { status }, { skip, limit }) {
   return { items, total };
 }
 
-const listAllForAdmin = async ({ status }, { skip, limit }) => {
+async function listByStatus(status, { skip, limit }) {
   const filter = status ? { status } : {};
   const [items, total] = await Promise.all([
-    Listing.find(filter).populate('recruiter', 'name email').sort({ createdAt: -1 }).skip(skip).limit(limit).lean(),
+    Listing.find(filter).sort({ updatedAt: -1 }).skip(skip).limit(limit).populate('recruiter', 'name email profile').lean(),
     Listing.countDocuments(filter),
   ]);
   return { items, total };
-};
+}
 
 const save = (listing) => listing.save();
+const closeExpired = (now = new Date()) =>
+  Listing.updateMany({ status: 'approved', deadline: { $lt: now } }, { status: 'closed' });
 
-module.exports = { create, findById, findByIdPopulated, search, listForRecruiter, listAllForAdmin, save };
+module.exports = {
+  create,
+  findById,
+  findByIdPopulated,
+  search,
+  listForRecruiter,
+  listByStatus,
+  save,
+  closeExpired,
+  buildStudentFilter,
+};
