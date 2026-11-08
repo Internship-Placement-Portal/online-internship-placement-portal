@@ -38,6 +38,7 @@ export default function Analytics() {
   const [exporting, setExporting] = useState('');
   const { data: d, loading, error } = useAsync(() => placementApi(filters), [JSON.stringify(filters)]);
   const set = (k) => (e) => setDraft((f) => ({ ...f, [k]: e.target.value }));
+  const hasPendingChanges = Object.keys(filters).some((key) => filters[key] !== draft[key]);
   const canReset = Object.values(filters).some(Boolean) || Object.values(draft).some(Boolean);
 
   function resetFilters() {
@@ -125,6 +126,12 @@ export default function Analytics() {
           ))}
         </div>
       </form>
+
+      {hasPendingChanges && (
+        <div style={{ marginTop: 16 }}>
+          <Alert tone="info">You have unapplied filter changes. Apply filters to update the report and exports.</Alert>
+        </div>
+      )}
 
       {error && (
         <div style={{ marginTop: 16 }}>
