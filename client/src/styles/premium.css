@@ -1,6 +1,85 @@
 /* ───────────── Premium layer: frosted glass, soft gradients, floating navigation ─────────────
    Loaded after app.css. Colours come only from the tokens defined in app.css. */
 
+.l-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+  margin-top: 1.3rem;
+}
+.metric-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 1rem 1.1rem;
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  box-shadow: var(--shadow-sm);
+}
+.metric-value {
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  line-height: 1;
+  font-weight: 800;
+  letter-spacing: -0.06em;
+  color: var(--accent-text);
+}
+.metric-label {
+  font-weight: 700;
+  color: var(--text);
+}
+.metric-card small {
+  color: var(--muted);
+  line-height: 1.45;
+}
+.quick-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 0.9rem;
+  margin-top: 1.3rem;
+}
+.quick-action-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.9rem;
+  padding: 0.9rem 1rem;
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  box-shadow: var(--shadow-sm);
+  color: var(--text);
+  text-decoration: none;
+}
+.quick-action-card div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+.quick-action-card strong {
+  font-size: 0.98rem;
+}
+.quick-action-card span {
+  color: var(--muted);
+  font-size: 0.84rem;
+  line-height: 1.5;
+}
+.quick-action-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  flex-shrink: 0;
+  border-radius: 14px;
+  background: var(--primary-soft);
+  color: var(--accent-text);
+}
+.quick-action-card:hover {
+  border-color: var(--accent);
+  box-shadow: var(--shadow-lg), 0 0 0 1px color-mix(in srgb, var(--accent) 30%, transparent);
+  transform: translateY(-3px);
+}
+
 body {
   background: var(--bg);
   background-image: radial-gradient(60rem 32rem at 88% -8%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 62%),
