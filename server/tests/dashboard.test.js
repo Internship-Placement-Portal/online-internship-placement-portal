@@ -182,6 +182,57 @@ describe('placement analytics (IPP-F-019, IPP-F-020)', () => {
     expect(res.body.kpis.avgTestAccuracy).toBe(63.3);
   });
 
+  it('counts only finished attempts submitted within the selected date range', async () => {
+    const { admin, students } = await dataset();
+    const test = await Test.create({ title: 'T', durationMinutes: 10, questionCount: 5 });
+    await TestAttempt.collection.insertMany([
+      {
+        student: students[0].user._id,
+        test: test._id,
+        attemptNo: 1,
+        status: 'submitted',
+        accuracy: 80,
+        submittedAt: monthsAgo(0),
+        startedAt: monthsAgo(0),
+        answers: [],
+        questions: [],
+      },
+      {
+        student: students[1].user._id,
+        test: test._id,
+        attemptNo: 1,
+        status: 'in_progress',
+        accuracy: 100,
+        submittedAt: monthsAgo(0),
+        startedAt: monthsAgo(0),
+        answers: [],
+        questions: [],
+      },
+      {
+        student: students[2].user._id,
+        test: test._id,
+        attemptNo: 1,
+        status: 'submitted',
+        accuracy: 60,
+        submittedAt: monthsAgo(1),
+        startedAt: monthsAgo(1),
+        answers: [],
+        questions: [],
+      },
+    ]);
+
+    const from = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1)).toISOString().slice(0, 10);
+    const to = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 0)).toISOString().slice(0, 10);
+    const res = await request(app).get(`/api/dashboard/placement?from=${from}&to=${to}`).set(admin.auth);
+
+    expect(res.status).toBe(200);
+    expect(res.body.kpis.testAttempts).toBe(1);
+    expect(res.body.kpis.scoredTestAttempts).toBe(1);
+    expect(res.body.kpis.avgTestAccuracy).toBe(80);
+    expect(res.body.monthly).toHaveLength(1);
+    expect(res.body.monthly[0]).toMatchObject({ testAttempts: 1, scoredAttempts: 1, avgAccuracy: 80 });
+  });
+
   it('is admin only', async () => {
     const student = await createUser({ role: 'student' });
     const recruiter = await createUser({ role: 'recruiter' });
