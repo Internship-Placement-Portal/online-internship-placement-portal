@@ -86,12 +86,14 @@ describe('Placement analytics page', () => {
     await screen.findByText('2 scored · 3 total attempts');
 
     await user.type(screen.getByLabelText('From'), '2026-01-01');
+    expect(screen.getByText(/You have unapplied filter changes/)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Reset filters' })).toBeEnabled();
     expect(placementApi).toHaveBeenCalledTimes(1);
 
     await user.click(screen.getByRole('button', { name: 'Reset filters' }));
 
     expect(screen.getByLabelText('From')).toHaveValue('');
+    expect(screen.queryByText(/You have unapplied filter changes/)).not.toBeInTheDocument();
     expect(placementApi).toHaveBeenCalledTimes(1);
   });
 
@@ -101,13 +103,30 @@ describe('Placement analytics page', () => {
     await screen.findByText('2 scored · 3 total attempts');
 
     await user.type(screen.getByLabelText('From'), '2026-01-01');
+    expect(screen.getByText(/You have unapplied filter changes/)).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Apply' }));
     await waitFor(() => expect(placementApi).toHaveBeenLastCalledWith({ from: '2026-01-01', to: '', company: '' }));
+    expect(screen.queryByText(/You have unapplied filter changes/)).not.toBeInTheDocument();
 
     await user.click(screen.getByRole('button', { name: 'Reset filters' }));
 
     await waitFor(() => expect(placementApi).toHaveBeenLastCalledWith({ from: '', to: '', company: '' }));
     expect(screen.getByLabelText('From')).toHaveValue('');
     expect(screen.getByRole('button', { name: 'Reset filters' })).toBeDisabled();
+  });
+
+  it('lets an admin retry after analytics fails to load', async () => {
+    const user = userEvent.setup();
+    placementApi
+      .mockRejectedValueOnce({ request: {}, message: 'Network error' })
+      .mockResolvedValueOnce(analytics);
+
+    renderAnalytics();
+
+    expect(await screen.findByText('Cannot reach the server. Check your connection.')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Try again' }));
+
+    expect(await screen.findByText('2 scored · 3 total attempts')).toBeInTheDocument();
+    expect(placementApi).toHaveBeenCalledTimes(2);
   });
 });

@@ -36,8 +36,9 @@ export default function Analytics() {
   const [filters, setFilters] = useState({ from: '', to: '', company: '' });
   const [draft, setDraft] = useState(filters);
   const [exporting, setExporting] = useState('');
-  const { data: d, loading, error } = useAsync(() => placementApi(filters), [JSON.stringify(filters)]);
+  const { data: d, loading, error, reload } = useAsync(() => placementApi(filters), [JSON.stringify(filters)]);
   const set = (k) => (e) => setDraft((f) => ({ ...f, [k]: e.target.value }));
+  const hasPendingChanges = Object.keys(filters).some((key) => filters[key] !== draft[key]);
   const canReset = Object.values(filters).some(Boolean) || Object.values(draft).some(Boolean);
 
   function resetFilters() {
@@ -126,9 +127,20 @@ export default function Analytics() {
         </div>
       </form>
 
+      {hasPendingChanges && (
+        <div style={{ marginTop: 16 }}>
+          <Alert tone="info">You have unapplied filter changes. Apply filters to update the report and exports.</Alert>
+        </div>
+      )}
+
       {error && (
         <div style={{ marginTop: 16 }}>
-          <Alert tone="danger">{error}</Alert>
+          <Alert tone="danger">
+            {error}{' '}
+            <button type="button" className="btn btn-secondary btn-sm" onClick={reload} disabled={loading}>
+              <RotateCcw size={15} aria-hidden="true" /> Try again
+            </button>
+          </Alert>
         </div>
       )}
       {loading && !d && (
