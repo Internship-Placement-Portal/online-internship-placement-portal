@@ -137,7 +137,7 @@ export default function Analytics() {
             <Kpi icon={Percent} num={`${d.kpis.placementRate}%`} label="Placement rate" sub={`${d.kpis.placedStudents} of ${d.kpis.totalStudents} students placed`} />
             <Kpi icon={Send} num={d.kpis.applications} label="Applications" sub={`${d.kpis.conversionRate}% selected · ${d.kpis.shortlisted} shortlisted`} />
             <Kpi icon={UserCheck} num={d.kpis.selections} label="Selections" sub={`${d.kpis.activeListings} active listings · ${d.kpis.recruiters} recruiters`} />
-            <Kpi icon={Users} num={`${d.kpis.avgTestAccuracy}%`} label="Avg. test accuracy" sub={`${d.kpis.testAttempts} attempts`} />
+            <Kpi icon={Users} num={`${d.kpis.avgTestAccuracy}%`} label="Avg. test accuracy" sub={`${d.kpis.scoredTestAttempts} scored · ${d.kpis.testAttempts} total attempts`} />
           </div>
 
           <div className="stack" style={{ marginTop: 16 }}>
@@ -214,14 +214,14 @@ export default function Analytics() {
             <ChartCard
               title="Student performance trend"
               subtitle="Average test accuracy per month — gaps mean no tests were taken"
-              table={{ head: ['Month', 'Test attempts', 'Avg. accuracy'], rows: d.monthly.map((m) => [m.label, m.testAttempts, m.avgAccuracy == null ? null : `${m.avgAccuracy}%`]) }}
+              table={{ head: ['Month', 'Test attempts', 'Scored attempts', 'Avg. accuracy'], rows: d.monthly.map((m) => [m.label, m.testAttempts, m.scoredAttempts, m.avgAccuracy == null ? null : `${m.avgAccuracy}%`]) }}
             >
               <LineChart
                 data={d.monthly.map((m) => ({ label: m.label, short: m.label.slice(0, 3), accuracy: m.avgAccuracy }))}
                 series={[{ key: 'accuracy', name: 'Avg. accuracy %' }]}
                 max={100}
                 unit="%"
-                summary={`Line chart of average monthly test accuracy. Overall ${d.kpis.avgTestAccuracy} percent across ${d.kpis.testAttempts} attempts.`}
+                summary={`Line chart of average monthly test accuracy. Overall ${d.kpis.avgTestAccuracy} percent across ${d.kpis.scoredTestAttempts} scored attempts out of ${d.kpis.testAttempts} total attempts.`}
               />
             </ChartCard>
           </div>

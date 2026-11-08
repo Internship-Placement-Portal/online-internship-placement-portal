@@ -42,7 +42,7 @@ function toPdf({ summary, rows }, stream) {
     ['Applications', String(kpis.applications)],
     ['Selections', `${kpis.selections} (${kpis.conversionRate}% of applications)`],
     ['Shortlisted', String(kpis.shortlisted)],
-    ['Test attempts', `${kpis.testAttempts} (average accuracy ${kpis.avgTestAccuracy}%)`],
+    ['Test attempts', `${kpis.scoredTestAttempts} scored of ${kpis.testAttempts} total (average accuracy ${kpis.avgTestAccuracy}%)`],
   ];
   doc.fontSize(10);
   kpiRows.forEach(([k, v]) => {
@@ -75,9 +75,9 @@ function toPdf({ summary, rows }, stream) {
   );
   table(
     'Monthly trend',
-    ['Month', 'Applications', 'Selections', 'Test attempts', 'Avg. accuracy'],
-    summary.monthly.map((m) => [m.label, m.applications, m.selections, m.testAttempts, m.avgAccuracy == null ? '—' : `${m.avgAccuracy}%`]),
-    [120, 100, 100, 100, 100]
+    ['Month', 'Applications', 'Selections', 'Attempts', 'Scored', 'Avg. accuracy'],
+    summary.monthly.map((m) => [m.label, m.applications, m.selections, m.testAttempts, m.scoredAttempts, m.avgAccuracy == null ? '—' : `${m.avgAccuracy}%`]),
+    [100, 90, 90, 85, 75, 75]
   );
 
   doc.addPage();
