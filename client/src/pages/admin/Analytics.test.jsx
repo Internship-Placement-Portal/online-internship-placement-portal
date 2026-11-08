@@ -114,4 +114,19 @@ describe('Placement analytics page', () => {
     expect(screen.getByLabelText('From')).toHaveValue('');
     expect(screen.getByRole('button', { name: 'Reset filters' })).toBeDisabled();
   });
+
+  it('lets an admin retry after analytics fails to load', async () => {
+    const user = userEvent.setup();
+    placementApi
+      .mockRejectedValueOnce({ request: {}, message: 'Network error' })
+      .mockResolvedValueOnce(analytics);
+
+    renderAnalytics();
+
+    expect(await screen.findByText('Cannot reach the server. Check your connection.')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Try again' }));
+
+    expect(await screen.findByText('2 scored · 3 total attempts')).toBeInTheDocument();
+    expect(placementApi).toHaveBeenCalledTimes(2);
+  });
 });
