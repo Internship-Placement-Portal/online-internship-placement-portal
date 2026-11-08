@@ -13,6 +13,7 @@ import {
   Video,
   RefreshCw,
   ExternalLink,
+  Search,
 } from 'lucide-react';
 
 import { studentDashboardApi } from '../../api/dashboard.js';
@@ -80,6 +81,39 @@ export default function StudentDashboard() {
           Practice tests
         </Link>
       </DashHero>
+
+      <section className="quick-actions" aria-label="Quick actions">
+        {[
+          {
+            to: '/student/internships',
+            title: 'Browse internships',
+            text: 'Explore fresh openings that match your interests.',
+            icon: Search,
+          },
+          {
+            to: '/student/applications',
+            title: 'Track applications',
+            text: 'Stay on top of offers, interviews and outcomes.',
+            icon: ClipboardCheck,
+          },
+          {
+            to: '/student/tests',
+            title: 'Practice tests',
+            text: 'Sharpen speed, accuracy and confidence before deadlines.',
+            icon: Timer,
+          },
+        ].map(({ to, title, text, icon: Icon }) => (
+          <Link key={title} to={to} className="quick-action-card lift">
+            <span className="quick-action-icon" aria-hidden="true">
+              <Icon size={18} />
+            </span>
+            <div>
+              <strong>{title}</strong>
+              <span>{text}</span>
+            </div>
+          </Link>
+        ))}
+      </section>
 
       {error && (
         <div style={{ marginTop: 16 }}>
