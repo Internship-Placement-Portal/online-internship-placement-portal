@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import Select from '../../components/Select.jsx';
-import { Download, FileSpreadsheet, FileText, Percent, Send, UserCheck, Users } from 'lucide-react';
+import { Download, FileSpreadsheet, FileText, Percent, RotateCcw, Send, UserCheck, Users } from 'lucide-react';
 import { downloadExport, placementApi } from '../../api/dashboard.js';
 import { errorInfo } from '../../api/http.js';
 import { BarChart, ChartCard, DonutChart, LineChart, StackedBars, chartColor } from '../../components/charts.jsx';
@@ -38,6 +38,13 @@ export default function Analytics() {
   const [exporting, setExporting] = useState('');
   const { data: d, loading, error } = useAsync(() => placementApi(filters), [JSON.stringify(filters)]);
   const set = (k) => (e) => setDraft((f) => ({ ...f, [k]: e.target.value }));
+  const canReset = Object.values(filters).some(Boolean) || Object.values(draft).some(Boolean);
+
+  function resetFilters() {
+    const empty = { from: '', to: '', company: '' };
+    setDraft(empty);
+    setFilters(empty);
+  }
 
   async function doExport(format) {
     setExporting(format);
@@ -97,6 +104,9 @@ export default function Analytics() {
         </div>
         <button type="submit" className="btn">
           Apply
+        </button>
+        <button type="button" className="btn btn-secondary" onClick={resetFilters} disabled={!canReset}>
+          <RotateCcw size={16} aria-hidden="true" /> Reset filters
         </button>
         <div className="btn-row">
           {PRESETS.map(([label, fn]) => (

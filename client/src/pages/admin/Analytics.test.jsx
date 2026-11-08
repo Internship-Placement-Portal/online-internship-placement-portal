@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import Analytics from './Analytics.jsx';
 import { placementApi } from '../../api/dashboard.js';
 import { ToastProvider } from '../../components/ui.jsx';
@@ -77,5 +78,36 @@ describe('Placement analytics page', () => {
     expect(within(trend).getByRole('cell', { name: '3' })).toBeInTheDocument();
     expect(within(trend).getByRole('cell', { name: '2' })).toBeInTheDocument();
     expect(within(trend).getByRole('cell', { name: '75%' })).toBeInTheDocument();
+  });
+
+  it('clears a pending date edit without applying it', async () => {
+    const user = userEvent.setup();
+    renderAnalytics();
+    await screen.findByText('2 scored · 3 total attempts');
+
+    await user.type(screen.getByLabelText('From'), '2026-01-01');
+    expect(screen.getByRole('button', { name: 'Reset filters' })).toBeEnabled();
+    expect(placementApi).toHaveBeenCalledTimes(1);
+
+    await user.click(screen.getByRole('button', { name: 'Reset filters' }));
+
+    expect(screen.getByLabelText('From')).toHaveValue('');
+    expect(placementApi).toHaveBeenCalledTimes(1);
+  });
+
+  it('resets applied filters and reloads the default analytics', async () => {
+    const user = userEvent.setup();
+    renderAnalytics();
+    await screen.findByText('2 scored · 3 total attempts');
+
+    await user.type(screen.getByLabelText('From'), '2026-01-01');
+    await user.click(screen.getByRole('button', { name: 'Apply' }));
+    await waitFor(() => expect(placementApi).toHaveBeenLastCalledWith({ from: '2026-01-01', to: '', company: '' }));
+
+    await user.click(screen.getByRole('button', { name: 'Reset filters' }));
+
+    await waitFor(() => expect(placementApi).toHaveBeenLastCalledWith({ from: '', to: '', company: '' }));
+    expect(screen.getByLabelText('From')).toHaveValue('');
+    expect(screen.getByRole('button', { name: 'Reset filters' })).toBeDisabled();
   });
 });
