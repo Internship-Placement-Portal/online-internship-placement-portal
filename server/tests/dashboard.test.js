@@ -120,7 +120,7 @@ describe('placement analytics (IPP-F-019, IPP-F-020)', () => {
     expect(res.body.kpis.applications).toBe(0);
     expect(res.body.kpis.placementRate).toBe(0);
     expect(res.body.monthly).toHaveLength(12);
-    expect(res.body.monthly.every((m) => m.applications === 0 && m.avgAccuracy === null)).toBe(true);
+    expect(res.body.monthly.every((m) => m.applications === 0 && m.testAttempts === 0 && m.scoredAttempts === 0 && m.avgAccuracy === null)).toBe(true);
     expect(res.body.companyWise).toEqual([]);
   });
 
@@ -144,40 +144,42 @@ describe('placement analytics (IPP-F-019, IPP-F-020)', () => {
     const test = await Test.create({ title: 'T', durationMinutes: 10, questionCount: 5 });
     const mk = (student, accuracy, at) => ({ student: student.user._id, test: test._id, attemptNo: 1, status: 'submitted', accuracy, score: accuracy, maxScore: 100, submittedAt: at, startedAt: at, answers: [], questions: [] });
     await TestAttempt.collection.insertMany([
-  mk(students[0], 40, monthsAgo(3)),
-  mk(students[1], 60, monthsAgo(3)),
-  mk(students[2], 90, monthsAgo(0)),
-
-  // Completed attempt without an accuracy score.
-  {
-    student: students[3].user._id,
-    test: test._id,
-    attemptNo: 4,
-    status: 'submitted',
-    score: 0,
-    maxScore: 100,
-    submittedAt: monthsAgo(3),
-    startedAt: monthsAgo(3),
-    answers: [],
-    questions: [],
-  },
-]);
+      mk(students[0], 40, monthsAgo(3)),
+      mk(students[1], 60, monthsAgo(3)),
+      mk(students[2], 90, monthsAgo(0)),
+      {
+        student: students[3].user._id,
+        test: test._id,
+        attemptNo: 4,
+        status: 'submitted',
+        score: 0,
+        maxScore: 100,
+        submittedAt: monthsAgo(3),
+        startedAt: monthsAgo(3),
+        answers: [],
+        questions: [],
+      },
+    ]);
     const res = await request(app).get('/api/dashboard/placement').set(admin.auth);
     const by = Object.fromEntries(res.body.monthly.map((m) => [m.month, m]));
-   expect(by[key(monthsAgo(3))]).toMatchObject({
-  testAttempts: 3,
-  avgAccuracy: 50,
-});
-
-expect(by[key(monthsAgo(0))]).toMatchObject({
-  testAttempts: 1,
-  avgAccuracy: 90,
-});
-
-expect(by[key(monthsAgo(1))].avgAccuracy).toBe(null);
-
-expect(res.body.kpis.testAttempts).toBe(4);
-expect(res.body.kpis.avgTestAccuracy).toBe(63.3);
+    expect(by[key(monthsAgo(3))]).toMatchObject({
+      testAttempts: 3,
+      scoredAttempts: 2,
+      avgAccuracy: 50,
+    });
+    expect(by[key(monthsAgo(0))]).toMatchObject({
+      testAttempts: 1,
+      scoredAttempts: 1,
+      avgAccuracy: 90,
+    });
+    expect(by[key(monthsAgo(1))]).toMatchObject({
+      testAttempts: 0,
+      scoredAttempts: 0,
+      avgAccuracy: null,
+    });
+    expect(res.body.kpis.testAttempts).toBe(4);
+    expect(res.body.kpis.scoredTestAttempts).toBe(3);
+    expect(res.body.kpis.avgTestAccuracy).toBe(63.3);
   });
 
   it('is admin only', async () => {
