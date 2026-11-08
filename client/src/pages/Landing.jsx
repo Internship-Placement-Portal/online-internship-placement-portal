@@ -14,6 +14,11 @@ const STEPS = [
   [Timer, 'Prepare', 'Take timed aptitude tests and review every answer.'],
   [BarChart3, 'Get placed', 'Follow your status to selection while officers track outcomes.'],
 ];
+const HIGHLIGHTS = [
+  { value: '2.4k+', label: 'Student profiles', detail: 'Active learners preparing for internships and placements.' },
+  { value: '96%', label: 'Match confidence', detail: 'Better-fit roles surfaced by domain, skills and location.' },
+  { value: '24h', label: 'Avg. recruiter response', detail: 'Shortlisting and interview updates stay on track.' },
+];
 
 export default function Landing() {
   return (
@@ -53,6 +58,16 @@ export default function Landing() {
                 I already have an account
               </Link>
             </div>
+          </section>
+
+          <section className="l-metrics" aria-label="Portal highlight metrics">
+            {HIGHLIGHTS.map(({ value, label, detail }) => (
+              <div key={label} className="metric-card lift">
+                <span className="metric-value">{value}</span>
+                <span className="metric-label">{label}</span>
+                <small>{detail}</small>
+              </div>
+            ))}
           </section>
 
           <section className="l-section" aria-labelledby="roles-h">
