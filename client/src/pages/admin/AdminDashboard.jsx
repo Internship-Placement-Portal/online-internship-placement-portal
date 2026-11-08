@@ -53,7 +53,7 @@ export default function AdminDashboard() {
             <StatCard icon={Percent} value={data.kpis.placementRate} suffix="%" decimals={1} label="Placement rate" to="/admin/analytics" />
             <StatCard icon={Send} value={data.kpis.applications} label="Applications" spark={data.monthly.map((m) => m.applications)} to="/admin/analytics" />
             <StatCard icon={UserCheck} value={data.kpis.selections} label="Selections" spark={data.monthly.map((m) => m.selections)} to="/admin/analytics" />
-            <StatCard icon={BarChart3} value={data.kpis.avgTestAccuracy} suffix="%" decimals={1} label="Avg. test accuracy" spark={data.monthly.map((m) => m.avgAccuracy || 0)} to="/admin/analytics" />
+            <StatCard icon={BarChart3} value={data.kpis.avgTestAccuracy} suffix="%" decimals={1} label="Avg. test accuracy" sub={`${data.kpis.scoredTestAttempts} scored / ${data.kpis.testAttempts} total attempts`} spark={data.monthly.map((m) => m.avgAccuracy || 0)} to="/admin/analytics" />
           </div>
         </>
       )}

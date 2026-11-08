@@ -32,24 +32,13 @@ async function placement(query = {}) {
     applications: appsByMonth.get(key) || 0,
     selections: selByMonth.get(key) || 0,
     testAttempts: testsByMonth.get(key)?.attempts || 0,
-
-   avgAccuracy:
-  (testsByMonth.get(key)?.scoredAttempts || 0) > 0
-    ? round1(testsByMonth.get(key).avgAccuracy)
-    : null,
+    scoredAttempts: testsByMonth.get(key)?.scoredAttempts || 0,
+    avgAccuracy: (testsByMonth.get(key)?.scoredAttempts || 0) > 0 ? round1(testsByMonth.get(key).avgAccuracy) : null,
   }));
 
-   const attempts = tests.reduce((s, t) => s + t.attempts, 0);
-
-   const scoredAttempts = tests.reduce(
-  (s, t) => s + t.scoredAttempts,
-  0
-   );
-
-   const weightedAccuracy = tests.reduce(
-    (s, t) => s + (t.avgAccuracy || 0) * t.scoredAttempts,
-    0
-  );
+  const attempts = tests.reduce((s, t) => s + t.attempts, 0);
+  const scoredAttempts = tests.reduce((s, t) => s + t.scoredAttempts, 0);
+  const weightedAccuracy = tests.reduce((s, t) => s + (t.avgAccuracy || 0) * t.scoredAttempts, 0);
   return {
     filters: {
       from: range.from.toISOString().slice(0, 10),
@@ -69,9 +58,8 @@ async function placement(query = {}) {
       activeListings: counts.activeListings,
       recruiters: counts.recruiters,
       testAttempts: attempts,
-      avgTestAccuracy: scoredAttempts
-     ? round1(weightedAccuracy / scoredAttempts)
-     : 0,
+      scoredTestAttempts: scoredAttempts,
+      avgTestAccuracy: scoredAttempts ? round1(weightedAccuracy / scoredAttempts) : 0,
     },
     statusBreakdown,
     companyWise: facets.company.map((c) => ({ company: c._id, applications: c.applications, shortlisted: c.shortlisted, selected: c.selected })),
