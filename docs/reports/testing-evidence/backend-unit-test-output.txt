@@ -1,4 +1,4 @@
-heemadhawala.r@HEEMADHAWALAs-MacBook-Air online-internship-placement-portal % cd server
+cd server
 npm test
 
 > ipp-server@1.0.0 test
@@ -394,4 +394,3 @@ Body with code 123456
 ℹ skipped 0
 ℹ todo 0
 ℹ duration_ms 80662.890417
-heemadhawala.r@HEEMADHAWALAs-MacBook-Air server % 
