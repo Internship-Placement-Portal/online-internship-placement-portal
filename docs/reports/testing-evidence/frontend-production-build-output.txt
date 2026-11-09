@@ -1,4 +1,4 @@
-cd client
+heemadhawala.r@HEEMADHAWALAs-MacBook-Air online-internship-placement-portal % cd client
 npm run build
 
 > ipp-client@1.0.0 build
@@ -12,3 +12,4 @@ dist/assets/index-w_IQw3HI.css   55.41 kB │ gzip:  11.33 kB
 dist/assets/index-BJK8C3uY.js   398.65 kB │ gzip: 119.99 kB
 
 ✓ built in 521ms
+heemadhawala.r@HEEMADHAWALAs-MacBook-Air client %
