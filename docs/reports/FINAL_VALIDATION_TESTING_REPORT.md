@@ -50,11 +50,11 @@ The validation behaviours above are included in the backend test execution:
 
 The source evidence is included in:
 
-`docs/testing-evidence/backend-unit-test-output.txt`
+`docs/reports/testing-evidence/backend-unit-test-output.txt`
 
 and
 
-`docs/testing-evidence/backend-coverage-test-output.txt`
+`docs/reports/testing-evidence/backend-coverage-test-output.txt`
 
 ## 5. Limitations
 
