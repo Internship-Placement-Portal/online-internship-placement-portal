@@ -43,7 +43,7 @@ The supplied output reaches the end of `coverage:core` and returns to the shell 
 
 The complete coverage-enabled terminal output, including the coverage summary and core coverage command, is stored at:
 
-`docs/testing-evidence/backend-coverage-test-output.txt`
+`docs/reports/testing-evidence/backend-coverage-test-output.txt`
 
 ## 7. Scope and limitations
 
