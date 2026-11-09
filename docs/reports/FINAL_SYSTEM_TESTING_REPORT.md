@@ -38,7 +38,7 @@ The captured Vite output reports:
 
 The exact terminal capture is stored at:
 
-`docs/testing-evidence/frontend-production-build-output.txt`
+`docs/reports/testing-evidence/frontend-production-build-output.txt`
 
 ## 5. Frontend automated test evidence
 
