@@ -1,0 +1,52 @@
+Frontend test execution — 9 November 2026
+Project: online-internship-placement-portal/client
+Command:
+  npm test
+
+Package script:
+  vitest run
+
+Runner:
+  Vitest v5.0.5
+
+Final summary:
+  Test Files  15 passed (15)
+       Tests  56 passed (56)
+  Duration    8.24s
+
+Observed passing test files:
+- src/context/AuthContext.test.jsx — 5 tests
+- src/features/ApplyPanel.test.jsx — 8 tests
+- src/pages/student/Tests.test.jsx — 3 tests
+- src/pages/student/ApplicationDetail.test.jsx — 3 tests
+- src/pages/student/Internships.test.jsx — 6 tests
+- src/pages/student/TestResult.test.jsx — 3 tests
+- src/pages/admin/Analytics.test.jsx — 4 tests
+- src/pages/student/TestRunner.test.jsx — 2 tests
+- src/components/ListingCard.test.jsx — 6 tests
+- src/components/RouteGuards.test.jsx — 6 tests
+- src/pages/admin/AdminDashboard.test.jsx — 2 tests
+- src/pages/recruiter/RecruiterDashboard.test.jsx — 2 tests
+- src/pages/student/StudentDashboard.test.jsx — 2 tests
+- src/pages/student/MyApplications.test.jsx — 3 tests
+- src/test/setup.test.jsx — 1 test
+
+Examples of behaviours covered in the displayed output:
+- AuthContext finishes loading when no session is available.
+- ApplyPanel rejects files that are not PDFs and submits a valid resume.
+- Internship page renders search UI, displays API results, accepts a keyword, and handles URL filters.
+- Student test page shows the correct action for available, in-progress and completed tests.
+- TestRunner records answers and submits the attempt for scoring.
+- TestResult displays scores and response review details.
+- ApplicationDetail displays progress/interview information and handles resume-access errors.
+- Admin analytics applies and clears filters.
+- Student, recruiter and admin dashboards render their respective data.
+
+Warnings/advisories observed:
+- React printed warnings that some Internships component state updates in tests were not wrapped in act(...). These are warnings, not reported test failures; all 56 tests passed. They indicate test code could be improved to wrap asynchronous/state-triggering updates with React Testing Library act()/waitFor patterns.
+- Vitest printed a jsdom environment performance advisory: jsdom was created 15 times (21.38s total), and suggested vmThreads or isolate:false as possible performance optimizations. This is an optimization advisory, not a test failure.
+
+Scope:
+- This is frontend automated component/unit-test evidence.
+- It is not frontend code-coverage evidence.
+- It is not proof of complete browser-based end-to-end testing or formal user acceptance testing.

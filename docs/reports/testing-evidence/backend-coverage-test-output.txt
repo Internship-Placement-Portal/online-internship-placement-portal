@@ -1,0 +1,476 @@
+)
+  ✔ rejects invalid backward transitions to Applied with 400 INVALID_TRANSITION (36.216333ms)
+  ✔ rejects demoting a Selected candidate back to Shortlisted with 400 INVALID_TRANSITION (50.793ms)
+✔ TC-App-02 | Application status transitions (IPP-F-011) (1239.375584ms)
+▶ TC-App-02 | Student dashboard status reflection (IPP-F-011)
+  ✔ dynamically reflects recruiter status changes on the student dashboard (43.688375ms)
+✔ TC-App-02 | Student dashboard status reflection (IPP-F-011) (43.8465ms)
+▶ TC-App-02 | Recruiter applicant filtering by status (IPP-F-011)
+  ✔ filters applicants by status query parameter (53.343375ms)
+✔ TC-App-02 | Recruiter applicant filtering by status (IPP-F-011) (53.49675ms)
+▶ TC-App-02 | Access control & audit trail (IPP-F-011)
+  ✔ prevents unauthorized recruiters from updating applicant status (25.22725ms)
+  ✔ records an audit log with actor, from, and to fields on every status update (28.571458ms)
+✔ TC-App-02 | Access control & audit trail (IPP-F-011) (53.991334ms)
+▶ apply with resume (IPP-F-010)
+  ✔ records an application linking student, listing and resume, and stores the file (74.108083ms)
+  ✔ removes the uploaded resume when a duplicate-key race occurs (21.457583ms)
+  ✔ removes the uploaded resume when application creation fails unexpectedly (18.363041ms)
+  ✔ tells the student on the listing page whether they already applied (37.382583ms)
+  ✔ blocks duplicate applications without storing a second file (29.809167ms)
+  ✔ rejects unavailable listings: unknown, unapproved, expired (25.80675ms)
+  ✔ is student only and requires authentication and a listingId (31.236916ms)
+✔ apply with resume (IPP-F-010) (1152.682916ms)
+▶ resume validation and scanning (IPP-SR-005)
+  ✔ rejects non-PDF extension, wrong mime type and a missing file (26.839958ms)
+  ✔ rejects files that are not really PDFs even if named .pdf (23.134625ms)
+  ✔ rejects files over 5 MB with 413 (21.688208ms)
+  ✔ accepts a file just under the limit (33.384083ms)
+  ✔ blocks PDFs with embedded JavaScript and stores nothing (16.7255ms)
+  ✔ runs registered scanner hooks and fails closed when a scanner errors (23.318667ms)
+  ✔ sanitises path tricks in the original file name (15.184ms)
+✔ resume validation and scanning (IPP-SR-005) (160.721833ms)
+▶ applications lists and resume access (IPP-F-010, IPP-F-011)
+  ✔ lets the student list their applications with listing info (22.834458ms)
+  ✔ lets the owning recruiter list and filter applicants; other recruiters get 403 (38.594667ms)
+  ✔ serves the PDF only to the applicant and the owning recruiter (52.8515ms)
+✔ applications lists and resume access (IPP-F-010, IPP-F-011) (114.556208ms)
+▶ status management + notifications (IPP-F-011, IPP-F-012)
+  ✔ persists the change, shows it to the student, audits it and notifies in-app and by email (53.482667ms)
+  ✔ validates status values, rejects no-op changes and enforces ownership (65.252459ms)
+  ✔ a failing email provider is retried and never breaks the status update (11.188542ms)
+  ✔ notifications: list, mark one read, mark all read, and never leak across users (91.983167ms)
+✔ status management + notifications (IPP-F-011, IPP-F-012) (222.26575ms)
+▶ interview scheduling (IPP-F-013)
+  ✔ only works for shortlisted candidates and is visible to the student (104.814625ms)
+  ✔ validates date, mode and link, supports in-person without a link, and allows rescheduling (142.346833ms)
+  ✔ is limited to the owning recruiter (54.330542ms)
+✔ interview scheduling (IPP-F-013) (301.808417ms)
+▶ authentication endpoint rate limiting (IPP-SR-004)
+  ✔ returns 429 when the login request threshold is exceeded (53.216333ms)
+✔ authentication endpoint rate limiting (IPP-SR-004) (54.2105ms)
+▶ GET /health
+  ✔ returns API and database health status (28.388208ms)
+✔ GET /health (932.312375ms)
+▶ registration + email OTP (IPP-F-001, IPP-F-003)
+  ✔ registers a student as pending_verification and stores only a bcrypt hash (462.084833ms)
+  ✔ uses a unique salt when hashing the same password for different users (2154.344958ms)
+  ✔ recruiters start with approvalStatus pending (435.405584ms)
+  ✔ rejects the admin role and invalid input with 400 (66.8525ms)
+  ✔ returns 409 for a duplicate email (448.408958ms)
+  ✔ blocks login until the OTP is verified, then allows it (1333.490167ms)
+  ✔ locks OTP guessing after too many wrong codes (476.010959ms)
+✔ registration + email OTP (IPP-F-001, IPP-F-003) (5377.313667ms)
+▶ login + JWT (IPP-F-002, IPP-SR-002)
+  ✔ returns { token, expiresIn, role } and a refresh cookie (873.080083ms)
+  ✔ issues a JWT with the expected subject, role, issuer, and expiry (866.908667ms)
+  ✔ rejects wrong password and unknown email with the same 401 (1289.079541ms)
+  ✔ GET /me requires a valid token (871.860375ms)
+  ✔ is not fooled by NoSQL operator payloads (435.601334ms)
+✔ login + JWT (IPP-F-002, IPP-SR-002) (4336.899125ms)
+▶ account lockout (IPP-F-004)
+  ✔ locks after 5 failures: 6th attempt gets 423 even with the right password, and an audit entry exists (2822.100292ms)
+  ✔ unlocks once the lock window has passed and resets the counter (3042.319208ms)
+  ✔ a successful login resets the failure counter (4287.831125ms)
+✔ account lockout (IPP-F-004) (10152.544166ms)
+▶ refresh + logout (IPP-SR-002)
+  ✔ rotates the refresh token and rejects reuse of the old one (889.489625ms)
+  ✔ logout revokes the refresh token (1548.115083ms)
+  ✔ refresh without a cookie is 401 (7.429666ms)
+✔ refresh + logout (IPP-SR-002) (2445.356833ms)
+▶ RBAC (IPP-F-023, IPP-SR-006)
+  ✔ allows the matching role and returns 403 + audit entry otherwise (984.420875ms)
+  ✔ admin and recruiter only reach their own routes; anonymous gets 401 (920.524208ms)
+  ✔ a deactivated user is cut off immediately (869.551ms)
+✔ RBAC (IPP-F-023, IPP-SR-006) (2774.7995ms)
+▶ rate limiting (IPP-SR-004)
+  ✔ returns 429 once the threshold is exceeded (10.746ms)
+✔ rate limiting (IPP-SR-004) (10.918625ms)
+▶ error handling
+  ✔ unknown route returns the JSON envelope; malformed JSON returns 400 (7.941083ms)
+✔ error handling (8.079167ms)
+▶ date range helper
+  ✔ defaults to the last 12 calendar months and lists every month (9.939416ms)
+  ✔ rejects reversed, malformed and over-long ranges (3.394708ms)
+✔ date range helper (1391.252584ms)
+▶ placement analytics (IPP-F-019, IPP-F-020)
+  ✔ computes KPIs, status breakdown and company-wise figures that reconcile with raw data (106.331709ms)
+  ✔ returns exactly 12 months, zero-filled where there is no data, and never throws on gaps (45.07875ms)
+  ✔ handles an empty platform: zeros, 12 months, no errors (14.268334ms)
+  ✔ supports date-range and company filters (56.855917ms)
+  ✔ includes monthly test performance trends with null accuracy for months without attempts (44.294541ms)
+  ✔ counts only finished attempts submitted within the selected date range (96.353708ms)
+  ✔ is admin only (37.213958ms)
+✔ placement analytics (IPP-F-019, IPP-F-020) (401.071792ms)
+▶ export (IPP-F-021)
+  ✔ CSV contains every filtered record with the correct headers and is audit-logged (64.195125ms)
+  ✔ neutralises spreadsheet formula injection and escapes quotes/commas (3.726208ms)
+  ✔ PDF export returns a real PDF and rejects bad formats (83.272583ms)
+  ✔ exports an empty selection without failing (35.188708ms)
+✔ export (IPP-F-021) (186.7855ms)
+▶ student dashboard (IPP-F-018)
+  ✔ summarises applications, interviews and test scores that match the underlying records (44.442375ms)
+  ✔ only ever shows the signed-in student their own data, and handles a brand-new account (36.892667ms)
+  ✔ is student only (17.771875ms)
+✔ student dashboard (IPP-F-018) (99.374ms)
+▶ audit log viewer (IPP-F-024)
+  ✔ lists entries newest first with actor, filters by action/actor/date and paginates (45.582459ms)
+  ✔ is admin only (24.015166ms)
+✔ audit log viewer (IPP-F-024) (69.800708ms)
+▶ HTTPS enforcement (IPP-SR-001, IPP-NF-003)
+  ✔ redirects plain-HTTP GETs to HTTPS and refuses plain-HTTP writes (37.423833ms)
+  ✔ serves requests that arrived over TLS (via the proxy header) and sends HSTS (5.494375ms)
+  ✔ keeps /health reachable over HTTP for load-balancer probes (1.988291ms)
+✔ HTTPS enforcement (IPP-SR-001, IPP-NF-003) (45.978417ms)
+▶ TLS 1.2+ only when Node terminates TLS (IPP-SR-001)
+  ✔ completes a TLS 1.2+ handshake and serves the API over HTTPS (18.109ms)
+  ✔ rejects clients that only offer TLS 1.1 or lower (2.333875ms)
+  ✔ is configured with a TLS 1.2 floor (0.218ms)
+  ✔ does not allow the Node TLS server minimum to be lowered below TLS 1.2 (0.229ms)
+✔ TLS 1.2+ only when Node terminates TLS (IPP-SR-001) (161.208667ms)
+▶ listing CRUD + ownership (IPP-F-006)
+  ✔ lets an approved recruiter create a draft, then publish it for approval (68.146459ms)
+  ✔ creates directly as pending_approval with publish=true (12.094083ms)
+  ✔ does not allow recruiters to set listing status directly (15.550625ms)
+  ✔ blocks recruiters who are not approved (8.540083ms)
+  ✔ blocks an unapproved recruiter from publishing an existing draft (16.881709ms)
+  ✔ rejects each missing required listing field (28.813458ms)
+  ✔ validates input: missing fields, invalid deadlines, bad domain, negative stipend (26.432958ms)
+  ✔ only the owner can edit; others get 403 and unknown ids 404 (26.675791ms)
+  ✔ editing an approved listing sends it back for re-approval (10.774458ms)
+  ✔ closed listings cannot be edited (14.225458ms)
+  ✔ GET /listings/mine returns only the recruiter own listings, filterable by status (35.102083ms)
+  ✔ students and anonymous users cannot create or list "mine" (12.528125ms)
+✔ listing CRUD + ownership (IPP-F-006) (1294.738334ms)
+▶ search, filter, pagination (IPP-F-007)
+  ✔ lists approved listings only (drafts, pending, rejected and closed are hidden) (17.085417ms)
+  ✔ filters by domain, location, stipend range and duration (26.365167ms)
+  ✔ combines multiple filters into one search (13.958ms)
+  ✔ rejects minimum stipend or duration greater than the maximum (14.694209ms)
+  ✔ full-text search matches title and skills (17.928584ms)
+  ✔ paginates and sorts (19.691667ms)
+  ✔ treats regex characters in location literally and rejects operator injection (16.863667ms)
+  ✔ only students can search; recruiters/admins are forbidden and anonymous is 401 (15.854792ms)
+  ✔ treats empty filter values as "no filter" instead of rejecting them (30.350792ms)
+  ✔ exposes the domain list (13.106916ms)
+✔ search, filter, pagination (IPP-F-007) (186.424666ms)
+▶ listing details (IPP-F-008)
+  ✔ returns every field plus the company profile (21.503833ms)
+  ✔ gives students a 404 for unknown, malformed, unapproved and expired listings (24.319375ms)
+  ✔ lets the owner see their draft but not another recruiter (24.418958ms)
+✔ listing details (IPP-F-008) (70.47475ms)
+▶ expired listings are hidden (IPP-F-009)
+  ✔ drops listings from search the moment the deadline passes, and the job closes them (17.178291ms)
+✔ expired listings are hidden (IPP-F-009) (17.326834ms)
+
+--- DEV MAIL ---
+To: student@example.com
+Subject: Hello
+Body with code 123456
+----------------
+
+▶ mailer transports (SRS 3.3, 3.4)
+  ✔ smtp: hands the message to the SMTP transporter with the configured sender (1.252625ms)
+
+--- DEV MAIL ---
+To: student@example.com
+Subject: Hello
+Body with code 123456
+----------------
+
+  ✔ smtp: retries transient failures with backoff and eventually delivers (5.73ms)
+  ✔ smtp: in development a failing provider falls back to printing the mail to the console (0.544292ms)
+  ✔ console fallback prints the mail; memory transport stores it (0.166084ms)
+  ✔ with no transport configured nothing is sent and nothing throws (0.162375ms)
+✔ mailer transports (SRS 3.3, 3.4) (8.921417ms)
+▶ TC-Test-02 | Automatic MCQ evaluation and answer key reconciliation (IPP-F-015)
+  ✔ evaluates a 100% correct submission against the known answer key and displays exact scores (105.147083ms)
+  ✔ evaluates partial submissions with correct, incorrect, and omitted answers accurately (36.777334ms)
+  ✔ guarantees idempotency on repeated submit calls and blocks unauthorized access (47.848333ms)
+  ✔ computes category-level accuracy breakdown and time spent metrics (48.605625ms)
+  ✔ rejects answers targeting foreign questions outside the active attempt (22.735458ms)
+✔ TC-Test-02 | Automatic MCQ evaluation and answer key reconciliation (IPP-F-015) (1226.452792ms)
+▶ password reset (IPP-F-005)
+  ✔ answers identically for known and unknown emails, and only mails the real one (498.63675ms)
+  ✔ lets the user choose a new password with the emailed link, then the old one stops working (1729.934542ms)
+  ✔ is single use (888.820125ms)
+  ✔ expires after 30 minutes (447.068375ms)
+  ✔ stores only a hash of the token, with a 30 minute expiry (440.92825ms)
+  ✔ rejects garbage tokens and weak passwords (465.993916ms)
+  ✔ revokes existing sessions and clears an account lockout (3858.458708ms)
+✔ password reset (IPP-F-005) (9327.370042ms)
+▶ TC-Auth-03 | Password hashing & salt uniqueness (IPP-F-003)
+  ✔ stores passwords as valid bcrypt hashes and never as plaintext (1321.819959ms)
+  ✔ generates unique salts per user even when identical passwords are used (859.608167ms)
+✔ TC-Auth-03 | Password hashing & salt uniqueness (IPP-F-003) (3000.682459ms)
+▶ TC-Auth-03 | API response credential hygiene (IPP-F-003)
+  ✔ never returns password or passwordHash in registration, login, or profile responses (892.88075ms)
+✔ TC-Auth-03 | API response credential hygiene (IPP-F-003) (893.076125ms)
+▶ admin question bank (IPP-F-014)
+  ✔ creates, lists, updates and deletes questions with audit entries (82.005959ms)
+  ✔ validates MCQ shape: options, key range, distinct options; coding questions carry no options (26.51725ms)
+  ✔ keeps code characters in question text intact (10.654541ms)
+  ✔ cannot change the type, and questions used by attempts are archived not deleted (39.448625ms)
+  ✔ filters by type, difficulty and search text, paginates and lists categories (31.040458ms)
+  ✔ manages tests: create, update, list, with validation (21.141709ms)
+  ✔ is admin only (24.926916ms)
+  ✔ students never see the answer key in any student endpoint (21.395625ms)
+✔ admin question bank (IPP-F-014) (1109.171625ms)
+▶ RBAC matrix covers every endpoint (IPP-SR-006)
+  ✔ every registered route has a declared access rule, and no rule is stale (1.216875ms)
+  ✔ the temporary /api/rbac probe routes are gone (0.08975ms)
+✔ RBAC matrix covers every endpoint (IPP-SR-006) (976.922958ms)
+▶ RBAC matrix: enforcement per endpoint (IPP-F-023)
+  ✔ rejects anonymous callers with 401 on all 48 protected endpoints (93.33375ms)
+  ✔ rejects every role outside the allowed set with 403 on every protected endpoint (203.158583ms)
+  ✔ lets every allowed role through the gate (any status other than 401/403) (188.611459ms)
+  ✔ rejects malformed, expired-looking and tampered bearer tokens on a protected endpoint (5.311125ms)
+✔ RBAC matrix: enforcement per endpoint (IPP-F-023) (490.682417ms)
+▶ TC-Admin-02 | Anonymous callers (IPP-F-023)
+  ✔ returns 401 on a protected endpoint when no token is supplied (30.234125ms)
+✔ TC-Admin-02 | Anonymous callers (IPP-F-023) (923.799792ms)
+▶ TC-Admin-02 | Wrong-role callers (IPP-F-023)
+  ✔ returns 403 FORBIDDEN when a student calls an admin-only route (25.903833ms)
+  ✔ returns 403 FORBIDDEN when an admin calls a student-only route (10.5325ms)
+  ✔ writes an audit entry that includes requiredRoles in metadata (10.696917ms)
+  ✔ records the actual role of the denied user in audit metadata (10.1835ms)
+✔ TC-Admin-02 | Wrong-role callers (IPP-F-023) (57.631ms)
+▶ TC-Admin-02 | Invalid role in token (IPP-F-023)
+  ✔ calls next with 400 INVALID_ROLE when req.user has an unrecognised role (2.773208ms)
+✔ TC-Admin-02 | Invalid role in token (IPP-F-023) (2.881375ms)
+▶ TC-Admin-02 | Unapproved recruiter (IPP-F-023)
+  ✔ returns 403 RECRUITER_NOT_APPROVED when recruiter is pending (9.680458ms)
+  ✔ allows an approved recruiter through the gate on recruiter-only routes (11.261375ms)
+✔ TC-Admin-02 | Unapproved recruiter (IPP-F-023) (21.119209ms)
+▶ TC-Admin-02 | Audit-DB failure resilience (IPP-F-023)
+  ✔ still returns 403 (not 500) when the audit service throws (8.49775ms)
+✔ TC-Admin-02 | Audit-DB failure resilience (IPP-F-023) (8.6325ms)
+▶ TC-Sec-06 | File format and MIME validation (IPP-SR-005)
+  ✔ accepts a valid PDF resume within 5 MB and stores exactly one file on disk (76.961958ms)
+  ✔ rejects non-PDF extensions (.docx, .png, .exe) with 400 INVALID_FILE (23.515792ms)
+  ✔ rejects spoofed MIME types claiming to be PDF (14.871ms)
+  ✔ rejects files without a valid %PDF- magic byte header (14.796125ms)
+  ✔ rejects truncated PDFs missing the %%EOF footer (14.815417ms)
+  ✔ rejects empty or undersized (<16 bytes) files (14.445166ms)
+✔ TC-Sec-06 | File format and MIME validation (IPP-SR-005) (1012.323292ms)
+▶ TC-Sec-06 | 5 MB file size limit enforcement (IPP-SR-005)
+  ✔ rejects files exceeding 5 MB with 413 FILE_TOO_LARGE (22.449167ms)
+  ✔ accepts files within the 5 MB limit (30.986541ms)
+✔ TC-Sec-06 | 5 MB file size limit enforcement (IPP-SR-005) (53.650167ms)
+▶ TC-Sec-06 | Active-content heuristic scanner & audit logging (IPP-SR-005)
+  ✔ blocks PDFs containing /JavaScript and records a MALICIOUS_UPLOAD_BLOCKED audit entry (22.729375ms)
+  ✔ blocks PDFs containing /Launch exploit actions (13.93025ms)
+  ✔ blocks PDFs containing /OpenAction automated execution triggers (13.599959ms)
+  ✔ blocks PDFs containing /SubmitForm data exfiltration hooks (14.554125ms)
+  ✔ blocks PDFs containing /EmbeddedFile attachments (14.146375ms)
+✔ TC-Sec-06 | Active-content heuristic scanner & audit logging (IPP-SR-005) (79.254208ms)
+▶ TC-App-01 | Storage cleanliness on rejected uploads (IPP-SR-005)
+  ✔ does not store any secondary file when duplicate application is rejected (19.393958ms)
+✔ TC-App-01 | Storage cleanliness on rejected uploads (IPP-SR-005) (19.507583ms)
+▶ upload scanners (IPP-SR-005)
+  ✔ heuristic scanner flags active content and passes plain PDFs (0.888667ms)
+  ✔ clamd scanner reports clean files (11.895791ms)
+  ✔ clamd scanner reports infected files (4.083833ms)
+  ✔ clamd scanner rejects (fails closed upstream) when the daemon is unreachable (1.913167ms)
+✔ upload scanners (IPP-SR-005) (19.94125ms)
+▶ httpScorer
+  ✔ posts answers + key to the service and returns its result (54.479333ms)
+  ✔ falls back to the Node scorer when the service is down or errors (14.577125ms)
+  ✔ maps a 422 from the service to UNKNOWN_QUESTION (5.156667ms)
+✔ httpScorer (698.329292ms)
+▶ TC-List-02 | Single criterion filtering (IPP-F-007)
+  ✔ filters listings strictly by domain (69.094042ms)
+  ✔ filters listings case-insensitively by location substring (20.23375ms)
+  ✔ filters listings by stipend boundaries (minStipend and maxStipend) (16.185083ms)
+  ✔ filters listings by duration boundaries (minDuration and maxDuration) (15.027292ms)
+✔ TC-List-02 | Single criterion filtering (IPP-F-007) (1149.267875ms)
+▶ TC-List-02 | Multi-filter combinations (IPP-F-007)
+  ✔ combines domain, location, stipend range, and duration in a single search (14.778959ms)
+  ✔ returns empty results when multi-filter criteria have no overlap (15.933042ms)
+✔ TC-List-02 | Multi-filter combinations (IPP-F-007) (30.90525ms)
+▶ TC-List-02 | Sorting and range validation (IPP-F-007)
+  ✔ sorts listings by stipend in descending order (16.080125ms)
+  ✔ rejects minStipend > maxStipend with 400 (10.628375ms)
+  ✔ rejects minDuration > maxDuration with 400 (9.533084ms)
+  ✔ blocks recruiters and unauthenticated users from searching listings (14.113125ms)
+✔ TC-List-02 | Sorting and range validation (IPP-F-007) (50.670541ms)
+▶ resume storage encryption (IPP-NF-003)
+  ✔ encrypts a resume on disk and returns the original bytes when opened (8.565792ms)
+  ✔ rejects a tampered encrypted resume (3.095459ms)
+  ✔ rejects an encrypted file whose format marker has been altered (2.373666ms)
+  ✔ continues to read an existing plaintext resume (1.82225ms)
+✔ resume storage encryption (IPP-NF-003) (17.677292ms)
+▶ test engine: start, randomisation, timer (IPP-F-014)
+  ✔ starts an attempt with the configured question count, duration and no answer key (86.144833ms)
+  ✔ randomises question selection/order across attempts (113.391083ms)
+  ✔ draws only from the configured categories and active questions (30.208208ms)
+  ✔ resumes the same attempt when started twice (no second attempt) (39.891834ms)
+  ✔ 404s for inactive/unknown tests, 409 when the bank is empty, and is student only (31.241333ms)
+  ✔ lists tests with the student state (27.470208ms)
+✔ test engine: start, randomisation, timer (IPP-F-014) (1323.357958ms)
+▶ auto-save (IPP-F-014)
+  ✔ persists answers incrementally and returns them when the attempt is reopened (53.314542ms)
+  ✔ rejects answers for questions outside the attempt, bad indexes, and other students (38.664666ms)
+  ✔ rejects MCQ indexes outside the actual option count (32.895ms)
+  ✔ rejects answer fields that do not match the question type (26.968542ms)
+  ✔ allows unanswered questions to save time spent (27.767125ms)
+✔ auto-save (IPP-F-014) (179.967292ms)
+▶ MCQ auto-scoring (IPP-F-015)
+  ✔ scores to the known answer key and returns the result immediately (34.083375ms)
+  ✔ rejects duplicate question IDs in a single submission (21.778167ms)
+  ✔ computes category-wise analytics and time per question (IPP-F-017) (44.596792ms)
+  ✔ is idempotent: resubmitting returns the stored result and cannot change it (36.583458ms)
+  ✔ result is hidden while in progress and only visible to the owner (41.349166ms)
+  ✔ coding answers are recorded but not auto-scored (22.663167ms)
+✔ MCQ auto-scoring (IPP-F-015) (201.443875ms)
+▶ timer and auto-submit (IPP-F-014)
+  ✔ auto-submits when the timer has reached zero and rejects late saves (29.694459ms)
+  ✔ the scheduled job submits expired attempts nobody touched (28.663583ms)
+  ✔ a submit after the grace period ignores the late answers (25.855333ms)
+  ✔ GET on an expired attempt settles it and reports the finished status (26.122125ms)
+✔ timer and auto-submit (IPP-F-014) (110.625167ms)
+▶ reattempt block + admin override (IPP-F-016)
+  ✔ blocks a completed test with a clear message (32.026042ms)
+  ✔ admin override creates a NEW attempt record that the student can run once (52.859083ms)
+  ✔ refuses invalid overrides and non-admins (64.570709ms)
+✔ reattempt block + admin override (IPP-F-016) (149.830875ms)
+▶ analytics per student and per test (IPP-F-017)
+  ✔ admin can query attempts and aggregates per test and per student (91.614042ms)
+✔ analytics per student and per test (IPP-F-017) (91.770708ms)
+▶ scoring service layer (swap point)
+  ✔ testService scores through scoringService, so a replacement implementation takes over (29.213167ms)
+  ✔ rejects unknown question ids with 422 as in the SAD contract (4.319583ms)
+  ✔ exposes autoSubmitExpired for operations (2.987917ms)
+✔ scoring service layer (swap point) (36.844333ms)
+▶ upload rate limiting (IPP-SR-004)
+  ✔ returns 429 once the upload threshold is exceeded (74.286583ms)
+✔ upload rate limiting (IPP-SR-004) (924.80725ms)
+▶ Monthly uptime calculation (IPP-NF-002)
+  ✔ calculates uptime and excludes scheduled maintenance (16.788125ms)
+  ✔ does not double-count overlapping downtime intervals (3.327458ms)
+  ✔ rejects a future month (0.96925ms)
+  ✔ counts an ongoing outage only up to the report month end (2.38825ms)
+  ✔ reports when monthly uptime falls below 99.5% (2.228792ms)
+✔ Monthly uptime calculation (IPP-NF-002) (760.554291ms)
+▶ Uptime monitoring service (IPP-NF-002)
+  ✔ detects database unavailability (8.63675ms)
+  ✔ records downtime after database recovery (11.141917ms)
+✔ Uptime monitoring service (IPP-NF-002) (635.651333ms)
+ℹ tests 236
+ℹ suites 66
+ℹ pass 236
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 83607.107416
+
+=============================== Coverage summary ===============================
+Statements   : 96.22% ( 4082/4242 )
+Branches     : 90.32% ( 1083/1199 )
+Functions    : 95.93% ( 236/246 )
+Lines        : 96.22% ( 4082/4242 )
+================================================================================
+-|---------|----------|---------|---------|-------------------
+ | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+-|---------|----------|---------|---------|-------------------
+ |   96.22 |    90.32 |   95.93 |   96.22 |                   
+  |   83.87 |      100 |     100 |   83.87 |                   
+   |   83.87 |      100 |     100 |   83.87 | 45-54             
+  |   63.41 |    33.33 |      50 |   63.41 |                   
+   |       0 |        0 |       0 |       0 | 1-35              
+   |   88.63 |    34.48 |     100 |   88.63 | ...17,82-83,85-86 
+  |   99.54 |      100 |     100 |   99.54 |                   
+   |     100 |      100 |     100 |     100 |                   
+   |     100 |      100 |     100 |     100 |                   
+   |   98.38 |      100 |     100 |   98.38 | 30                
+   |     100 |      100 |     100 |     100 |                   
+   |     100 |      100 |     100 |     100 |                   
+   |     100 |      100 |     100 |     100 |                   
+   |     100 |      100 |     100 |     100 |                   
+   |     100 |      100 |     100 |     100 |                   
+  |    64.7 |    71.42 |      50 |    64.7 |                   
+   |      64 |       75 |      50 |      64 | 13-15,18-23       
+   |   65.38 |    66.66 |      50 |   65.38 | 14-16,19-24       
+  |   99.55 |    91.76 |     100 |   99.55 |                   
+   |     100 |     90.9 |     100 |     100 | 16                
+   |   96.77 |    64.28 |     100 |   96.77 | 16                
+   |     100 |      100 |     100 |     100 |                   
+   |     100 |      100 |     100 |     100 |                   
+   |     100 |    94.11 |     100 |     100 | 17                
+   |     100 |      100 |     100 |     100 |                   
+   |     100 |      100 |     100 |     100 |                   
+   |     100 |      100 |     100 |     100 |                   
+  |     100 |    93.33 |     100 |     100 |                   
+   |     100 |      100 |     100 |     100 |                   
+   |     100 |      100 |     100 |     100 |                   
+   |     100 |      100 |     100 |     100 |                   
+   |     100 |      100 |     100 |     100 |                   
+   |     100 |      100 |     100 |     100 |                   
+   |     100 |      100 |     100 |     100 |                   
+   |     100 |      100 |     100 |     100 |                   
+   |     100 |      100 |     100 |     100 |                   
+   |     100 |      100 |     100 |     100 |                   
+   |     100 |       80 |     100 |     100 | 25                
+  |     100 |    92.19 |    93.5 |     100 |                   
+   |     100 |      100 |      90 |     100 |                   
+   |     100 |      100 |     100 |     100 |                   
+   |     100 |       72 |   92.85 |     100 | 76,83-87,90       
+   |     100 |    88.88 |      75 |     100 | 13                
+   |     100 |    94.87 |     100 |     100 | 53,70             
+   |     100 |      100 |     100 |     100 |                   
+   |     100 |    93.75 |   88.88 |     100 | 23                
+   |     100 |      100 |     100 |     100 |                   
+   |     100 |      100 |     100 |     100 |                   
+   |     100 |      100 |      90 |     100 |                   
+  |     100 |      100 |     100 |     100 |                   
+   |     100 |      100 |     100 |     100 |                   
+   |     100 |      100 |     100 |     100 |                   
+   |     100 |      100 |     100 |     100 |                   
+   |     100 |      100 |     100 |     100 |                   
+   |     100 |      100 |     100 |     100 |                   
+   |     100 |      100 |     100 |     100 |                   
+   |     100 |      100 |     100 |     100 |                   
+   |     100 |      100 |     100 |     100 |                   
+   |     100 |      100 |     100 |     100 |                   
+  |   95.99 |    90.85 |   98.37 |   95.99 |                   
+   |     100 |    91.89 |     100 |     100 | 67,85,93          
+   |     100 |    95.58 |     100 |     100 | 41,97,120         
+   |     100 |    96.25 |     100 |     100 | 11,56,113         
+   |   94.44 |     62.5 |     100 |   94.44 | 10-11             
+   |   96.36 |    85.96 |    92.3 |   96.36 | 52-54,85-89       
+   |     100 |     90.9 |     100 |     100 | 37,58,63,79       
+   |   96.63 |    96.61 |     100 |   96.63 | 31-32,71-72       
+   |      84 |     90.9 |     100 |      84 | 15-26             
+   |     100 |    88.88 |     100 |     100 | 13                
+   |   93.67 |    84.21 |     100 |   93.67 | 29-30,58-60       
+   |   98.73 |     90.9 |     100 |   98.73 | 42                
+   |     100 |    84.44 |     100 |     100 | 62,96,100,109-125 
+   |   95.87 |       75 |     100 |   95.87 | 22-23,66-67       
+   |      98 |    93.19 |     100 |      98 | 162-163,180-186   
+   |   93.81 |    82.35 |     100 |   93.81 | 14-15,73-76       
+   |      69 |    66.66 |      75 |      69 | ...68,74-86,90-92 
+   |     100 |      100 |     100 |     100 |                   
+  |    98.1 |     83.6 |     100 |    98.1 |                   
+   |     100 |      100 |     100 |     100 |                   
+   |     100 |      100 |     100 |     100 |                   
+   |   96.42 |       60 |     100 |   96.42 | 25                
+   |     100 |    93.33 |     100 |     100 | 12                
+   |    91.3 |    33.33 |     100 |    91.3 | 16-17             
+   |     100 |      100 |     100 |     100 |                   
+   |     100 |       80 |     100 |     100 | 8,11,19-20        
+   |     100 |    85.71 |     100 |     100 | 7                 
+  |     100 |      100 |     100 |     100 |                   
+   |     100 |      100 |     100 |     100 |                   
+   |     100 |      100 |     100 |     100 |                   
+   |     100 |      100 |     100 |     100 |                   
+   |     100 |      100 |     100 |     100 |                   
+   |     100 |      100 |     100 |     100 |                   
+   |     100 |      100 |     100 |     100 |                   
+   |     100 |      100 |     100 |     100 |                   
+-|---------|----------|---------|---------|-------------------
+
+> ipp-server@1.0.0 coverage:core
+> c8 check-coverage --lines 40 --functions 40 --branches 40 --include "src/**/auth*.js" --include "src/**/application*.js" --include "src/**/notification*.js" --include "src/**/test*.js" --include "src/**/attempt*.js" --include "src/**/scoring*.js" --include "src/**/question*.js" --include "src/**/storage*.js" --include "src/**/scan*.js" --include "src/**/resumeValidation.js"
+
+heemadhawala.r@HEEMADHAWALAs-MacBook-Air server % 
