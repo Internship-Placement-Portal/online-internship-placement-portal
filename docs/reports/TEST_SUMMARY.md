@@ -2,7 +2,7 @@
 
 **Project:** Online Internship & Placement Preparation Portal (IPP)  
 **Latest execution evidence:** 9 November 2026  
-**Evidence location:** `docs/testing-evidence/`
+**Evidence location:** `docs/reports/testing-evidence/`
 
 ## Latest recorded results
 
