@@ -56,7 +56,7 @@ The run printed React `act(...)` warnings for state updates in the Internships p
 
 The captured terminal summary is stored at:
 
-`docs/testing-evidence/frontend-unit-test-output.txt`
+`docs/reports/testing-evidence/frontend-unit-test-output.txt`
 
 ## 6. Backend integration evidence
 
@@ -64,8 +64,8 @@ The backend test output includes API-level scenarios for authentication, role pe
 
 The complete captured logs are stored at:
 
-- `docs/testing-evidence/backend-unit-test-output.txt`
-- `docs/testing-evidence/backend-coverage-test-output.txt`
+- `docs/reports/testing-evidence/backend-unit-test-output.txt`
+- `docs/reports/testing-evidence/backend-coverage-test-output.txt`
 
 ## 7. System testing status and boundaries
 
