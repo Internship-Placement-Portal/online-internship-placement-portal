@@ -473,3 +473,4 @@ Lines        : 96.22% ( 4082/4242 )
 > ipp-server@1.0.0 coverage:core
 > c8 check-coverage --lines 40 --functions 40 --branches 40 --include "src/**/auth*.js" --include "src/**/application*.js" --include "src/**/notification*.js" --include "src/**/test*.js" --include "src/**/attempt*.js" --include "src/**/scoring*.js" --include "src/**/question*.js" --include "src/**/storage*.js" --include "src/**/scan*.js" --include "src/**/resumeValidation.js"
 
+heemadhawala.r@HEEMADHAWALAs-MacBook-Air server % 
