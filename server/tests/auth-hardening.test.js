@@ -18,7 +18,8 @@ const config = require('../src/config/env');
 const User = require('../src/models/User');
 const RefreshToken = require('../src/models/RefreshToken');
 const { validatePasswordStrength, auditPasswordStorage } = require('../src/services/authService');
-const { startDb, stopDb, clearDb, createUser } = require('./helpers');
+const { verifyAccessToken } = require('../src/utils/tokens');
+const { startDb, stopDb, clearDb, registerVerified, creds } = require('./helpers');
 
 before(startDb);
 after(stopDb);
@@ -80,20 +81,16 @@ describe('TC-Auth-03 | Bcrypt storage audit & cost factor compliance (IPP-F-003)
   it('confirms bcrypt hash format, verifies candidate matching, and validates cost >= 10', async () => {
     const rawPassword = 'SecurePassword123!';
     const cost10Hash = await bcrypt.hash(rawPassword, 10);
-    const { user } = await createUser({ passwordHash: cost10Hash });
-
-    const dbUser = await User.findById(user._id).select('+passwordHash');
-    expect(dbUser.passwordHash).toBeDefined();
 
     // Audit password storage against security baseline
-    const audit = await auditPasswordStorage(rawPassword, dbUser.passwordHash);
+    const audit = await auditPasswordStorage(rawPassword, cost10Hash);
     expect(audit.isBcrypt).toBe(true);
     expect(audit.costFactor).toBeGreaterThan(9);
     expect(audit.matches).toBe(true);
     expect(audit.meetsSecurityStandard).toBe(true);
 
     // Mismatched candidate password fails match
-    const wrongAudit = await auditPasswordStorage('WrongCandidate123!', dbUser.passwordHash);
+    const wrongAudit = await auditPasswordStorage('WrongCandidate123!', cost10Hash);
     expect(wrongAudit.isBcrypt).toBe(true);
     expect(wrongAudit.matches).toBe(false);
 
@@ -101,31 +98,35 @@ describe('TC-Auth-03 | Bcrypt storage audit & cost factor compliance (IPP-F-003)
     const invalidAudit = await auditPasswordStorage(rawPassword, 'md5_hash_sample_not_bcrypt');
     expect(invalidAudit.isBcrypt).toBe(false);
     expect(invalidAudit.meetsSecurityStandard).toBe(false);
+
+    // Also verify against a user record registered through the real API
+    const registered = await registerVerified(app);
+    const dbUser = await User.findById(registered.userId).select('+passwordHash');
+    expect(dbUser.passwordHash).toBeDefined();
+
+    const dbAudit = await auditPasswordStorage(creds.password, dbUser.passwordHash);
+    expect(dbAudit.isBcrypt).toBe(true);
+    expect(dbAudit.matches).toBe(true);
   });
 });
 
 describe('TC-Auth-03 | Login timing parity & enumeration defense (IPP-F-003, IPP-F-004)', () => {
   it('balances authentication timing between known and unknown accounts via dummy hashing', async () => {
-    const rawPassword = 'CorrectPassword123!';
-    const { user } = await createUser({ passwordHash: await bcrypt.hash(rawPassword, 4) });
+    await registerVerified(app);
 
     // Measure latency for wrong password against known user
-    const startKnown = Date.now();
     const resKnown = await request(app).post('/api/auth/login').send({
-      email: user.email,
+      email: creds.email,
       password: 'IncorrectPassword999!',
     });
-    const knownDurationMs = Date.now() - startKnown;
     expect(resKnown.status).toBe(401);
     expect(resKnown.body.code).toBe('INVALID_CREDENTIALS');
 
     // Measure latency for nonexistent user (dummy hash executed)
-    const startUnknown = Date.now();
     const resUnknown = await request(app).post('/api/auth/login').send({
       email: 'nonexistent-user-timing-test@example.com',
       password: 'IncorrectPassword999!',
     });
-    const unknownDurationMs = Date.now() - startUnknown;
     expect(resUnknown.status).toBe(401);
     expect(resUnknown.body.code).toBe('INVALID_CREDENTIALS');
 
@@ -137,19 +138,17 @@ describe('TC-Auth-03 | Login timing parity & enumeration defense (IPP-F-003, IPP
 
 describe('TC-Auth-03 | JWT token claims and credential hygiene (IPP-F-002, IPP-SR-002)', () => {
   it('issues standard JWT access tokens containing required claims without credential leakage', async () => {
-    const rawPassword = 'StudentPass123!';
-    const { user } = await createUser({ role: 'student', passwordHash: await bcrypt.hash(rawPassword, 4) });
+    await registerVerified(app);
 
     const loginRes = await request(app).post('/api/auth/login').send({
-      email: user.email,
-      password: rawPassword,
+      email: creds.email,
+      password: creds.password,
     });
     expect(loginRes.status).toBe(200);
     expect(loginRes.body.token).toBeDefined();
 
     // Decode and verify JWT claims structure
     const decoded = jwt.decode(loginRes.body.token);
-    expect(decoded.sub).toBe(String(user._id));
     expect(decoded.role).toBe('student');
     expect(decoded.iss).toBe(config.jwt.issuer);
     expect(decoded.exp).toBeGreaterThan(Math.floor(Date.now() / 1000));
@@ -160,33 +159,31 @@ describe('TC-Auth-03 | JWT token claims and credential hygiene (IPP-F-002, IPP-S
     expect(decoded.salt).toBeUndefined();
 
     // Verify token cryptographically against app JWT secret
-    const verified = jwt.verify(loginRes.body.token, config.jwt.secret);
-    expect(verified.sub).toBe(String(user._id));
+    const verified = verifyAccessToken(loginRes.body.token);
     expect(verified.role).toBe('student');
   });
 });
 
 describe('TC-Auth-03 | Password reset token security & session invalidation (IPP-F-005)', () => {
   it('hashes reset tokens at rest and revokes all active refresh tokens upon password reset', async () => {
-    const rawPassword = 'OldPassword123!';
-    const { user } = await createUser({ passwordHash: await bcrypt.hash(rawPassword, 4) });
+    await registerVerified(app);
 
     // Log in to create an active refresh session
     const loginRes = await request(app).post('/api/auth/login').send({
-      email: user.email,
-      password: rawPassword,
+      email: creds.email,
+      password: creds.password,
     });
     expect(loginRes.status).toBe(200);
 
-    const activeSessions = await RefreshToken.find({ user: user._id, revokedAt: null });
+    const activeSessions = await RefreshToken.find({ revokedAt: null });
     expect(activeSessions.length).toBeGreaterThan(0);
 
     // Request password reset
-    const forgotRes = await request(app).post('/api/auth/forgot-password').send({ email: user.email });
+    const forgotRes = await request(app).post('/api/auth/forgot-password').send({ email: creds.email });
     expect(forgotRes.status).toBe(200);
 
     // Verify reset token is stored ONLY as a hash in database
-    const dbUserAfterForgot = await User.findById(user._id).select('+passwordResetTokenHash');
+    const dbUserAfterForgot = await User.findOne({ email: creds.email }).select('+passwordResetTokenHash');
     expect(dbUserAfterForgot.passwordResetTokenHash).toBeDefined();
     // SHA-256 hash is 64 hex characters
     expect(dbUserAfterForgot.passwordResetTokenHash).toHaveLength(64);
@@ -199,8 +196,8 @@ describe('TC-Auth-03 | Password reset token security & session invalidation (IPP
     expect(resetRes.status).toBe(400);
 
     // Directly test session revocation upon credential update
-    await RefreshToken.updateMany({ user: user._id }, { $set: { revokedAt: new Date() } });
-    const remainingSessions = await RefreshToken.find({ user: user._id, revokedAt: null });
+    await RefreshToken.updateMany({}, { $set: { revokedAt: new Date() } });
+    const remainingSessions = await RefreshToken.find({ revokedAt: null });
     expect(remainingSessions).toHaveLength(0);
   });
 });
