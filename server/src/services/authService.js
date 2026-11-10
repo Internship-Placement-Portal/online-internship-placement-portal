@@ -217,4 +217,86 @@ async function resetPassword({ token, password }, ctx = {}) {
   return { status: 'password_reset' };
 }
 
-module.exports = { register, verifyEmail, resendOtp, login, refresh, logout, forgotPassword, resetPassword };
+// IPP-F-003 / TC-Auth-03: Password strength validation with entropy and anti-stuffing heuristics
+function validatePasswordStrength(password, { email = '', name = '' } = {}) {
+  const errors = [];
+  if (typeof password !== 'string') {
+    return { valid: false, score: 0, errors: ['Password must be a string'] };
+  }
+
+  if (password.length < 8) {
+    errors.push('Password must be at least 8 characters long');
+  }
+  if (!/[a-z]/.test(password)) {
+    errors.push('Password must contain at least one lowercase letter');
+  }
+  if (!/[A-Z]/.test(password)) {
+    errors.push('Password must contain at least one uppercase letter');
+  }
+  if (!/[0-9]/.test(password)) {
+    errors.push('Password must contain at least one digit');
+  }
+  if (!/[^a-zA-Z0-9\s]/.test(password)) {
+    errors.push('Password must contain at least one special character');
+  }
+
+  // Anti-stuffing: check for email local part
+  if (email && typeof email === 'string') {
+    const localPart = email.split('@')[0].toLowerCase();
+    if (localPart.length >= 3 && password.toLowerCase().includes(localPart)) {
+      errors.push('Password cannot contain your email identifier');
+    }
+  }
+
+  // Anti-stuffing: check for name tokens
+  if (name && typeof name === 'string') {
+    const tokens = name.toLowerCase().split(/\s+/).filter((t) => t.length >= 3);
+    for (const token of tokens) {
+      if (password.toLowerCase().includes(token)) {
+        errors.push('Password cannot contain parts of your name');
+        break;
+      }
+    }
+  }
+
+  // Calculate score (0 to 100)
+  let score = 0;
+  if (password.length >= 8) score += 20;
+  if (password.length >= 12) score += 15;
+  if (password.length >= 16) score += 15;
+  if (/[a-z]/.test(password)) score += 10;
+  if (/[A-Z]/.test(password)) score += 10;
+  if (/[0-9]/.test(password)) score += 15;
+  if (/[^a-zA-Z0-9\s]/.test(password)) score += 15;
+
+  return {
+    valid: errors.length === 0,
+    score: Math.min(100, score),
+    errors,
+  };
+}
+
+// IPP-F-003: Timing-safe bcrypt storage and cost-factor audit helper
+async function auditPasswordStorage(candidatePassword, storedHash) {
+  if (typeof storedHash !== 'string') {
+    return { isBcrypt: false, costFactor: 0, matches: false, meetsSecurityStandard: false };
+  }
+  const match = storedHash.match(/^\$2[aby]\$(\d\d)\$/);
+  if (!match) {
+    return { isBcrypt: false, costFactor: 0, matches: false, meetsSecurityStandard: false };
+  }
+  const costFactor = parseInt(match[1], 10);
+  const matches = typeof candidatePassword === 'string'
+    ? await bcrypt.compare(candidatePassword, storedHash)
+    : false;
+  return {
+    isBcrypt: true,
+    costFactor,
+    matches,
+    meetsSecurityStandard: costFactor >= 10,
+  };
+}
+
+module.exports = { register, verifyEmail, resendOtp, login, refresh, logout, forgotPassword, resetPassword, validatePasswordStrength, auditPasswordStorage };
+
+
